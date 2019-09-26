@@ -79,7 +79,7 @@ sFilesRaw = bst_process('CallProcess', 'process_import_surfaces', sFilesRaw, [],
 
 SurfFile  = fullfile(bst_get('BrainstormDbDir'),ProtocolName,'anat',SubjectName,'tess_cortex_concat.mat');
 LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
-script_import_label(SurfFile,LabelFile);
+script_import_label(SurfFile,LabelFile,0);
 
 % ===== LINK CONTINUOUS FILE =====
 % Process: Create link to raw file

@@ -7,7 +7,7 @@
 % Andy Hu, Feb. 24, 2019
 
 
-% Updates
+% Authors
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
 % - Usama Riaz
