@@ -9,21 +9,40 @@
         "base_url"  : "https://codeload.github.com/CCC-members/BC-VARETA_Toolbox/zip/master"        
         },
     "run_bash_mode":{
-        "description":"HPC-option1",
-        "value":false
+        "description":"HPC-option",
+        "value":true
         },
-	"externals" : {
-		"name" : "brainstorm",
-		"url" : ""
-		},
-    "matlab_runtime": {
+	"matlab_runtime": {
          "mac":"http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/maci64/MCR_R2018b_maci64_installer.dmg.zip",
          "win":"http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/win64/MCR_R2018b_win64_installer.exe",
          "linux":"http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/glnxa64/MCR_R2018b_glnxa64_installer.zip"
     },
-    "bst_path":"E:\\Develop\\Malasia_Protocol\\bst_pt\\brainstorm3",
+    "bst_path":"D:\\Neuroinformatic Lab\\Toolsboxes\\brainstorm3",
     "bst_url":"https://codeload.github.com/brainstorm-tools/brainstorm3/zip/master",
     "raw_data_path":"D:\\NeuroInformatics Lab\\BC-VARETA1.0_repo\\raw_data",
-    "protocol_name":"ExampleProtocol"
+    "protocol_name":"ExampleProtocol",
+
+    "selected_data_set":{
+        description:"Data set number on the list",
+        value:1
+    },
+
+    "data_set":[{
+        "id":1,
+        "name":"Malaysia",
+        "invariants":[
+            {
+                "type":"folder",
+                "name":"",
+                "location":""
+            },
+            {
+                "type":"folder",
+                "name":"",
+                "location":""
+            }
+        ]
+    }
+    ]
 
 }

@@ -26,22 +26,19 @@ addpath(fullfile('function'));
 app_properties = jsondecode(fileread(strcat('app_properties.json')));
 
 disp('------------Preparing BrianStorm properties ---------------');
-bst_path =  bst_properties.bst_path;
+bst_path =  app_properties.bst_path;
 console = false;
-try
-    run_mode = bst_properties.run_mode;
-catch
-    run_mode = app_properties.run_mode;
-end
-if (run_mode == '1')
+
+run_mode = app_properties.run_bash_mode.value;
+if (run_mode)
     console = true;
     if(isempty( bst_path))
-        bst_url =  bst_properties.bst_url;
+        bst_url =  app_properties.bst_url;
         filename = 'brainstorm.zip';
         [filepath,filename,ext] = download_file(url,pwd,filename);
         [folderpath,foldername] = unpackage_file(filename,pwd);
     end
-    ProtocolName = bst_properties.protocol_name;
+    ProtocolName = app_properties.protocol_name;
 else
     if(isempty( bst_path))
         answer = questdlg('Did you download the brainstorm?', ...
