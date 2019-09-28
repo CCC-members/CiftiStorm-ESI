@@ -19,30 +19,47 @@
     },
     "bst_path":"D:\\Neuroinformatic Lab\\Toolsboxes\\brainstorm3",
     "bst_url":"https://codeload.github.com/brainstorm-tools/brainstorm3/zip/master",
-    "raw_data_path":"D:\\NeuroInformatics Lab\\BC-VARETA1.0_repo\\raw_data",
+    "eeg_data_path":"E:\\Data\\CMI_Pipeline\\whole_eeg",
+    "anat_data_path":"E:\\Data\\CMI_Pipeline\\whole-cp",
+    "hcp_data_path":"E:\\Data\\CMI_Pipeline\\ciftify",
     "protocol_name":"ExampleProtocol",
-
     "selected_data_set":{
-        description:"Data set number on the list",
-        value:1
+        "description":"DataSet number on the list",
+        "value":2
     },
-
-    "data_set":[{
-        "id":1,
-        "name":"Malaysia",
-        "invariants":[
-            {
-                "type":"folder",
-                "name":"",
-                "location":""
-            },
-            {
-                "type":"folder",
-                "name":"",
-                "location":""
-            }
-        ]
-    }
+    "data_set":[
+        {
+            "id":1,
+            "name":"Malaysia",
+            "function":"tutorial_neuromag_malaysia",
+            "invariants":[
+                {
+                    "type":"folder",
+                    "name":"",
+                    "location":""
+                },
+                {
+                    "type":"folder",
+                    "name":"",
+                    "location":""
+                }]
+        },
+        {
+            "id":2,
+            "name":"CMI",
+            "function":"tutorial_philips_mff_cmi",
+            "invariants":[
+                {
+                    "type":"folder",
+                    "name":"",
+                    "location":""
+                },
+                {
+                    "type":"folder",
+                    "name":"",
+                    "location":""
+                }
+            ]
+        }
     ]
-
 }
