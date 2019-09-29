@@ -20,6 +20,7 @@
 % brainstorm('stop');
 addpath(fullfile('app'));
 addpath(fullfile('functions'));
+addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'properties'));
 % addpath(strcat('bst_lf_ppl',filesep,'guide'));
 %app_properties = jsondecode(fileread(strcat('properties',filesep,'app_properties.json')));
@@ -97,13 +98,15 @@ end
 
 BrainstormDbDir = bst_get('BrainstormDbDir');
 app_properties.bs_db_path = BrainstormDbDir;
-saveJSON(app_properties,strcat('app_properties.json'));
+saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
 
+        
 % Delete existing protocol
+% brainstorm('start');
 gui_brainstorm('DeleteProtocol', ProtocolName);
-
 % Create new protocol
-gui_brainstorm('CreateProtocol', ProtocolName, 0, 0,BrainstormDbDir);
+gui_brainstorm('CreateProtocol', ProtocolName, 0, 0);
+
 
 
 %-------------- Uploading Data subject --------------------------
@@ -118,13 +121,10 @@ for j=1:size(subjects,1)
     subject_name = subjects(j).name;
     if(isfolder(fullfile(eeg_data_path,subject_name)) & isfolder(fullfile(hcp_data_path,subject_name)) & subject_name ~= '.' & string(subject_name) ~="..")
         disp(strcat('--> Processing subject: ', subject_name));
-        % Input files       
-            selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
-            if(check_data_structure(selected_data_set,app_properties,subject_name))
-                eval(strcat(selected_data_set.function,'();'));
-            else
-                subjects_process_error = [subjects_process_error ; subject_name] ;
-            end
+        % Input files
+        selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+        str_function = strcat(selected_data_set.function,'("',eeg_data_path,'","',hcp_data_path,'","',subject_name,'","',ProtocolName,'")');        
+        eval(str_function);
     end
     if(~isfolder(fullfile(eeg_data_path,subject_name)) || ~isfolder(fullfile(hcp_data_path,subject_name)))
         subjects_process_error = [subjects_process_error ; subject_name] ;
