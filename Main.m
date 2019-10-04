@@ -39,7 +39,8 @@ if (run_mode)
         [filepath,filename,ext] = download_file(url,pwd,filename);
         [folderpath,foldername] = unpackage_file(filename,pwd);
     end
-    ProtocolName = app_properties.protocol_name;
+   selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+   ProtocolName = selected_data_set.protocol_name;
 else
     if(isempty( bst_path))
         answer = questdlg('Did you download the brainstorm?', ...
@@ -76,7 +77,9 @@ else
     disp('------Waitintg for Protocol------');
     uiwait(guiHandle.UIFigure);
     delete(guiHandle);
-    ProtocolName = app_properties.protocol_name;
+    
+    selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+    ProtocolName = selected_data_set.protocol_name;
 end
 
 addpath(genpath(bst_path));
@@ -119,16 +122,18 @@ subjects = dir(hcp_data_path);
 subjects_process_error = [];  
 for j=1:size(subjects,1)
     subject_name = subjects(j).name;
-    if(isfolder(fullfile(eeg_data_path,subject_name)) & isfolder(fullfile(hcp_data_path,subject_name)) & subject_name ~= '.' & string(subject_name) ~="..")
-        disp(strcat('--> Processing subject: ', subject_name));
-        % Input files
-        selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
-        str_function = strcat(selected_data_set.function,'("',eeg_data_path,'","',hcp_data_path,'","',subject_name,'","',ProtocolName,'")');        
-        eval(str_function);
-    end
-    if(~isfolder(fullfile(eeg_data_path,subject_name)) || ~isfolder(fullfile(hcp_data_path,subject_name)))
-        subjects_process_error = [subjects_process_error ; subject_name] ;
-        disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+    if(subject_name ~= '.' & string(subject_name) ~="..")
+        gui_brainstorm('CreateProtocol', [ProtocolName,'_',subject_name], 0, 0);
+        if(isfolder(fullfile(eeg_data_path,subject_name)) & isfolder(fullfile(hcp_data_path,subject_name)))
+            disp(strcat('--> Processing subject: ', subject_name));
+            % Input files
+            str_function = strcat(selected_data_set.function,'("',eeg_data_path,'","',hcp_data_path,'","',subject_name,'","',ProtocolName,'")');
+            eval(str_function);
+        end
+        if(~isfolder(fullfile(eeg_data_path,subject_name)) || ~isfolder(fullfile(hcp_data_path,subject_name)))
+            subjects_process_error = [subjects_process_error ; subject_name] ;
+            disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+        end
     end
 end
 
