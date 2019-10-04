@@ -3,7 +3,7 @@
 
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
-% Brainstorm (24-Feb-2019)
+% Brainstorm (23-Sep-2019)
 % 
 
 
