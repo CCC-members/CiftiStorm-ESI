@@ -4,7 +4,7 @@
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
 % Brainstorm (24-Feb-2019)
-% Andy Hu, Feb. 24, 2019
+% 
 
 
 % Authors
@@ -119,6 +119,7 @@ subjects = dir(hcp_data_path);
 subjects_process_error = [];  
 for j=1:size(subjects,1)
     subject_name = subjects(j).name;
+%     if subject_name == "sub-NDARAM873GAC"
     if(isfolder(fullfile(eeg_data_path,subject_name)) & isfolder(fullfile(hcp_data_path,subject_name)) & subject_name ~= '.' & string(subject_name) ~="..")
         disp(strcat('--> Processing subject: ', subject_name));
         % Input files
@@ -130,6 +131,7 @@ for j=1:size(subjects,1)
         subjects_process_error = [subjects_process_error ; subject_name] ;
         disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
     end
+%     end
 end
 
 brainstorm('stop');
