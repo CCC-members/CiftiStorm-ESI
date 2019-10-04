@@ -108,7 +108,7 @@ saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
 % brainstorm('start');
 gui_brainstorm('DeleteProtocol', ProtocolName);
 
-gui_brainstorm('CreateProtocol', [ProtocolName,'_1'], 0, 0);
+gui_brainstorm('CreateProtocol', ProtocolName, 0, 0);
 
 
 
@@ -123,9 +123,9 @@ subjects_process_error = [];
 for j=1:size(subjects,1)
     subject_name = subjects(j).name;
     if(subject_name ~= '.' & string(subject_name) ~="..")
-        if( mod((j-3),10) == 0  )
-            gui_brainstorm('CreateProtocol', [ProtocolName,'_',(j-3)], 0, 0);
-        end
+%         if( mod((j-3),10) == 0  )
+%             gui_brainstorm('CreateProtocol', [ProtocolName,'_',(j-3)], 0, 0);
+%         end
         if(isfolder(fullfile(eeg_data_path,subject_name)) && isfolder(fullfile(hcp_data_path,subject_name)))
             disp(strcat('--> Processing subject: ', subject_name));
             % Input files
