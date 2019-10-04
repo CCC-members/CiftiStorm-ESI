@@ -107,8 +107,8 @@ saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
 % Delete existing protocol
 % brainstorm('start');
 gui_brainstorm('DeleteProtocol', ProtocolName);
-% Create new protocol
-gui_brainstorm('CreateProtocol', ProtocolName, 0, 0);
+
+gui_brainstorm('CreateProtocol', [ProtocolName,'_1'], 0, 0);
 
 
 
@@ -119,12 +119,14 @@ hcp_data_path = app_properties.hcp_data_path;
 disp(strcat('--> Data Source:  ', hcp_data_path ));
 app_properties.hcp_data_path;
 subjects = dir(hcp_data_path);
-subjects_process_error = [];  
+subjects_process_error = []; 
 for j=1:size(subjects,1)
     subject_name = subjects(j).name;
     if(subject_name ~= '.' & string(subject_name) ~="..")
-        gui_brainstorm('CreateProtocol', [ProtocolName,'_',subject_name], 0, 0);
-        if(isfolder(fullfile(eeg_data_path,subject_name)) & isfolder(fullfile(hcp_data_path,subject_name)))
+        if( mod((j-3),10) == 0  )
+            gui_brainstorm('CreateProtocol', [ProtocolName,'_',(j-3)], 0, 0);
+        end
+        if(isfolder(fullfile(eeg_data_path,subject_name)) && isfolder(fullfile(hcp_data_path,subject_name)))
             disp(strcat('--> Processing subject: ', subject_name));
             % Input files
             str_function = strcat(selected_data_set.function,'("',eeg_data_path,'","',hcp_data_path,'","',subject_name,'","',ProtocolName,'")');
