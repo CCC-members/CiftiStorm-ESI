@@ -1,4 +1,4 @@
-function tutorial_philips_mff_cmi(eeg_data_path,hcp_data_path,subID,ProtocolName)
+function protocol_philips_mff_cmi(eeg_data_path,hcp_data_path,subID,ProtocolName)
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -59,85 +59,59 @@ bst_process('CallProcess', 'process_generate_head', [], [], ...
     'erodefactor', 1, ...
     'fillfactor',  2);
 
-% % Process: Import surfaces
-% L_surf = fullfile(AnatDir,'Native',strcat('P-',SubjectName,'.L.midthickness.native.surf.gii'));
-% R_surf = fullfile(AnatDir,'Native',strcat('P-',SubjectName,'.R.midthickness.native.surf.gii'));
-% sFiles = bst_process('CallProcess', 'process_import_surfaces', sFiles, [], ...
-%     'subjectname', SubjectName, ...
-%     'cortexfile1', {L_surf, 'GII-MNI'}, ...
-%     'cortexfile2', {R_surf, 'GII-MNI'}, ...
-%     'nvertcortex', 8000);
-% 
-% % Process: Generate BEM surfaces
-% bst_process('CallProcess', 'process_generate_bem', [], [], ...
-%     'subjectname', SubjectName, ...
-%     'nscalp',      1922, ...
-%     'nouter',      1922, ...
-%     'ninner',      1922, ...
-%     'thickness',   4);
-% 
-% SurfFile  = fullfile(bst_get('BrainstormDbDir'),ProtocolName,'anat',SubjectName,'tess_cortex_concat.mat');
-% LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
-% script_import_label(SurfFile,LabelFile,0);
-% 
-% % ===== ACCESS RECORDINGS =====
-% % Process: Create link to raw file
-% sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
-%     'subjectname',    SubjectName, ...
-%     'datafile',       {RawFile, 'EEG-EGI-MFF'}, ...
-%     'channelreplace', 1, ...
-%     'channelalign',   1);
-% 
-% % Process: Snapshot: Sensors/MRI registration
-% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-%     'target',   1, ...  % Sensors/MRI registration
-%     'modality', 4, ...  % EEG
-%     'orient',   1, ...  % left
-%     'comment',  'MEG/MRI Registration');
-% 
-% % Process: Refine registration
-% sFiles = bst_process('CallProcess', 'process_headpoints_refine', sFiles, []);
-% 
-% % Process: Snapshot: Sensors/MRI registration
-% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-%     'target',   1, ...  % Sensors/MRI registration
-%     'modality', 4, ...  % EEG
-%     'orient',   1, ...  % left
-%     'comment',  'MEG/MRI Registration');
-% 
-% % Process: Refine registration
-% sFiles = bst_process('CallProcess', 'process_headpoints_refine', sFiles, []);
-% 
-% % Process: Snapshot: Sensors/MRI registration
-% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-%     'target',   1, ...  % Sensors/MRI registration
-%     'modality', 4, ...  % EEG
-%     'orient',   1, ...  % left
-%     'comment',  'MEG/MRI Registration');
-% 
-% % Process: Refine registration
-% sFiles = bst_process('CallProcess', 'process_headpoints_refine', sFiles, []);
-% 
-% 
-% 
-% % Process: Snapshot: Sensors/MRI registration
-% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-%     'target',   1, ...  % Sensors/MRI registration
-%     'modality', 4, ...  % EEG
-%     'orient',   1, ...  % left
-%     'comment',  'MEG/MRI Registration');
-% 
-% % Process: Project electrodes on scalp
-% sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
-% 
-% % Process: Snapshot: Sensors/MRI registration
-% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-%     'target',   1, ...  % Sensors/MRI registration
-%     'modality', 4, ...  % EEG
-%     'orient',   1, ...  % left
-%     'comment',  'MEG/MRI Registration');
-% 
-% 
+% Process: Import surfaces
+sFiles = bst_process('CallProcess', 'process_import_surfaces', sFiles, [], ...
+    'subjectname', SubjectName, ...
+    'cortexfile1', {fullfile(AnatDir,'Native',['P-',SubjectName,'.L.midthickness.native.surf.gii']), 'GII-MNI'}, ...
+    'cortexfile2', {fullfile(AnatDir,'Native',['P-',SubjectName,'.R.midthickness.native.surf.gii']), 'GII-MNI'}, ...
+    'nvertcortex', 8000);
+
+SurfFile  = fullfile(bst_get('BrainstormDbDir'),ProtocolName,'anat',SubjectName,'tess_cortex_concat.mat');
+LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
+script_import_label(SurfFile,LabelFile,0);
+
+% Process: Generate BEM surfaces
+bst_process('CallProcess', 'process_generate_bem', [], [], ...
+    'subjectname', SubjectName, ...
+    'nscalp',      1922, ...
+    'nouter',      1922, ...
+    'ninner',      1922, ...
+    'thickness',   4);
+
+% Process: Generate SPM canonical surfaces
+sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
+    'subjectname', SubjectName, ...
+    'resolution',  2);  % 8196
+
+% ===== ACCESS RECORDINGS =====
+% Process: Create link to raw file
+sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
+    'subjectname',    SubjectName, ...
+    'datafile',       {RawFile, 'EEG-EGI-MFF'}, ...
+    'channelreplace', 0, ...
+    'channelalign',   0);
+
+% Process: Set channel file% 
+sFiles = bst_process('CallProcess', 'process_import_channel', sFiles, [], ...
+    'usedefault',   110, ...  % NotAligned: GSN HydroCel 128 E001
+    'channelalign', 1, ...
+    'fixunits',     1, ...
+    'vox2ras',      1);
+
+[sSubject, iSubject] = bst_get('Subject', SubjectName);
+db_surface_default(iSubject, 'Scalp', 3);
+db_surface_default(iSubject, 'OuterSkull', 4);
+db_surface_default(iSubject, 'InnerSkull', 5);
+db_surface_default(iSubject, 'Cortex', 1);
+
+% Process: Refine registration
+sFiles = bst_process('CallProcess', 'process_headpoints_refine', sFiles, []);
+
+% Process: Project electrodes on scalp
+sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
+
+[sSubject, iSubject] = bst_get('Subject', SubjectName);
+
 % % ===== HEAD MODEL: SURFACE =====
 % % Process: Compute head model
 % sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
@@ -152,10 +126,11 @@ bst_process('CallProcess', 'process_generate_head', [], [], ...
 %          'isAdaptative', 1, ...
 %          'isSplit',      0, ...
 %          'SplitLength',  4000));
-     
-     
+%      
+%      
+% [sSubject, iSubject] = bst_get('Subject', SubjectName);
+
 % Save and display report
 ReportFile = bst_report('Save', sFiles);
 bst_report('Open', ReportFile);
 disp([10 'BST> TutorialPhilipsMFF: Done.' 10]);
-

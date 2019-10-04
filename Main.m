@@ -114,7 +114,7 @@ eeg_data_path = app_properties.eeg_data_path;
 anat_data_path = app_properties.anat_data_path;
 hcp_data_path = app_properties.hcp_data_path;
 disp(strcat('--> Data Source:  ', hcp_data_path ));
-app_properties.hcp_data_path
+app_properties.hcp_data_path;
 subjects = dir(hcp_data_path);
 subjects_process_error = [];  
 for j=1:size(subjects,1)
