@@ -1,4 +1,4 @@
-# BrainStorm_Protocol
+# BrainStorm Protocol for obtain Lead Field
 
 % Authors
 % - Ariosky Areces Gonzalez
