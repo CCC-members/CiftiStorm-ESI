@@ -1,4 +1,4 @@
-function protocol_headmodel_hbn(eeg_data_path,hcp_data_path,subID,ProtocolName)
+function protocol_headmodel_hbn(hcp_data_path,eeg_data_path,non_brain_data_path,subID,ProtocolName)
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -26,6 +26,7 @@ function protocol_headmodel_hbn(eeg_data_path,hcp_data_path,subID,ProtocolName)
 
 eeg_data_path = char(eeg_data_path);
 hcp_data_path = char(hcp_data_path);
+non_brain_path = char(non_brain_data_path);
 subID = char(subID);
 ProtocolName = char(ProtocolName);
 

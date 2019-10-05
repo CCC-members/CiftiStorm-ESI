@@ -3,7 +3,7 @@
 
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
-% Brainstorm (23-Sep-2019)
+% Brainstorm (25-Sep-2019)
 % 
 
 
@@ -13,7 +13,6 @@
 % - Usama Riaz
 %
 %    September 25, 2019
-
 
 %%
 %------------ Preparing properties --------------------
@@ -40,6 +39,7 @@ if (run_mode)
         [folderpath,foldername] = unpackage_file(filename,pwd);
     end
    selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+   selected_data_set = selected_data_set{1,1};
    ProtocolName = selected_data_set.protocol_name;
 else
     if(isempty( bst_path))
@@ -83,6 +83,7 @@ else
 end
 
 addpath(genpath(bst_path));
+addpath(genpath(app_properties.spm_path));
 
 %---------------- Starting BrainStorm-----------------------
 if ~brainstorm('status')
@@ -106,40 +107,44 @@ saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
         
 % Delete existing protocol
 % brainstorm('start');
-gui_brainstorm('DeleteProtocol', ProtocolName);
-
-gui_brainstorm('CreateProtocol', ProtocolName, 0, 0);
+% gui_brainstorm('DeleteProtocol', [char(ProtocolName),'_','1']);
+% % 
+% gui_brainstorm('CreateProtocol', [char(ProtocolName),'_','1'], 0, 0);
 
 
 
 %-------------- Uploading Data subject --------------------------
-eeg_data_path = app_properties.eeg_data_path;
-anat_data_path = app_properties.anat_data_path;
-hcp_data_path = app_properties.hcp_data_path;
-disp(strcat('--> Data Source:  ', hcp_data_path ));
-app_properties.hcp_data_path;
-subjects = dir(hcp_data_path);
+
+disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
+
+subjects = dir(selected_data_set.hcp_data_path);
 subjects_process_error = []; 
+subjects_processed =[];
+
 for j=1:size(subjects,1)
     subject_name = subjects(j).name;
     if(subject_name ~= '.' & string(subject_name) ~="..")
-%         if( mod((j-3),10) == 0  )
-%             gui_brainstorm('CreateProtocol', [ProtocolName,'_',(j-3)], 0, 0);
-%         end
-        if(isfolder(fullfile(eeg_data_path,subject_name)) && isfolder(fullfile(hcp_data_path,subject_name)))
-            disp(strcat('--> Processing subject: ', subject_name));
-            % Input files
-            str_function = strcat(selected_data_set.function,'("',eeg_data_path,'","',hcp_data_path,'","',subject_name,'","',ProtocolName,'")');
-            eval(str_function);
+        if( mod((j-3),10) == 0  )
+            Protocol_count = j-2;            
+            ProtocolName = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
+            gui_brainstorm('DeleteProtocol',ProtocolName);
+            gui_brainstorm('CreateProtocol',ProtocolName , 0, 0);
         end
-        if(~isfolder(fullfile(eeg_data_path,subject_name)) || ~isfolder(fullfile(hcp_data_path,subject_name)))
+        disp(strcat('--> Processing subject: ', subject_name));
+        % Input files
+        try
+            str_function = strcat(selected_data_set.function,'("',selected_data_set.hcp_data_path,'","',selected_data_set.eeg_data_path,'","',selected_data_set.non_brain_data_path,'","',subject_name,'","',ProtocolName,'")');
+            eval(str_function);
+            subjects_processed = [subjects_processed ; subject_name] ;
+        catch            
             subjects_process_error = [subjects_process_error ; subject_name] ;
             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
         end
     end
 end
 
-brainstorm('stop');
+save report.mat subjects_processed subjects_process_error;
 
+brainstorm('stop');
 
 
