@@ -54,12 +54,12 @@ sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
     'subjectname', SubjectName, ...
     'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
 
-% Process: Snapshot: Sensors/MRI registration
-bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-    'target',   1, ...  % Sensors/MRI registration
-    'modality', 6, ...  % MEG (All)
-    'orient',   1, ...  % left
-    'comment',  'MRI Registration');
+% % Process: Snapshot: Sensors/MRI registration
+% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+%     'target',   1, ...  % Sensors/MRI registration
+%     'modality', 6, ...  % MEG (All)
+%     'orient',   1, ...  % left
+%     'comment',  'MRI Registration');
 
 % Process: Import surfaces
 sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
@@ -73,17 +73,46 @@ sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, []
     'nvertcortex', 8000, ...
     'nvertskull',  7000);
 
-% Process: Snapshot: Sensors/MRI registration
-bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
-    'target',   1, ...  % Sensors/MRI registration
-    'modality', 6, ...  % EEG (All)
-    'orient',   1, ...  % left
-    'comment',  'Importing ');
+% % Process: Snapshot: Sensors/MRI registration
+% bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+%     'target',   1, ...  % Sensors/MRI registration
+%     'modality', 6, ...  % EEG (All)
+%     'orient',   1, ...  % left
+%     'comment',  'Importing ');
 
 % Process: Import Atlas
 SurfFile  = fullfile(bst_get('BrainstormDbDir'),ProtocolName,'anat',SubjectName,'tess_cortex_concat.mat');
 LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
 script_import_label(SurfFile,LabelFile,0);
+
+
+% Get subject definition
+sSubject = bst_get('Subject', SubjectName);
+% Get MRI file and surface files
+MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+CortexFile = sSubject.Surface(sSubject.iCortex).FileName;
+HeadFile   = sSubject.Surface(sSubject.iScalp).FileName;
+% Display MRI
+hFigMri1 = view_mri(MriFile);
+hFigMri3 = view_mri_3d(MriFile, [], [], 'NewFigure');
+hFigMri2 = view_mri_slices(MriFile, 'x', 20); 
+pause(0.5);
+% Close figures
+close([hFigMri1 hFigMri2 hFigMri3]);
+% Display scalp and cortex
+hFigSurf = view_surface(HeadFile);
+hFigSurf = view_surface(CortexFile, [], [], hFigSurf);
+hFigMriSurf = view_mri(MriFile, CortexFile);
+% Figure configuration
+iTess = 2;
+panel_surface('SetShowSulci',     hFigSurf, iTess, 1);
+panel_surface('SetSurfaceColor',  hFigSurf, iTess, [1 0 0]);
+panel_surface('SetSurfaceSmooth', hFigSurf, iTess, 0.5, 0);
+panel_surface('SetSurfaceTransparency', hFigSurf, iTess, 0.8);
+figure_3d('SetStandardView', hFigSurf, 'left');
+pause(0.5);
+% Close figures
+close([hFigSurf hFigMriSurf]);
 
 % Process: Generate BEM surfaces
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
@@ -177,6 +206,6 @@ bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
 
 % Save and display report
 ReportFile = bst_report('Save', sFiles);
-bst_report('Export',  ReportFile, 'E:\\Report')
+bst_report('Export',  ReportFile, ['D:\\Report_',SubjectName,'.html']);
 bst_report('Open', ReportFile);
 disp([10 'BST> TutorialPhilipsMFF: Done.' 10]);
