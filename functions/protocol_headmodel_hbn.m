@@ -54,6 +54,12 @@ sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
     'subjectname', SubjectName, ...
     'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
 
+% Process: Snapshot: Sensors/MRI registration
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 6, ...  % MEG (All)
+    'orient',   1, ...  % left
+    'comment',  'MRI Registration');
 
 % Process: Import surfaces
 sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
@@ -66,6 +72,13 @@ sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, []
     'nverthead',   7000, ...
     'nvertcortex', 8000, ...
     'nvertskull',  7000);
+
+% Process: Snapshot: Sensors/MRI registration
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 6, ...  % EEG (All)
+    'orient',   1, ...  % left
+    'comment',  'Importing ');
 
 % Process: Import Atlas
 SurfFile  = fullfile(bst_get('BrainstormDbDir'),ProtocolName,'anat',SubjectName,'tess_cortex_concat.mat');
@@ -110,27 +123,60 @@ db_surface_default(iSubject, 'Cortex', 1);
 % Process: Project electrodes on scalp
 sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
 
+
+
+% Process: Snapshot: Sensors/MRI registration
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 4, ...  % EEG
+    'orient',   1, ...  % left
+    'comment',  'MEG/MRI Registration');
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 4, ...  % EEG
+    'orient',   5, ...  % front
+    'comment',  'MEG/MRI Registration');
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 4, ...  % EEG
+    'orient',   2, ...  % right
+    'comment',  'MEG/MRI Registration');
+bst_process('CallProcess', 'process_snapshot', sFiles, [], ...
+    'target',   1, ...  % Sensors/MRI registration
+    'modality', 4, ...  % EEG
+    'orient',   6, ...  % back
+    'comment',  'MEG/MRI Registration');
+
+% {'left', 'right', 'top', 'bottom', 'front', 'back', 'left_intern', 'right_intern'}
+
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
 
 % ===== HEAD MODEL: SURFACE =====
 % Process: Compute head model
-sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
-    'sourcespace', 1, ...  % Cortex surface
-    'eeg',         3, ...  % OpenMEEG BEM
-    'openmeeg',    struct(...
-         'BemSelect',    [0, 0, 1], ...
-         'BemCond',      [1, 0.0125, 1], ...
-         'BemNames',     {{'Scalp', 'Skull', 'Brain'}}, ...
-         'BemFiles',     {{}}, ...
-         'isAdjoint',    0, ...
-         'isAdaptative', 1, ...
-         'isSplit',      0, ...
-         'SplitLength',  4000));
-     
+% sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
+%     'sourcespace', 1, ...  % Cortex surface
+%     'eeg',         3, ...  % OpenMEEG BEM
+%     'openmeeg',    struct(...
+%          'BemSelect',    [0, 0, 1], ...
+%          'BemCond',      [1, 0.0125, 1], ...
+%          'BemNames',     {{'Scalp', 'Skull', 'Brain'}}, ...
+%          'BemFiles',     {{}}, ...
+%          'isAdjoint',    0, ...
+%          'isAdaptative', 1, ...
+%          'isSplit',      0, ...
+%          'SplitLength',  4000));
+%      
      
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
 
+
+%% Export Subject to BC-VARETA
+% export_subject_BCV(sSubject);
+
+
+
 % Save and display report
 ReportFile = bst_report('Save', sFiles);
+bst_report('Export',  ReportFile, 'E:\\Report')
 bst_report('Open', ReportFile);
 disp([10 'BST> TutorialPhilipsMFF: Done.' 10]);
