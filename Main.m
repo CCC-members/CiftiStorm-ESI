@@ -25,6 +25,7 @@ clear all;
 %------------ Preparing properties --------------------
 % brainstorm('stop');
 addpath(fullfile('app'));
+addpath(fullfile('external'));
 addpath(fullfile('functions'));
 addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'properties'));
@@ -139,14 +140,14 @@ for j=1:size(subjects,1)
         end
         disp(strcat('--> Processing subject: ', subject_name));
         % Input files
-%         try
+        try
             str_function = strcat(selected_data_set.function,'("',selected_data_set.hcp_data_path,'","',selected_data_set.eeg_data_path,'","',selected_data_set.non_brain_data_path,'","',subject_name,'","',ProtocolName,'")');
             eval(str_function);
             subjects_processed = [subjects_processed ; subject_name] ;
-%         catch            
-%             subjects_process_error = [subjects_process_error ; subject_name] ;
-%             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
-%         end
+        catch            
+            subjects_process_error = [subjects_process_error ; subject_name] ;
+            disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+        end
     end
 end
 
