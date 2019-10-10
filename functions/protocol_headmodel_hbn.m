@@ -44,6 +44,7 @@ SubjectName = char(ID);
 
 % Start a new report
 bst_report('Start',['Protocol for subject:' , SubjectName]);
+bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
 
 % Build the path of the files to import
 SubjectDir = char(fullfile(hcp_data_path,subID));
