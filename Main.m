@@ -89,6 +89,11 @@ else
     selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
     ProtocolName = selected_data_set.protocol_name;
 end
+colin_channel_path = fullfile(bst_path,'defaults','eeg','Colin27');
+channel_GSN_129 = strcat('tools',filesep,'channel_GSN_129.mat');
+channel_GSN_HydroCel_129_E001 = strcat('tools',filesep,'channel_GSN_HydroCel_129_E001.mat');
+copyfile( channel_GSN_129 , colin_channel_path);
+copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
 
 addpath(genpath(bst_path));
 addpath(genpath(app_properties.spm_path));
