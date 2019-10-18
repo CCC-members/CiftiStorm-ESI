@@ -4,7 +4,7 @@
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
 % Brainstorm (25-Sep-2019)
-% 
+%
 
 
 % Authors
@@ -38,17 +38,22 @@ bst_path =  app_properties.bst_path;
 console = false;
 
 run_mode = app_properties.run_bash_mode.value;
-if (run_mode)
+if (run_mode)    
     console = true;
     if(isempty( bst_path))
         bst_url =  app_properties.bst_url;
         filename = 'brainstorm.zip';
         [filepath,filename,ext] = download_file(url,pwd,filename);
         [folderpath,foldername] = unpackage_file(filename,pwd);
+    else
+        if(~isfolder(bst_path))
+            fprintf(2,'\n ->> Error: The brainstorm path is wrong.');
+            return;
+        end
     end
-   selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
-   selected_data_set = selected_data_set{1,1};
-   ProtocolName = selected_data_set.protocol_name;
+    selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+    selected_data_set = selected_data_set{1,1};
+    ProtocolName = selected_data_set.protocol_name;
 else
     if(isempty( bst_path))
         answer = questdlg('Did you download the brainstorm?', ...
@@ -63,8 +68,7 @@ else
                 end
                 app_properties.bs_path=bst_path;
                 saveJSON(app_properties,strcat('app_properties.json'));
-                
-                
+                        
             case 'Download'
                 bst_url =  app_properties.bs_url;
                 filename = 'brainstorm.zip';
@@ -89,75 +93,89 @@ else
     selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
     ProtocolName = selected_data_set.protocol_name;
 end
-colin_channel_path = fullfile(bst_path,'defaults','eeg','Colin27');
-channel_GSN_129 = strcat('tools',filesep,'channel_GSN_129.mat');
-channel_GSN_HydroCel_129_E001 = strcat('tools',filesep,'channel_GSN_HydroCel_129_E001.mat');
-copyfile( channel_GSN_129 , colin_channel_path);
-copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
 
-addpath(genpath(bst_path));
-addpath(genpath(app_properties.spm_path));
-
-%---------------- Starting BrainStorm-----------------------
-if ~brainstorm('status')
-    if(console)
-        brainstorm nogui local        
-    else
-        brainstorm nogui
-        data_folder = uigetdir('tittle','Select the Data Folder');
-        if(data_folder==0)
-            return;
+if(isfolder(bst_path) || isfolder(app_properties.spm_path))
+    
+    % Copying the new file channel
+    colin_channel_path = fullfile(bst_path,'defaults','eeg','Colin27');
+    channel_GSN_129 = strcat('tools',filesep,'channel_GSN_129.mat');
+    channel_GSN_HydroCel_129_E001 = strcat('tools',filesep,'channel_GSN_HydroCel_129_E001.mat');
+    copyfile( channel_GSN_129 , colin_channel_path);
+    copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
+    
+    
+    
+    addpath(genpath(bst_path));
+    addpath(genpath(app_properties.spm_path));
+    
+    %---------------- Starting BrainStorm-----------------------
+    if ~brainstorm('status')
+        if(console)
+            brainstorm nogui local
+        else
+            brainstorm nogui
+            data_folder = uigetdir('tittle','Select the Data Folder');
+            if(data_folder==0)
+                return;
+            end
+            app_properties.raw_data_path = data_folder;
+            saveJSON(app_properties,strcat('app_properties.json'));
         end
-        app_properties.raw_data_path = data_folder;
-        saveJSON(app_properties,strcat('app_properties.json'));
     end
-end
-
-BrainstormDbDir = bst_get('BrainstormDbDir');
-app_properties.bs_db_path = BrainstormDbDir;
-saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
-
+    
+    BrainstormDbDir = bst_get('BrainstormDbDir');
+    app_properties.bs_db_path = BrainstormDbDir;
+    saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
+    
+    
+    % Delete existing protocol
+    % brainstorm('start');
+    % gui_brainstorm('DeleteProtocol', [char(ProtocolName),'_','1']);
+    % %
+    % gui_brainstorm('CreateProtocol', [char(ProtocolName),'_','1'], 0, 0);
+    
+    
+    
+    %-------------- Uploading Data subject --------------------------
+    if(is_check_dataset_properties(selected_data_set))
         
-% Delete existing protocol
-% brainstorm('start');
-% gui_brainstorm('DeleteProtocol', [char(ProtocolName),'_','1']);
-% % 
-% gui_brainstorm('CreateProtocol', [char(ProtocolName),'_','1'], 0, 0);
-
-
-
-%-------------- Uploading Data subject --------------------------
-
-disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
-
-subjects = dir(selected_data_set.hcp_data_path);
-subjects_process_error = []; 
-subjects_processed =[];
-
-for j=1:size(subjects,1)
-    subject_name = subjects(j).name;
-    if(subject_name ~= '.' & string(subject_name) ~="..")
-        if( mod((j-3),10) == 0  )
-            Protocol_count = j-3;            
-            ProtocolName = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
-            gui_brainstorm('DeleteProtocol',ProtocolName);
-            gui_brainstorm('CreateProtocol',ProtocolName , 0, 0);
+        disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
+        
+        subjects = dir(selected_data_set.hcp_data_path);
+        subjects_process_error = [];
+        subjects_processed =[];
+        
+        
+        
+        for j=1:size(subjects,1)
+            subject_name = subjects(j).name;
+            
+            if(subject_name ~= '.' & string(subject_name) ~="..")
+                if( mod((j-3),10) == 0  )
+                    Protocol_count = j-3;
+                    ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
+                    gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                    gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
+                end
+                disp(strcat('--> Processing subject: ', subject_name));
+                % Input files
+                %         try
+                str_function = strcat(selected_data_set.function,'("',selected_data_set.hcp_data_path,'","',selected_data_set.eeg_data_path,'","',selected_data_set.non_brain_data_path,'","',subject_name,'","',ProtocolName_R,'")');
+                eval(str_function);
+                subjects_processed = [subjects_processed ; subject_name] ;
+                %         catch
+                %             subjects_process_error = [subjects_process_error ; subject_name] ;
+                %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+                %         end
+            end
         end
-        disp(strcat('--> Processing subject: ', subject_name));
-        % Input files
-        try
-            str_function = strcat(selected_data_set.function,'("',selected_data_set.hcp_data_path,'","',selected_data_set.eeg_data_path,'","',selected_data_set.non_brain_data_path,'","',subject_name,'","',ProtocolName,'")');
-            eval(str_function);
-            subjects_processed = [subjects_processed ; subject_name] ;
-        catch            
-            subjects_process_error = [subjects_process_error ; subject_name] ;
-            disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
-        end
+        
+        save report.mat subjects_processed subjects_process_error;
     end
+    brainstorm('stop');
+    
+else
+   fprintf(2,'\n ->> Error: The spm path or brainstorm path are wrong.');
 end
-
-save report.mat subjects_processed subjects_process_error;
-
-brainstorm('stop');
 
 
