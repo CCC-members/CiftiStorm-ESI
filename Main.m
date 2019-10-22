@@ -145,28 +145,28 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
         subjects_process_error = [];
         subjects_processed =[];
         
-        
-        
+         
         for j=1:size(subjects,1)
             subject_name = subjects(j).name;
-            
-            if(subject_name ~= '.' & string(subject_name) ~="..")
-                if( mod((j-3),10) == 0  )
-                    Protocol_count = j-3;
-                    ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
-                    gui_brainstorm('DeleteProtocol',ProtocolName_R);
-                    gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
+            if(subject_name == "P-NDARYM277DEA")
+                if(subject_name ~= '.' & string(subject_name) ~="..")
+                    if( mod((j-3),10) == 0  )
+                        Protocol_count = j-3;
+                        ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
+                        gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                        gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
+                    end
+                    disp(strcat('--> Processing subject: ', subject_name));
+                    % Input files
+                    %         try
+                    str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
+                    eval(str_function);
+                    subjects_processed = [subjects_processed ; subject_name] ;
+                    %         catch
+                    %             subjects_process_error = [subjects_process_error ; subject_name] ;
+                    %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+                    %         end
                 end
-                disp(strcat('--> Processing subject: ', subject_name));
-                % Input files
-                %         try
-                str_function = strcat(selected_data_set.function,'("',selected_data_set.hcp_data_path,'","',selected_data_set.eeg_data_path,'","',selected_data_set.non_brain_data_path,'","',subject_name,'","',ProtocolName_R,'")');
-                eval(str_function);
-                subjects_processed = [subjects_processed ; subject_name] ;
-                %         catch
-                %             subjects_process_error = [subjects_process_error ; subject_name] ;
-                %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
-                %         end
             end
         end
         
