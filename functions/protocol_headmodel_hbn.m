@@ -166,8 +166,7 @@ bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200
 % Closing figure
 close(hFigSurf10);
 
-%%
-%%
+%% 
 % Process: Generate BEM surfaces
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'subjectname', SubjectName, ...
@@ -244,7 +243,7 @@ sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
     'subjectname',    SubjectName, ...
     'datafile',       {RawFile, 'EEG-EGI-MFF'}, ...
     'channelreplace', 0, ...
-    'channelalign',   0);
+    'channelalign',   1);
 
 % Process: Set channel file%
 sFiles = bst_process('CallProcess', 'process_import_channel', sFiles, [], ...
@@ -338,27 +337,122 @@ close(hFigSurf24)
 %%
 % ===== HEAD MODEL: SURFACE =====
 % Process: Compute head model
-sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
-    'sourcespace', 1, ...  % Cortex surface
-    'eeg',         3, ...  % OpenMEEG BEM
-    'openmeeg',    struct(...
-         'BemSelect',    [0, 0, 1], ...
-         'BemCond',      [1, 0.0125, 1], ...
-         'BemNames',     {{'Scalp', 'Skull', 'Brain'}}, ...
-         'BemFiles',     {{}}, ...
-         'isAdjoint',    0, ...
-         'isAdaptative', 1, ...
-         'isSplit',      0, ...
-         'SplitLength',  4000));
+% sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
+%     'sourcespace', 1, ...  % Cortex surface
+%     'eeg',         3, ...  % OpenMEEG BEM
+%     'openmeeg',    struct(...
+%          'BemSelect',    [0, 0, 1], ...
+%          'BemCond',      [1, 0.0125, 1], ...
+%          'BemNames',     {{'Scalp', 'Skull', 'Brain'}}, ...
+%          'BemFiles',     {{}}, ...
+%          'isAdjoint',    0, ...
+%          'isAdaptative', 1, ...
+%          'isSplit',      0, ...
+%          'SplitLength',  4000));
+
+% Get Protocol information
+ProtocolInfo = bst_get('ProtocolInfo');
+% Get subject directory
+[sSubject] = bst_get('Subject', SubjectName);
+subjectSubDir = bst_fileparts(sSubject.FileName);
+
+headmodel_options = struct();
+headmodel_options.Comment = 'OpenMEEG BEM';
+headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir]);
+headmodel_options.HeadModelType = 'surface';
+
+% Uploading Channels
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'channel.mat');
+BSTChannels = load(BSTChannelsFile);
+headmodel_options.Channel = BSTChannels.Channel;
+
+headmodel_options.MegRefCoef = [];
+headmodel_options.MEGMethod = '';
+headmodel_options.EEGMethod = 'openmeeg';
+headmodel_options.ECOGMethod = '';
+headmodel_options.SEEGMethod = '';
+headmodel_options.HeadCenter = [];
+headmodel_options.Radii = [0.88,0.93,1];
+headmodel_options.Conductivity = [0.33,0.0042,0.33];
+headmodel_options.SourceSpaceOptions = [];
+
+% Uploading cortex
+CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+headmodel_options.CortexFile = CortexFile;
+
+% Uploading head
+ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+headmodel_options.HeadFile = ScalpFile;
+
+InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+headmodel_options.InnerSkullFile = InnerSkullFile;
+
+OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+headmodel_options.OuterSkullFile =  OuterSkullFile;
+headmodel_options.GridOptions = [];
+headmodel_options.GridLoc  = [];
+headmodel_options.GridOrient  = [];
+headmodel_options.GridAtlas  = [];
+headmodel_options.Interactive  = true;
+headmodel_options.SaveFile  = true;
+
+BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
+BSTOuterSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
+BSTInnerSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
+headmodel_options.BemFiles = {BSTScalpFile, BSTOuterSkullFile,BSTInnerSkullFile};
+headmodel_options.BemNames = {'Scalp','Skull','Brain'};
+headmodel_options.BemCond = [1,0.0125,1];
+headmodel_options.iMeg = [];
+headmodel_options.iEeg = 1:length(BSTChannels.Channel);
+headmodel_options.iEcog = [];
+headmodel_options.iSeeg = [];
+headmodel_options.BemSelect = [true,true,true];
+headmodel_options.isAdjoint = false;
+headmodel_options.isAdaptative = true;
+headmodel_options.isSplit = false;
+headmodel_options.SplitLength = 4000;
 
 
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
+[headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
+%% Quality control 
+%%
+
+BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
+cortex = load(BSTCortexFile);
+
+
+head = load(BSTScalpFile);
+
+% Uploading Gain matrix
+BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'headmodel_surf_openmeeg.mat');
+BSTHeadModel = load(BSTHeadModelFile);
+Ke = BSTHeadModel.Gain;
+
+channels = [BSTChannels.Channel.Loc];
+channels = channels';
+
+
+[hFig25] = view3D_K(Ke,cortex,head,channels,17);
+bst_report('Snapshot',hFig25,[],'surface view', [200,200,750,475]);
+
+% %
+% figure_3d('SetStandardView', hFig25, 'left');
+% bst_report('Snapshot',hFig25,[],'Surface left view', [200,200,750,475]);
+% 
+% %
+% figure_3d('SetStandardView', hFig25, 'bottom');
+% bst_report('Snapshot',hFig25,[],'Surface bottom view', [200,200,750,475]);
+% 
+% %
+% figure_3d('SetStandardView', hFig25, 'right');
+% bst_report('Snapshot',hFig25,[],'Surface right view', [200,200,750,475]);
+
+% Closing figure
+close(hFig25)
 
 %% Export Subject to BC-VARETA
 % export_subject_BCV(sSubject);
-
-
 
 % Save and display report
 if(selected_data_set.report_output_path == "local")
