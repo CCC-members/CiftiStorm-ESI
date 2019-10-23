@@ -28,6 +28,7 @@ function protocol_headmodel_hbn(subID,ProtocolName)
 
 
 
+
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
 selected_data_set = selected_data_set{1,1};
@@ -41,12 +42,34 @@ ProtocolName = char(ProtocolName);
 ID = strsplit(subID,'-');
 ID = ID(2);
 
-
-
-
-% ===== IMPORT ANATOMY =====
 % Subject name
 SubjectName = char(ID);
+
+%% Checking the report output structure
+if(selected_data_set.report_output_path == "local")
+    report_output_path = pwd;
+else
+    report_output_path = selected_data_set.report_output_path ;    
+end
+if(~isfolder(report_output_path))
+    mkdir(report_output_path);
+end
+if(~isfolder(fullfile(report_output_path,'Reports')))
+    mkdir(fullfile(report_output_path,'Reports'));
+end
+if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
+    mkdir(fullfile(report_output_path,'Reports',ProtocolName));
+end
+report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'.html']);
+iter = 2;
+while(isfile(report_name))   
+   report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'_Iter_', num2str(iter),'.html']);
+   iter = iter + 1;
+end  
+
+
+%% ===== IMPORT ANATOMY =====
+
 
 % Start a new report
 bst_report('Start',['Protocol for subject:' , SubjectName]);
@@ -262,6 +285,15 @@ db_surface_default(iSubject, 'Cortex', 1);
 % Process: Project electrodes on scalp
 sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
 
+if(isempty(sFiles))
+    bst_report('Error',    '', [], ['The subject: ' , SubjectName,' haven''t MFF Raw data files']);
+    ReportFile = bst_report('Save');
+    bst_report('Export',  ReportFile,report_name);
+    bst_report('Open', ReportFile);    
+    bst_report('Close');
+    return;
+end
+
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
@@ -455,27 +487,7 @@ close(hFig25)
 % export_subject_BCV(sSubject);
 
 % Save and display report
-if(selected_data_set.report_output_path == "local")
-    report_output_path = pwd;
-else
-    report_output_path = selected_data_set.report_output_path ;    
-end
-if(~isfolder(report_output_path))
-    mkdir(report_output_path);
-end
-if(~isfolder(fullfile(report_output_path,'Reports')))
-    mkdir(fullfile(report_output_path,'Reports'));
-end
-if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
-    mkdir(fullfile(report_output_path,'Reports',ProtocolName));
-end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'.html']);
-iter = 2;
-while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'_Iter_', num2str(iter),'.html']);
-   iter = iter + 1;
-end  
-    
+   
 ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
