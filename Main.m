@@ -149,7 +149,6 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
             subject_name = subjects(j).name;
             if(j>2 && j<103 )
                 if(subject_name ~= '.' & string(subject_name) ~="..")
-                    ProtocolName_R = strcat(ProtocolName,'_',char(num2str(j)));
                     if( mod((j-3),10) == 0  )
                         Protocol_count = j-3;
                         ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
