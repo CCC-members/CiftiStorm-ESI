@@ -144,18 +144,19 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
         subjects = dir(selected_data_set.hcp_data_path);
         subjects_process_error = [];
         subjects_processed =[];
-        
-         
+               
         for j=1:size(subjects,1)
             subject_name = subjects(j).name;
-            if(subject_name == "P-NDARYM277DEA")
+            if(j>2 && j<103 )
                 if(subject_name ~= '.' & string(subject_name) ~="..")
+                    ProtocolName_R = strcat(ProtocolName,'_',char(num2str(j)));
                     if( mod((j-3),10) == 0  )
                         Protocol_count = j-3;
                         ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                         gui_brainstorm('DeleteProtocol',ProtocolName_R);
                         gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
                     end
+                    
                     disp(strcat('--> Processing subject: ', subject_name));
                     % Input files
                     %         try
