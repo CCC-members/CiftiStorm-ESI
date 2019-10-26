@@ -268,6 +268,25 @@ sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
     'channelreplace', 0, ...
     'channelalign',   1);
 
+if(isempty(sFiles)) 
+    tmp_path = selected_data_set.tmp_path;
+    if(isequal(tmp_path,'local'))
+       tmp_path = pwd;
+    end
+    mff_template_dir = selected_data_set.mff_template_dir;
+    temp_mff_folder = fullfile(tmp_path,'tmp',SubjectName, 'EEG', 'raw', 'mff_format', SubjectName);
+    mkdir(temp_mff_folder);
+    copyfile( [mff_template_dir,filesep,'*'] , temp_mff_folder);
+    bst_report('Info',    '', [], 'The error above was bypassed and does not constitute a factor to be consider in the Quality Control. Keep looking in the protocol for other possible issues or errors.');  
+    bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName, ', will use MFF Tameplate Raw Data.']);    
+    sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
+    'subjectname',    SubjectName, ...
+    'datafile',       {temp_mff_folder, 'EEG-EGI-MFF'}, ...
+    'channelreplace', 0, ...
+    'channelalign',   1);    
+    rmdir(fullfile(tmp_path,'tmp'),'s');    
+end
+
 % Process: Set channel file%
 sFiles = bst_process('CallProcess', 'process_import_channel', sFiles, [], ...
     'usedefault',   32, ...  % NotAligned: GSN HydroCel 129 E001 (32) / GSN 129 (26)
@@ -285,14 +304,6 @@ db_surface_default(iSubject, 'Cortex', 1);
 % Process: Project electrodes on scalp
 sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
 
-if(isempty(sFiles))
-    bst_report('Error',    '', [], ['The subject: ' , SubjectName,' haven''t MFF Raw data files']);
-    ReportFile = bst_report('Save');
-    bst_report('Export',  ReportFile,report_name);
-    bst_report('Open', ReportFile);    
-    bst_report('Close');
-    return;
-end
 
 %% Quality control
 %%
