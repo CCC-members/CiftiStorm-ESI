@@ -38,7 +38,7 @@ bst_path =  app_properties.bst_path;
 console = false;
 
 run_mode = app_properties.run_bash_mode.value;
-if (run_mode)    
+if (run_mode)
     console = true;
     if(isempty( bst_path))
         bst_url =  app_properties.bst_url;
@@ -68,7 +68,7 @@ else
                 end
                 app_properties.bs_path=bst_path;
                 saveJSON(app_properties,strcat('app_properties.json'));
-                        
+                
             case 'Download'
                 bst_url =  app_properties.bs_url;
                 filename = 'brainstorm.zip';
@@ -144,29 +144,27 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
         subjects = dir(selected_data_set.hcp_data_path);
         subjects_process_error = [];
         subjects_processed =[];
-               
+        
         for j=1:size(subjects,1)
             subject_name = subjects(j).name;
-            if(j>2 && j<103 )
-                if(subject_name ~= '.' & string(subject_name) ~="..")
-                    if( mod((j-3),10) == 0  )
-                        Protocol_count = j-3;
-                        ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
-                        gui_brainstorm('DeleteProtocol',ProtocolName_R);
-                        gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
-                    end
-                    
-                    disp(strcat('--> Processing subject: ', subject_name));
-                    % Input files
-                    %         try
-                    str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
-                    eval(str_function);
-                    subjects_processed = [subjects_processed ; subject_name] ;
-                    %         catch
-                    %             subjects_process_error = [subjects_process_error ; subject_name] ;
-                    %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
-                    %         end
+            if(subject_name ~= '.' & string(subject_name) ~="..")
+                if( mod((j-3),10) == 0  )
+                    Protocol_count = j-3;
+                    ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
+                    gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                    gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
                 end
+                
+                disp(strcat('--> Processing subject: ', subject_name));
+                % Input files
+                %         try
+                str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
+                eval(str_function);
+                subjects_processed = [subjects_processed ; subject_name] ;
+                %         catch
+                %             subjects_process_error = [subjects_process_error ; subject_name] ;
+                %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
+                %         end
             end
         end
         
@@ -175,7 +173,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     brainstorm('stop');
     
 else
-   fprintf(2,'\n ->> Error: The spm path or brainstorm path are wrong.');
+    fprintf(2,'\n ->> Error: The spm path or brainstorm path are wrong.');
 end
 
 
