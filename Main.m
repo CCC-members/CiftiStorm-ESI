@@ -145,16 +145,15 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
         subjects_process_error = [];
         subjects_processed =[];
         
+        Protocol_count = 0;
         for j=1:size(subjects,1)
             subject_name = subjects(j).name;
             if(subject_name ~= '.' & string(subject_name) ~="..")
-                if( mod((j-3),10) == 0  )
-                    Protocol_count = j-3;
+                if( mod(Protocol_count,10) == 0  )
                     ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
                     gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
-                end
-                
+                end                
                 disp(strcat('--> Processing subject: ', subject_name));
                 % Input files
                 %         try
@@ -165,6 +164,8 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                 %             subjects_process_error = [subjects_process_error ; subject_name] ;
                 %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
                 %         end
+                
+                Protocol_count = Protocol_count + 1;
             end
         end
         
