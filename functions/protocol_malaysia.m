@@ -1,4 +1,4 @@
-function protocol_malaysia(tutorial_dir,ID,name,condition)
+function protocol_malaysia(subID,ProtocolName)
 % TUTORIAL_NEUROMAG: Script that reproduces the results of the online tutorials "MEG median nerve (Elekta)"
 %
 % CORRESPONDING ONLINE TUTORIALS:
@@ -28,11 +28,12 @@ function protocol_malaysia(tutorial_dir,ID,name,condition)
 % Author: Francois Tadel, 2010-2016
 %% Modified from above for global/local object presentation
 
-% ===== FILES TO IMPORT =====
-% You have to specify the folder in which the tutorial dataset is unzipped
-if (nargin == 0) || isempty(tutorial_dir) || ~file_exist(tutorial_dir)
-    error('The first argument must be the full path to the tutorial dataset folder.');
-end
+app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
+selected_data_set = selected_data_set{1,1};
+
+condition 
+
 % Build the path of the files to import
 AnatDir = fullfile(tutorial_dir, 'T1w');
 RawFile = fullfile(tutorial_dir, [ID,'_spm'], [name,'_',condition,'_tsss.fif']);
