@@ -159,7 +159,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                 %         try
                 str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
                 eval(str_function);
-                subjects_processed = [subjects_processed ; subject_name] ;
+%                 subjects_processed = [subjects_processed ; subject_name] ;
                 %         catch
                 %             subjects_process_error = [subjects_process_error ; subject_name] ;
                 %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));

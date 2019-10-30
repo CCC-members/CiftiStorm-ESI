@@ -377,22 +377,6 @@ bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
 % Closing figure
 close(hFigSurf24)
 
-%%
-% ===== HEAD MODEL: SURFACE =====
-% Process: Compute head model
-% sFiles = bst_process('CallProcess', 'process_headmodel', sFiles, [], ...
-%     'sourcespace', 1, ...  % Cortex surface
-%     'eeg',         3, ...  % OpenMEEG BEM
-%     'openmeeg',    struct(...
-%          'BemSelect',    [0, 0, 1], ...
-%          'BemCond',      [1, 0.0125, 1], ...
-%          'BemNames',     {{'Scalp', 'Skull', 'Brain'}}, ...
-%          'BemFiles',     {{}}, ...
-%          'isAdjoint',    0, ...
-%          'isAdaptative', 1, ...
-%          'isSplit',      0, ...
-%          'SplitLength',  4000));
-
 % Get Protocol information
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
@@ -475,11 +459,17 @@ Ke = BSTHeadModel.Gain;
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
-
+%%
 [hFig25] = view3D_K(Ke,cortex,head,channels,17);
-bst_report('Snapshot',hFig25,[],'surface view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+view(0,360)
+bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+view(1,180)
+bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+view(90,360)
+bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
 
-% %
+
 % figure_3d('SetStandardView', hFig25, 'left');
 % bst_report('Snapshot',hFig25,[],'Surface left view', [200,200,750,475]);
 % 
@@ -503,5 +493,5 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
-disp([10 'BST> TutorialPhilipsMFF: Done.' 10]);
+disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
 
