@@ -26,10 +26,9 @@ function protocol_headmodel_hbn(subID,ProtocolName)
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
 
-
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
-selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
-selected_data_set = selected_data_set{1,1};
+app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
+selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
 eeg_data_path = char(selected_data_set.eeg_data_path);
 hcp_data_path = char(selected_data_set.hcp_data_path);
