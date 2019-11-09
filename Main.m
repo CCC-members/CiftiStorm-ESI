@@ -1,5 +1,6 @@
-%% Brainstorm Protocol
-%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%               Brainstorm Protocol for Head Model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
@@ -126,16 +127,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     BrainstormDbDir = bst_get('BrainstormDbDir');
     app_properties.bs_db_path = BrainstormDbDir;
     saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
-    
-    
-    % Delete existing protocol
-    % brainstorm('start');
-    % gui_brainstorm('DeleteProtocol', [char(ProtocolName),'_','1']);
-    % %
-    % gui_brainstorm('CreateProtocol', [char(ProtocolName),'_','1'], 0, 0);
-    
-    
-    
+   
     %-------------- Uploading Data subject --------------------------
     if(is_check_dataset_properties(selected_data_set))
         
@@ -154,7 +146,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
                     gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
                 end                
-                disp(strcat('--> Processing subject: ', subject_name));
+                disp(strcat('-->> Processing subject: ', subject_name));
                 % Input files
                 %         try
                 str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');

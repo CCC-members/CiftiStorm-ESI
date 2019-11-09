@@ -62,6 +62,43 @@ while(isfile(report_name))
    iter = iter + 1;
 end  
 
+%% Preparing eviroment
+
+% ===== GET DEFAULT =====   
+% Get registered Brainstorm EEG defaults
+bstDefaults = bst_get('EegDefaults');   
+nameGroup = selected_data_set.process_import_channel.group_layout_name;
+nameLayout = selected_data_set.process_import_channel.channel_layout_name;
+
+iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
+iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
+
+ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;   
+channel_layout= load(ChannelFile);
+
+if(~isequal(selected_data_set.process_import_channel.channel_label_file,'none'))
+    % Checking if label file match with selected channel layout
+    user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
+    if(is_match_labels_vs_channel_layout(user_labels,channel_layout.Channel))
+        disp("-->> Labels file is matching whit the selected Channel Layout.");
+        disp("-->> Removing channels from Labels file.");
+        tmp_path = selected_data_set.tmp_path;
+        if(isequal(tmp_path,'local'))
+            tmp_path = pwd;            
+        end
+        tmp_path = fullfile(tmp_path,'tmp');
+        mkdir(tmp_path);        
+        [~,name,ext] = fileparts(ChannelFile);
+        ChannelFile = fullfile(tmp_path,[name,ext]);
+        ChannelFile = remove_channels_from_layout(user_labels,channel_layout,ChannelFile);
+    else
+        msg = '-->> Some labels don''t match whit the selected Channel Layout.';
+        fprintf(2,msg);
+        disp('');
+        brainstorm stop;
+        return;
+    end
+end
 
 %% ===== IMPORT ANATOMY =====
 
@@ -257,22 +294,13 @@ close(hFigMri15);
 sSubject       = bst_get('Subject', SubjectName);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 [sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
-  
-% ===== GET DEFAULT =====   
-% Get registered Brainstorm EEG defaults
-bstDefaults = bst_get('EegDefaults');   
-%    iDef = find(strcmpi(cDef{2}, {bstDefaults(iGroup).contents.name}));  
-nameGroup = selected_data_set.process_import_channel.group_layout_name;
-nameLayout = selected_data_set.process_import_channel.channel_layout_name;
+FileFormat = 'BST';  
 
-iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
-iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
-
-ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;   
-FileFormat = 'BST';
+% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
+% ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
 [Output, ChannelFile, FileFormat] = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
-% [OutputFile, ChannelMat, ChannelReplace, ChannelAlign, Modality] = db_set_channel( iStudy, ChannelFile, 2, 2 );
+
 
 % Process: Set BEM Surfaces
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
@@ -280,20 +308,6 @@ db_surface_default(iSubject, 'Scalp', 5);
 db_surface_default(iSubject, 'OuterSkull', 6);
 db_surface_default(iSubject, 'InnerSkull', 7);
 db_surface_default(iSubject, 'Cortex', 1);
-
-% Process: Project electrodes on scalp
-% sFiles = struct;
-% sFiles.iStudy = iStudy;
-% sFiles.iItem = iItem;
-% sFiles.FileName = '';
-% sFiles.FileType = 'raw';
-% sFiles.Comment = '';
-% sFiles.Condition = '@intra';
-% sFiles.SubjectFile = [SubjectName,'/brainstormsubject.mat'];
-% sFiles.SubjectName = SubjectName;
-% sFiles.DataFile = '';
-% sFiles.ChannelFile = [SubjectName,'/@intra','/channel.mat'];
-% sFiles.ChannelTypes = {'EEG'};
 
 
 %% Project electrodes on the scalp surface.
@@ -312,6 +326,7 @@ BSTChannels = load(BSTChannelsFile);
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 channels = channel_project_scalp(head.Vertices, channels);
+
 % Report projections in original structure
 for iChan = 1:length(channels)
     BSTChannels.Channel(iChan).Loc = channels(iChan,:)';
@@ -473,14 +488,16 @@ channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
 %%
-[hFig25] = view3D_K(Ke,cortex,head,channels,17);
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+[hFig25] = view3D_K(Ke,cortex,head,channels,62);
+bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
 view(1,180)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
 view(90,360)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
+view(270,360)
+bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 
 % Closing figure
 close(hFig25)

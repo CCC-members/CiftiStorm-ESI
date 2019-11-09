@@ -27,8 +27,6 @@ function protocol_headmodel_hbn(subID,ProtocolName)
 % - Deirel Paz Linares
 
 
-
-
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
 selected_data_set = selected_data_set{1,1};
@@ -464,25 +462,15 @@ channels = channels';
 
 %%
 [hFig25] = view3D_K(Ke,cortex,head,channels,17);
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
 view(1,180)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
 view(90,360)
-bst_report('Snapshot',hFig25,[],'Field view', [200,200,750,475]);
-
-
-% figure_3d('SetStandardView', hFig25, 'left');
-% bst_report('Snapshot',hFig25,[],'Surface left view', [200,200,750,475]);
-% 
-% %
-% figure_3d('SetStandardView', hFig25, 'bottom');
-% bst_report('Snapshot',hFig25,[],'Surface bottom view', [200,200,750,475]);
-% 
-% %
-% figure_3d('SetStandardView', hFig25, 'right');
-% bst_report('Snapshot',hFig25,[],'Surface right view', [200,200,750,475]);
+bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
+view(270,360)
+bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 
 % Closing figure
 close(hFig25)
