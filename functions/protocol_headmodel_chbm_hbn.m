@@ -21,10 +21,11 @@ function protocol_headmodel_chbm_hbn(subID,ProtocolName)
 % =============================================================================@
 %
 % Author: Francois Tadel, 2014-2016
-
+%%
 % Updaters:
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
+%%
 
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
@@ -36,8 +37,9 @@ non_brain_path = char(selected_data_set.non_brain_data_path);
 SubjectName = char(subID);
 ProtocolName = char(ProtocolName);
 
-
+%%
 %% Checking the report output structure
+%%
 if(selected_data_set.report_output_path == "local")
     report_output_path = pwd;
 else
@@ -59,8 +61,9 @@ while(isfile(report_name))
    iter = iter + 1;
 end  
 
+%%
 %% Preparing eviroment
-
+%%
 % ===== GET DEFAULT =====   
 % Get registered Brainstorm EEG defaults
 bstDefaults = bst_get('EegDefaults');   
@@ -97,9 +100,9 @@ if(~isequal(selected_data_set.process_import_channel.channel_label_file,'none'))
     end
 end
 
+%%
 %% ===== IMPORT ANATOMY =====
-
-
+%%
 % Start a new report
 bst_report('Start',['Protocol for subject:' , SubjectName]);
 bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
@@ -107,12 +110,14 @@ bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
 % Build the path of the files to import
 AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
 
-
-% Process: Import MRI
+%%
+%% Process: Import MRI
+%%
 sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
     'subjectname', SubjectName, ...
     'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
 
+%%
 %% Quality control
 %%
 % Get subject definition
@@ -129,9 +134,11 @@ hFigMri3 = view_mri_slices(MriFile, 'z', 20);
 bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
 
 close([hFigMri1 hFigMri2 hFigMri3]);
+
+
 %%
+%% Process: Import surfaces 
 %%
-% Process: Import surfaces 
 L_surf = fullfile(AnatDir,'Native',[SubjectName,'.L.midthickness.native.surf.gii']);
 R_surf = fullfile(AnatDir,'Native',[SubjectName,'.R.midthickness.native.surf.gii']);
 if(selected_data_set.selected_surf ~= "native")
@@ -154,6 +161,7 @@ sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, []
     'nvertcortex', nvertcortex, ...
     'nvertskull',  nvertskull);
 
+%%
 %% Quality control
 %%
 % Get subject definition and subject files
@@ -217,7 +225,8 @@ bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200
 close(hFigSurf10);
 
 %% 
-% Process: Generate BEM surfaces
+%% Process: Generate BEM surfaces
+%%
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'subjectname', SubjectName, ...
     'nscalp',      1922, ...
@@ -225,6 +234,7 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'ninner',      1922, ...
     'thickness',   4);
 
+%%
 %% Quality Control
 %%
 % Get subject definition and subject files
@@ -266,13 +276,15 @@ bst_report('Snapshot',hFigSurf14,[],'BEM surfaces registration back view', [200,
 
 close(hFigSurf14);
 
+
 %%
+%% Process: Generate SPM canonical surfaces
 %%
-% Process: Generate SPM canonical surfaces
 sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
     'subjectname', SubjectName, ...
     'resolution',  2);  % 8196
 
+%%
 %% Quality control
 %%
 % Get subject definition and subject files
@@ -285,29 +297,34 @@ bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200
 
 % Close figures
 close(hFigMri15);
+
 %%
+%% ===== ACCESS RECORDINGS =====
 %%
-% ===== ACCESS RECORDINGS =====
 sSubject       = bst_get('Subject', SubjectName);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 [sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
 FileFormat = 'BST';  
 
-% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
+%%
+%% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
 % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
+%%
 [Output, ChannelFile, FileFormat] = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
 
-
-% Process: Set BEM Surfaces
+%%
+%% Process: Set BEM Surfaces
+%%
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
 db_surface_default(iSubject, 'Scalp', 5);
 db_surface_default(iSubject, 'OuterSkull', 6);
 db_surface_default(iSubject, 'InnerSkull', 7);
 db_surface_default(iSubject, 'Cortex', 1);
 
-
+%%
 %% Project electrodes on the scalp surface.
+%%
 % Get Protocol information
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
@@ -331,6 +348,7 @@ end
 % Save modifications in channel file
 bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
 
+%%
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
@@ -376,12 +394,16 @@ bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,2
 
 % Close figures
 close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+
+%%
+%% Process: Import Atlas
 %%
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
-% Process: Import Atlas
+% 
 LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
 script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 
+%%
 %% Quality control 
 %%
 % 
@@ -403,7 +425,9 @@ bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
 % Closing figure
 close(hFigSurf24)
 
-% Get Protocol information
+%%
+%% Get Protocol information
+%%
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject] = bst_get('Subject', SubjectName);
@@ -465,9 +489,12 @@ headmodel_options.isAdaptative = true;
 headmodel_options.isSplit = false;
 headmodel_options.SplitLength = 4000;
 
-
+%%
+%% Process: OpenMEEG
+%%
 [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
+%%
 %% Quality control 
 %%
 
@@ -499,11 +526,14 @@ bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 % Closing figure
 close(hFig25)
 
+%%
 %% Export Subject to BC-VARETA
+%%
 % export_subject_BCV(sSubject);
 
-% Save and display report
-   
+%%
+%% Save and display report
+%%   
 ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);

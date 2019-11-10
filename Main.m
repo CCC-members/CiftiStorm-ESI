@@ -17,11 +17,10 @@
 
 
 %% Preparing WorkSpace
-% restoredefaultpath;
+restoredefaultpath;
 clc;
 close all;
 clear all;
-
 %%
 %------------ Preparing properties --------------------
 % brainstorm('stop');
@@ -36,7 +35,7 @@ app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')))
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
 
-disp('------------Preparing BrianStorm properties ---------------');
+disp('------------Preparing BrainStorm properties ---------------');
 bst_path =  app_properties.bst_path;
 console = false;
 
@@ -53,7 +52,7 @@ if (run_mode)
             fprintf(2,'\n ->> Error: The brainstorm path is wrong.');
             return;
         end
-    end    
+    end
 else
     if(isempty( bst_path))
         answer = questdlg('Did you download the brainstorm?', ...
@@ -88,7 +87,7 @@ else
     guiHandle = protocol_guide;
     disp('------Waitintg for Protocol------');
     uiwait(guiHandle.UIFigure);
-    delete(guiHandle);    
+    delete(guiHandle);
 end
 if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     
@@ -98,7 +97,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     channel_GSN_HydroCel_129_E001 = strcat('tools',filesep,'channel_GSN_HydroCel_129_E001.mat');
     copyfile( channel_GSN_129 , colin_channel_path);
     copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
-        
+    
     addpath(genpath(bst_path));
     addpath(app_properties.spm_path);
     
@@ -122,13 +121,13 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
     
     %-------------- Uploading Data subject --------------------------
-    if(isnumeric(selected_data_set.id))        
-        if(is_check_dataset_properties(selected_data_set))            
+    if(isnumeric(selected_data_set.id))
+        if(is_check_dataset_properties(selected_data_set))
             disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
             ProtocolName = selected_data_set.protocol_name;
             subjects = dir(selected_data_set.hcp_data_path);
             subjects_process_error = [];
-            subjects_processed =[];            
+            subjects_processed =[];
             Protocol_count = 0;
             for j=1:size(subjects,1)
                 subject_name = subjects(j).name;
@@ -157,7 +156,27 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
         end
     else
         if(isequal(selected_data_set.id,'after_MaQC'))
-            
+            % Load all protools
+
+            new_bst_DB = selected_data_set.bst_db_path;
+            bst_set('BrainstormDbDir', new_bst_DB);        
+           
+            gui_brainstorm('UpdateProtocolsList'); 
+            try
+                db_import(new_bst_DB);
+            catch
+            end           
+            protocols = jsondecode(fileread(selected_data_set.MaQC_report_file));
+            for i = 1 : length(protocols)
+                protocol_name = protocols(i).protocol_name;
+                iProtocol = bst_get('Protocol', protocol_name);
+                gui_brainstorm('SetCurrentProtocol', iProtocol);
+                for j = 1 : length(protocols(i).subjects)
+                    subjectID = protocols(i).subjects(j);
+                    str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
+                    eval(str_function);
+                end
+            end
         end
     end
     brainstorm('stop');
