@@ -1,4 +1,4 @@
-function protocol_headmodel_hbn(subID,ProtocolName)
+function protocol_headmodel_chbm_hbn(subID,ProtocolName)
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -21,10 +21,11 @@ function protocol_headmodel_hbn(subID,ProtocolName)
 % =============================================================================@
 %
 % Author: Francois Tadel, 2014-2016
-
+%%
 % Updaters:
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
+%%
 
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
@@ -33,16 +34,12 @@ selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.v
 eeg_data_path = char(selected_data_set.eeg_data_path);
 hcp_data_path = char(selected_data_set.hcp_data_path);
 non_brain_path = char(selected_data_set.non_brain_data_path);
-subID = char(subID);
+SubjectName = char(subID);
 ProtocolName = char(ProtocolName);
 
-ID = strsplit(subID,'-');
-ID = ID(2);
-
-% Subject name
-SubjectName = char(ID);
-
+%%
 %% Checking the report output structure
+%%
 if(selected_data_set.report_output_path == "local")
     report_output_path = pwd;
 else
@@ -64,25 +61,63 @@ while(isfile(report_name))
    iter = iter + 1;
 end  
 
+%%
+%% Preparing eviroment
+%%
+% ===== GET DEFAULT =====   
+% Get registered Brainstorm EEG defaults
+bstDefaults = bst_get('EegDefaults');   
+nameGroup = selected_data_set.process_import_channel.group_layout_name;
+nameLayout = selected_data_set.process_import_channel.channel_layout_name;
 
+iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
+iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
+
+ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;   
+channel_layout= load(ChannelFile);
+
+if(~isequal(selected_data_set.process_import_channel.channel_label_file,'none'))
+    % Checking if label file match with selected channel layout
+    user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
+    if(is_match_labels_vs_channel_layout(user_labels,channel_layout.Channel))
+        disp("-->> Labels file is matching whit the selected Channel Layout.");
+        disp("-->> Removing channels from Labels file.");
+        tmp_path = selected_data_set.tmp_path;
+        if(isequal(tmp_path,'local'))
+            tmp_path = pwd;            
+        end
+        tmp_path = fullfile(tmp_path,'tmp');
+        mkdir(tmp_path);        
+        [~,name,ext] = fileparts(ChannelFile);
+        ChannelFile = fullfile(tmp_path,[name,ext]);
+        ChannelFile = remove_channels_from_layout(user_labels,channel_layout,ChannelFile);
+    else
+        msg = '-->> Some labels don''t match whit the selected Channel Layout.';
+        fprintf(2,msg);
+        disp('');
+        brainstorm stop;
+        return;
+    end
+end
+
+%%
 %% ===== IMPORT ANATOMY =====
-
-
+%%
 % Start a new report
 bst_report('Start',['Protocol for subject:' , SubjectName]);
 bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
 
 % Build the path of the files to import
 AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
-RawFile    = char(fullfile(eeg_data_path, SubjectName, 'EEG', 'raw', 'mff_format', SubjectName));
- 
 
-
-% Process: Import MRI
+%%
+%% Process: Import MRI
+%%
 sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
     'subjectname', SubjectName, ...
     'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
 
+%%
 %% Quality control
 %%
 % Get subject definition
@@ -99,14 +134,16 @@ hFigMri3 = view_mri_slices(MriFile, 'z', 20);
 bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
 
 close([hFigMri1 hFigMri2 hFigMri3]);
+
+
 %%
+%% Process: Import surfaces 
 %%
-% Process: Import surfaces 
-L_surf = fullfile(AnatDir,'Native',['P-',SubjectName,'.L.midthickness.native.surf.gii']);
-R_surf = fullfile(AnatDir,'Native',['P-',SubjectName,'.R.midthickness.native.surf.gii']);
+L_surf = fullfile(AnatDir,'Native',[SubjectName,'.L.midthickness.native.surf.gii']);
+R_surf = fullfile(AnatDir,'Native',[SubjectName,'.R.midthickness.native.surf.gii']);
 if(selected_data_set.selected_surf ~= "native")
-    L_surf = fullfile(AnatDir,'fsaverage_LR32k',['P-',SubjectName,'.L.midthickness.32k_fs_LR.surf.gii']);
-    R_surf = fullfile(AnatDir,'fsaverage_LR32k',['P-',SubjectName,'.R.midthickness.32k_fs_LR.surf.gii']);
+    L_surf = fullfile(AnatDir,'fsaverage_LR32k',[SubjectName,'.L.midthickness.32k_fs_LR.surf.gii']);
+    R_surf = fullfile(AnatDir,'fsaverage_LR32k',[SubjectName,'.R.midthickness.32k_fs_LR.surf.gii']);
 end
 
 nverthead = selected_data_set.process_import_surfaces.nverthead;
@@ -115,15 +152,16 @@ nvertskull = selected_data_set.process_import_surfaces.nvertskull;
 
 sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
     'subjectname', SubjectName, ...
-    'headfile',    {fullfile(non_brain_path,['P-',SubjectName],['P-',SubjectName,'_outskin_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'headfile',    {fullfile(non_brain_path,SubjectName,[SubjectName,'_outskin_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
     'cortexfile1', {L_surf, 'GII-MNI'}, ...
     'cortexfile2', {R_surf, 'GII-MNI'}, ...
-    'innerfile',   {fullfile(non_brain_path,['P-',SubjectName],['P-',SubjectName,'_inskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
-    'outerfile',   {fullfile(non_brain_path,['P-',SubjectName],['P-',SubjectName,'_outskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'innerfile',   {fullfile(non_brain_path,SubjectName,[SubjectName,'_inskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'outerfile',   {fullfile(non_brain_path,SubjectName,[SubjectName,'_outskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
     'nverthead',   nverthead, ...
     'nvertcortex', nvertcortex, ...
     'nvertskull',  nvertskull);
 
+%%
 %% Quality control
 %%
 % Get subject definition and subject files
@@ -187,7 +225,8 @@ bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200
 close(hFigSurf10);
 
 %% 
-% Process: Generate BEM surfaces
+%% Process: Generate BEM surfaces
+%%
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'subjectname', SubjectName, ...
     'nscalp',      1922, ...
@@ -195,6 +234,7 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'ninner',      1922, ...
     'thickness',   4);
 
+%%
 %% Quality Control
 %%
 % Get subject definition and subject files
@@ -236,13 +276,15 @@ bst_report('Snapshot',hFigSurf14,[],'BEM surfaces registration back view', [200,
 
 close(hFigSurf14);
 
+
 %%
+%% Process: Generate SPM canonical surfaces
 %%
-% Process: Generate SPM canonical surfaces
 sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
     'subjectname', SubjectName, ...
     'resolution',  2);  % 8196
 
+%%
 %% Quality control
 %%
 % Get subject definition and subject files
@@ -255,56 +297,58 @@ bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200
 
 % Close figures
 close(hFigMri15);
+
 %%
+%% ===== ACCESS RECORDINGS =====
 %%
-% ===== ACCESS RECORDINGS =====
-% Process: Create link to raw file
-sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
-    'subjectname',    SubjectName, ...
-    'datafile',       {RawFile, 'EEG-EGI-MFF'}, ...
-    'channelreplace', 0, ...
-    'channelalign',   1);
+sSubject       = bst_get('Subject', SubjectName);
+MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+[sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
+FileFormat = 'BST';  
 
-if(isempty(sFiles))
-    tmp_path = selected_data_set.tmp_path;
-    if(isequal(tmp_path,'local'))
-        tmp_path = pwd;
-    end
-    mff_template_dir = selected_data_set.mff_template_dir;
-    temp_mff_folder = fullfile(tmp_path,'tmp',SubjectName, 'EEG', 'raw', 'mff_format', SubjectName);
-    mkdir(temp_mff_folder);
-    copyfile( [mff_template_dir,filesep,'*'] , temp_mff_folder);
-    bst_report('Info',    '', [], 'The error above was bypassed and does not constitute a factor to be consider in the Quality Control. Keep looking in the protocol for other possible issues or errors.');
-    bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName, ', will use MFF Tameplate Raw Data.']);
-    sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
-        'subjectname',    SubjectName, ...
-        'datafile',       {temp_mff_folder, 'EEG-EGI-MFF'}, ...
-        'channelreplace', 0, ...
-        'channelalign',   1);
-    try
-        rmdir(fullfile(tmp_path,'tmp'),'s');
-    catch
-    end
-end
+%%
+%% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
+% ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
+%%
+[Output, ChannelFile, FileFormat] = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
-% Process: Set channel file%
-sFiles = bst_process('CallProcess', 'process_import_channel', sFiles, [], ...
-    'usedefault',   32, ...  % NotAligned: GSN HydroCel 129 E001 (32) / GSN 129 (26)
-    'channelalign', 1, ...
-    'fixunits',     1, ...
-    'vox2ras',      1);
 
-% Process: Set BEM Surfaces
+%%
+%% Process: Set BEM Surfaces
+%%
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
 db_surface_default(iSubject, 'Scalp', 5);
 db_surface_default(iSubject, 'OuterSkull', 6);
 db_surface_default(iSubject, 'InnerSkull', 7);
 db_surface_default(iSubject, 'Cortex', 1);
 
-% Process: Project electrodes on scalp
-sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
+%%
+%% Project electrodes on the scalp surface.
+%%
+% Get Protocol information
+ProtocolInfo = bst_get('ProtocolInfo');
+% Get subject directory
+[sSubject] = bst_get('Subject', SubjectName);
+subjectSubDir = bst_fileparts(sSubject.FileName);
 
+ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
+head = load(BSTScalpFile);
 
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, '@intra','channel.mat');
+BSTChannels = load(BSTChannelsFile);
+channels = [BSTChannels.Channel.Loc];
+channels = channels';
+channels = channel_project_scalp(head.Vertices, channels);
+
+% Report projections in original structure
+for iChan = 1:length(channels)
+    BSTChannels.Channel(iChan).Loc = channels(iChan,:)';
+end
+% Save modifications in channel file
+bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
+
+%%
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
@@ -312,19 +356,19 @@ sFiles = bst_process('CallProcess', 'process_channel_project', sFiles, []);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 
 hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
-hFigMri16      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
+hFigMri16      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
 
 hFigMri17      = script_view_mri_3d(MriFile, [], [], [], 'left');
-hFigMri17      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri17, 1);
+hFigMri17      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri17, 1);
 bst_report('Snapshot',hFigMri17,[],'Sensor-MRI registration left view', [200,200,750,475]);
 
 hFigMri18      = script_view_mri_3d(MriFile, [], [], [], 'right');
-hFigMri18      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri18, 1);
+hFigMri18      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri18, 1);
 bst_report('Snapshot',hFigMri18,[],'Sensor-MRI registration right view', [200,200,750,475]);
 
 hFigMri19      = script_view_mri_3d(MriFile, [], [], [], 'back');
-hFigMri19      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
+hFigMri19      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
 bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
 
 % View sources on Scalp
@@ -333,29 +377,33 @@ MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
-hFigMri20      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
+hFigMri20      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
 
 hFigMri21      = script_view_surface(ScalpFile, [], [], [],'left');
-hFigMri21      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri21, 1);
+hFigMri21      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri21, 1);
 bst_report('Snapshot',hFigMri21,[],'Sensor-Scalp registration left view', [200,200,750,475]);
 
 hFigMri22      = script_view_surface(ScalpFile, [], [], [],'right');
-hFigMri22      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri22, 1);
+hFigMri22      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri22, 1);
 bst_report('Snapshot',hFigMri22,[],'Sensor-Scalp registration right view', [200,200,750,475]);
 
 hFigMri23      = script_view_surface(ScalpFile, [], [], [],'back');
-hFigMri23      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
+hFigMri23      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
 bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
 close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+
+%%
+%% Process: Import Atlas
 %%
 [sSubject, iSubject] = bst_get('Subject', SubjectName);
-% Process: Import Atlas
+% 
 LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
 script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 
+%%
 %% Quality control 
 %%
 % 
@@ -377,7 +425,9 @@ bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
 % Closing figure
 close(hFigSurf24)
 
-% Get Protocol information
+%%
+%% Get Protocol information
+%%
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject] = bst_get('Subject', SubjectName);
@@ -385,11 +435,11 @@ subjectSubDir = bst_fileparts(sSubject.FileName);
 
 headmodel_options = struct();
 headmodel_options.Comment = 'OpenMEEG BEM';
-headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir]);
+headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,'@intra');
 headmodel_options.HeadModelType = 'surface';
 
 % Uploading Channels
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'channel.mat');
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, '@intra','channel.mat');
 BSTChannels = load(BSTChannelsFile);
 headmodel_options.Channel = BSTChannels.Channel;
 
@@ -439,20 +489,22 @@ headmodel_options.isAdaptative = true;
 headmodel_options.isSplit = false;
 headmodel_options.SplitLength = 4000;
 
-
+%%
+%% Process: OpenMEEG
+%%
 [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
+%%
 %% Quality control 
 %%
 
 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
 cortex = load(BSTCortexFile);
 
-
 head = load(BSTScalpFile);
 
 % Uploading Gain matrix
-BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'headmodel_surf_openmeeg.mat');
+BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,'@intra','headmodel_surf_openmeeg.mat');
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
@@ -460,7 +512,7 @@ channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
 %%
-[hFig25] = view3D_K(Ke,cortex,head,channels,17);
+[hFig25] = view3D_K(Ke,cortex,head,channels,62);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
 bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
@@ -474,11 +526,14 @@ bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 % Closing figure
 close(hFig25)
 
+%%
 %% Export Subject to BC-VARETA
+%%
 % export_subject_BCV(sSubject);
 
-% Save and display report
-   
+%%
+%% Save and display report
+%%   
 ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);

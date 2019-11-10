@@ -22,7 +22,7 @@ if(~isfolder(selected_dataset.non_brain_data_path) && selected_dataset.non_brain
     fprintf(2,'\n ->> Error: The non_brain folder don''t exist\n');
     return;
 end
-if(~isfolder(selected_dataset.report_output_path) && selected_dataset.report_output_path ~= "l")
+if(~isfolder(selected_dataset.report_output_path) && selected_dataset.report_output_path ~= "local")
     valided = false;
     fprintf(2,'\n ->> Error: The report output folder don''t exist\n');
     return;
