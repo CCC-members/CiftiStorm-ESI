@@ -162,10 +162,8 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
             bst_set('BrainstormDbDir', new_bst_DB);        
            
             gui_brainstorm('UpdateProtocolsList'); 
-            try
-                db_import(new_bst_DB);
-            catch
-            end           
+            db_import(new_bst_DB);  
+            
             protocols = jsondecode(fileread(selected_data_set.MaQC_report_file));
             for i = 1 : length(protocols)
                 protocol_name = protocols(i).protocol_name;
@@ -173,6 +171,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                 gui_brainstorm('SetCurrentProtocol', iProtocol);
                 for j = 1 : length(protocols(i).subjects)
                     subjectID = protocols(i).subjects(j);
+                    disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
                     str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
                     eval(str_function);
                 end

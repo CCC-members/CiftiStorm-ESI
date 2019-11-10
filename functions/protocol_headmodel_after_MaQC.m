@@ -43,6 +43,8 @@ end
 %%
 %% Quality control
 %%
+% Get Protocol info
+ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject definition
 sSubject = bst_get('Subject', subID);
 % Get MRI file and surface files
@@ -167,7 +169,6 @@ close(hFigSurf14);
 %% Quality control
 %%
 % Get subject definition and subject files
-sSubject       = bst_get('Subject', subID);
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
@@ -180,10 +181,7 @@ close(hFigMri15);
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
-[sSubject, iSubject] = bst_get('Subject', subID);
-MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'channel.mat');
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
 
 
 
@@ -203,29 +201,30 @@ hFigMri19      = script_view_mri_3d(MriFile, [], [], [], 'back');
 hFigMri19      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri19, 1);
 bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
 
+% Close figures
+close([hFigMri16 hFigMri17 hFigMri18 hFigMri19]);
+
 % View sources on Scalp
-[sSubject, iSubject] = bst_get('Subject', subID);
-MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
-hFigMri20      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
+hFigMri20      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri20, 1);
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
 
 hFigMri21      = script_view_surface(ScalpFile, [], [], [],'left');
-hFigMri21      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri21, 1);
+hFigMri21      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri21, 1);
 bst_report('Snapshot',hFigMri21,[],'Sensor-Scalp registration left view', [200,200,750,475]);
 
 hFigMri22      = script_view_surface(ScalpFile, [], [], [],'right');
-hFigMri22      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri22, 1);
+hFigMri22      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri22, 1);
 bst_report('Snapshot',hFigMri22,[],'Sensor-Scalp registration right view', [200,200,750,475]);
 
 hFigMri23      = script_view_surface(ScalpFile, [], [], [],'back');
-hFigMri23      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
+hFigMri23      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri23, 1);
 bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
-close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+close([hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
 
 %%
 %% Quality control 
@@ -251,18 +250,14 @@ close(hFigSurf24)
 %%
 %% Get Protocol information
 %%
-ProtocolInfo = bst_get('ProtocolInfo');
-% Get subject directory
-[sSubject] = bst_get('Subject', subID);
-subjectSubDir = bst_fileparts(sSubject.FileName);
 
 headmodel_options = struct();
 headmodel_options.Comment = 'OpenMEEG BEM';
-headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir]);
+headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID]);
 headmodel_options.HeadModelType = 'surface';
 
 % Uploading Channels
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'channel.mat');
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
 BSTChannels = load(BSTChannelsFile);
 headmodel_options.Channel = BSTChannels.Channel;
 
@@ -313,7 +308,7 @@ headmodel_options.isSplit = false;
 headmodel_options.SplitLength = 4000;
 
 
-[headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
+ [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
 %%
 %% Quality control 
@@ -323,7 +318,7 @@ BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
 cortex = load(BSTCortexFile);
 head = load(BSTScalpFile);
 % Uploading Gain matrix
-BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, ['@raw' subjectSubDir],'headmodel_surf_openmeeg.mat');
+BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'headmodel_surf_openmeeg.mat');
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
@@ -352,7 +347,7 @@ close(hFig25)
 %%
 %% Save and display report
 %%   
-ReportFile = bst_report('Save', sFiles);
+ReportFile = bst_report('Save');
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
