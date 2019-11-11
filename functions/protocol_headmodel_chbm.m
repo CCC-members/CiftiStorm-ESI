@@ -508,10 +508,11 @@ BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,'@intra','hea
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
+% Uploading Channels Loc
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
-%%
+%% Ploting sensors and sources on the scalp and cortex
 [hFig25] = view3D_K(Ke,cortex,head,channels,62);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
