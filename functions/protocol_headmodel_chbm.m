@@ -31,7 +31,9 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
-eeg_data_path = char(selected_data_set.eeg_data_path);
+if(isfield(selected_data_set, 'eeg_data_path'))
+    eeg_data_path = char(selected_data_set.eeg_data_path);
+end
 hcp_data_path = char(selected_data_set.hcp_data_path);
 non_brain_path = char(selected_data_set.non_brain_data_path);
 SubjectName = char(subID);
