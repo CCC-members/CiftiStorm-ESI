@@ -64,7 +64,7 @@ end
 %%
 %% Preparing eviroment
 %%
-% ===== GET DEFAULT =====   
+% ===== GET DEFAULT ===== 
 % Get registered Brainstorm EEG defaults
 bstDefaults = bst_get('EegDefaults');   
 nameGroup = selected_data_set.process_import_channel.group_layout_name;
@@ -512,7 +512,9 @@ Ke = BSTHeadModel.Gain;
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
+%%
 %% Ploting sensors and sources on the scalp and cortex
+%%
 [hFig25] = view3D_K(Ke,cortex,head,channels,62);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)

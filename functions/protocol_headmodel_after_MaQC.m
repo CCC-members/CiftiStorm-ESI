@@ -360,7 +360,9 @@ Ke = BSTHeadModel.Gain;
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
-%%%% Ploting sensors and sources on the scalp and cortex
+%%
+%% Ploting sensors and sources on the scalp and cortex
+%%
 [hFig25] = view3D_K(Ke,cortex,head,channels,17);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
