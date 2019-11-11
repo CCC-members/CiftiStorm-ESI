@@ -1,4 +1,4 @@
-function protocol_headmodel_chbm_hbn(subID,ProtocolName)
+function protocol_headmodel_chbm(subID,ProtocolName)
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
