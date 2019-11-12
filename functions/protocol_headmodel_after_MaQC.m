@@ -47,10 +47,10 @@ end
 if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
     mkdir(fullfile(report_output_path,'Reports',ProtocolName));
 end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',subID,'.html']);
+report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'.html']);
 iter = 2;
 while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',subID,'_Iter_', num2str(iter),'.html']);
+   report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'_Iter_', num2str(iter),'.html']);
    iter = iter + 1;
 end  
 

@@ -15,6 +15,15 @@ selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.v
 
 MaQC_params = selected_data_set.manual_qc_params';
 
+if(selected_data_set.report_output_path == "local")
+    report_output_path = pwd;
+else
+    report_output_path = selected_data_set.report_output_path ;    
+end
+protocol_report_path = fullfile(report_output_path,'Reports',ProtocolName);
+if(isfolder(protocol_report_path))
+   xlswrite(protocol_report_path,vector_1,'Fluid');
+end
 
 end
 
