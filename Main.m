@@ -138,17 +138,15 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                         gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
                     end
                     disp(strcat('-->> Processing subject: ', subject_name));
-                    % Input files
-                    %         try
+                   
                     str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
                     eval(str_function);
-                    %                 subjects_processed = [subjects_processed ; subject_name] ;
-                    %         catch
-                    %             subjects_process_error = [subjects_process_error ; subject_name] ;
-                    %             disp(strcat('--> The subject:  ', subject_name, ' have some problen with the input data.' ));
-                    %         end
-                    
+                                       
                     Protocol_count = Protocol_count + 1;
+                    if( mod(Protocol_count,10) == 0  )
+                        % Genering Manual QC file
+                        generate_MaQC_file();
+                    end
                 end
             end
             
@@ -157,7 +155,6 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     else
         if(isequal(selected_data_set.id,'after_MaQC'))
             % Load all protools
-
             new_bst_DB = selected_data_set.bst_db_path;
             bst_set('BrainstormDbDir', new_bst_DB);        
            
@@ -169,6 +166,8 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                 protocol_name = protocols(i).protocol_name;
                 iProtocol = bst_get('Protocol', protocol_name);
                 gui_brainstorm('SetCurrentProtocol', iProtocol);
+                generate_MaQC_file();
+                
                 for j = 1 : length(protocols(i).subjects)
                     subjectID = protocols(i).subjects(j);
                     disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
