@@ -24,21 +24,22 @@ protocol_report_path = fullfile(report_output_path,'Reports',ProtocolName);
 if(isfolder(protocol_report_path))
     file_name = fullfile(protocol_report_path,[ProtocolName,'_MaQC.xlsx']);
     
-    for i = 1 : length(MaQC_params)
+    MRI_Segmentation = 1:length(subjects);
+    Scalp_registration= 1:length(subjects);
+    Cortex_registration = 1:length(subjects);
+    OuterSkull_registration = 1:length(subjects);
+    InnerSkull_registration = 1:length(subjects);
+    Cortex = 1:length(subjects);
+    BEM_surfaces_registration = 1:length(subjects);
+    SPM_Scalp_Envelope = 1:length(subjects);
+    Sensor_Projection = 1:length(subjects);
+    Field_views = 1:length(subjects);
         
-    end
-    Age = [38;43;38;40;49];
-    Height = [71;69;64;67;64];
-    Weight = [176;163;131;133;119];
-    BloodPressure = [124 93; 109 77; 125 83; 117 75; 122 80];
-    
-    T = table(Age,Height,Weight,BloodPressure,...
+    T = table(MRI_Segmentation,Scalp_registration,Cortex_registration,OuterSkull_registration,...
+        InnerSkull_registration,Cortex,BEM_surfaces_registration,...
+        SPM_Scalp_Envelope,Sensor_Projection,Field_views,...
         'RowNames',subjects);
-    
-    v1 = {'Protocol Name';ProtocolName};
-    t = table(v1,v2,v3)
-    v2 = MaQC_params;
-    v3 = subjects;
+   
     writetable(T,file_name,'Sheet','Report')
 end
 
