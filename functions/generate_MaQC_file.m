@@ -24,16 +24,16 @@ protocol_report_path = fullfile(report_output_path,'Reports',ProtocolName);
 if(isfolder(protocol_report_path))
     file_name = fullfile(protocol_report_path,[ProtocolName,'_MaQC.xlsx']);
     
-    MRI_Segmentation = 1:length(subjects);
-    Scalp_registration= 1:length(subjects);
-    Cortex_registration = 1:length(subjects);
-    OuterSkull_registration = 1:length(subjects);
-    InnerSkull_registration = 1:length(subjects);
-    Cortex = 1:length(subjects);
-    BEM_surfaces_registration = 1:length(subjects);
-    SPM_Scalp_Envelope = 1:length(subjects);
-    Sensor_Projection = 1:length(subjects);
-    Field_views = 1:length(subjects);
+    MRI_Segmentation = logical.empty(length(subjects));
+    Scalp_registration= logical.empty(length(subjects));
+    Cortex_registration = logical.empty(length(subjects));
+    OuterSkull_registration = logical.empty(length(subjects));
+    InnerSkull_registration = logical.empty(length(subjects));
+    Cortex = logical.empty(length(subjects));
+    BEM_surfaces_registration = logical.empty(length(subjects));
+    SPM_Scalp_Envelope = logical.empty(length(subjects));
+    Sensor_Projection = logical.empty(length(subjects));
+    Field_views = logical.empty(length(subjects));
         
     T = table(MRI_Segmentation,Scalp_registration,Cortex_registration,OuterSkull_registration,...
         InnerSkull_registration,Cortex,BEM_surfaces_registration,...
