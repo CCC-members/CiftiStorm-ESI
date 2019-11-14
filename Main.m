@@ -143,7 +143,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
                     eval(str_function);
                                        
                     Protocol_count = Protocol_count + 1;
-                    if( mod(Protocol_count,10) == 0  )
+                    if( mod(Protocol_count,10) == 0  || j == size(subjects,1))
                         % Genering Manual QC file
                         generate_MaQC_file();
                     end
@@ -165,9 +165,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
             for i = 1 : length(protocols)
                 protocol_name = protocols(i).protocol_name;
                 iProtocol = bst_get('Protocol', protocol_name);
-                gui_brainstorm('SetCurrentProtocol', iProtocol);
-                generate_MaQC_file();
-                
+                gui_brainstorm('SetCurrentProtocol', iProtocol);                
                 for j = 1 : length(protocols(i).subjects)
                     subjectID = protocols(i).subjects(j);
                     disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
