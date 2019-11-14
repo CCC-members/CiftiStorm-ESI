@@ -29,22 +29,22 @@ if(isfolder(protocol_report_path))
     copyfile( MaQC_template_file , MaQC_file);
       
     Subject_ID = subjects;
-    MRI_Segmentation = cell(10,1);
-    Scalp_registration= cell(10,1);
-    Cortex_registration = cell(10,1);
-    OuterSkull_registration = cell(10,1);
-    InnerSkull_registration = cell(10,1);
-    Cortex = cell(10,1);
-    BEM_surfaces_registration = cell(10,1);
-    SPM_Scalp_Envelope = cell(10,1);
-    Sensor_Projection = cell(10,1);
-    Field_views = cell(10,1);
-        
+    MRI_Segmentation = cell(size(Subject_ID,1),1);
+    Scalp_registration= cell(size(Subject_ID,1),1);
+    Cortex_registration = cell(size(Subject_ID,1),1);
+    OuterSkull_registration = cell(size(Subject_ID,1),1);
+    InnerSkull_registration = cell(size(Subject_ID,1),1);
+    Cortex = cell(size(Subject_ID,1),1);
+    BEM_surfaces_registration = cell(size(Subject_ID,1),1);
+    SPM_Scalp_Envelope = cell(size(Subject_ID,1),1);
+    Sensor_Projection = cell(size(Subject_ID,1),1);
+    Field_views = cell(size(Subject_ID,1),1);
+ 
+    xlswrite(MaQC_file, {ProtocolName}, 'Report', 'D2');
     T = table(Subject_ID,MRI_Segmentation,Scalp_registration,Cortex_registration,OuterSkull_registration,...
         InnerSkull_registration,Cortex,BEM_surfaces_registration,...
         SPM_Scalp_Envelope,Sensor_Projection,Field_views,...
-        'RowNames',subjects);
-       
+        'RowNames',subjects);       
     writetable(T,MaQC_file,'Sheet','Report','Range','B3');
 end
 
