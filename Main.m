@@ -44,7 +44,9 @@ end
 
 %% ------------  Checking updates --------------------------
 disp('-->> Checking project laster version');
-app_check_version;
+if(isequal(app_check_version,'updated'))
+    return;
+end
 
 %%
 disp('-->> Preparing BrainStorm properties.');
