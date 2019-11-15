@@ -73,6 +73,12 @@ try
                     pause(2);
                     delete(f);
                     
+                    disp('-->> The project is already update with the laster version.');
+                    disp('-->> The process was stoped to refresh all file');
+                    disp('-->> The process will be start again, automaticaly');
+                        
+                    Main;
+                    
                 case 'No'
                     return;
                 case ''
