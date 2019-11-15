@@ -10,14 +10,10 @@
 % - Date: May 31, 2019
 
 
-try
-    
-    
-    if(isnetav())
-        
+try  
+    if(isnetav())        
         % loading local data
-        local = jsondecode(fileread(strcat('app_properties.json')));
-        
+        local = jsondecode(fileread(strcat('app_properties.json')));        
         % finding online data
         url = local.generals.url_check;
         matlab.net.http.HTTPOptions.VerifyServerName = false;
@@ -47,8 +43,8 @@ try
                     
                     %% Download lasted version
                     filename = strcat('BST_P_lasted_version.zip');
-                    disp(strcat("Downloading lasted version......."));
-                    jObj.setBusyText(strcat("Downloading lasted version "));
+                    disp(strcat("-->> Downloading laster version......."));
+                    jObj.setBusyText(strcat("Downloading laster version "));
                     
                     url = local.generals.base_url;
                     matlab.net.http.HTTPOptions.VerifyServerName = false;
@@ -58,7 +54,7 @@ try
                     %% Unzip lasted version
                     pause(1);
                     jObj.setBusyText('Unpacking version...');
-                    disp(strcat("Unpacking version..."));
+                    disp(strcat("-->> Unpacking version..."));
                     
                     exampleFiles = unzip(filename,pwd);
                     pause(1);
@@ -69,7 +65,7 @@ try
                     
                     jObj.stop;
                     jObj.setBusyText('All done!');
-                    disp(strcat("All done!"));
+                    disp(strcat("-->> All done!"));
                     pause(2);
                     delete(f);
                     
@@ -84,9 +80,11 @@ try
                 case ''
                     return;
             end
-        end
-    end
-    
+            
+        else
+            disp('-->> Nothing to update');
+        end        
+    end    
 catch
     return;
 end
