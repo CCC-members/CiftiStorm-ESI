@@ -1,19 +1,18 @@
-%  BC-VARETA check version
+function result = app_check_version()
+result = '';
+%  App check version
 %
 %
 % Authors:
 %   -   Ariosky Areces Gonzalez
 %   -   Deirel Paz Linares
-%   -   Eduardo Gonzalez Moreaira
 %   -   Pedro Valdes Sosa
 
-% - Date: May 31, 2019
-
-
-try  
-    if(isnetav())        
+% - Date: November 15, 2019
+try
+    if(isnetav())
         % loading local data
-        local = jsondecode(fileread(strcat('app_properties.json')));        
+        local = jsondecode(fileread(strcat('app_properties.json')));
         % finding online data
         url = local.generals.url_check;
         matlab.net.http.HTTPOptions.VerifyServerName = false;
@@ -71,22 +70,21 @@ try
                     
                     disp('-->> The project is already update with the laster version.');
                     disp('-->> The process was stoped to refresh all file');
-                    disp('-->> The process will be start again, automaticaly');
-                        
-                    Main;
-                    
-                case 'No'
+                    disp('-->> Please configure the app properties file, before restart the process.');
+                    result = 'updated';
+                case 'No'                    
                     return;
                 case ''
                     return;
             end
             
         else
-            disp('-->> Nothing to update');
-        end        
-    end    
+           disp('-->> Nothing to update');
+        end
+    end
 catch
     return;
+end
 end
 
 
