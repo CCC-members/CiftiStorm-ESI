@@ -34,11 +34,20 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
+%% ------------ Checking MatLab compatibility ----------------
+if(~app_check_matlab_version())
+   return;
+end
+
+%% ------------  Checking updates --------------------------
+app_check_version;
 
 disp('------------Preparing BrainStorm properties ---------------');
 bst_path =  app_properties.bst_path;
 console = false;
 
+
+%%
 run_mode = app_properties.run_bash_mode.value;
 if (run_mode)
     console = true;
