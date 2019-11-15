@@ -31,7 +31,9 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
-eeg_data_path = char(selected_data_set.eeg_data_path);
+if(isfield(selected_data_set, 'eeg_data_path'))
+    eeg_data_path = char(selected_data_set.eeg_data_path);
+end
 hcp_data_path = char(selected_data_set.hcp_data_path);
 non_brain_path = char(selected_data_set.non_brain_data_path);
 SubjectName = char(subID);
@@ -54,17 +56,17 @@ end
 if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
     mkdir(fullfile(report_output_path,'Reports',ProtocolName));
 end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'.html']);
+report_name = fullfile(report_output_path,'Reports',ProtocolName,[SubjectName,'.html']);
 iter = 2;
 while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',SubjectName,'_Iter_', num2str(iter),'.html']);
+   report_name = fullfile(report_output_path,'Reports',ProtocolName,[SubjectName,'_Iter_', num2str(iter),'.html']);
    iter = iter + 1;
 end  
 
 %%
 %% Preparing eviroment
 %%
-% ===== GET DEFAULT =====   
+% ===== GET DEFAULT ===== 
 % Get registered Brainstorm EEG defaults
 bstDefaults = bst_get('EegDefaults');   
 nameGroup = selected_data_set.process_import_channel.group_layout_name;
@@ -508,9 +510,12 @@ BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,'@intra','hea
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
+% Uploading Channels Loc
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
+%%
+%% Ploting sensors and sources on the scalp and cortex
 %%
 [hFig25] = view3D_K(Ke,cortex,head,channels,62);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);

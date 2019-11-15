@@ -1,5 +1,25 @@
 function protocol_headmodel_after_MaQC(ProtocolName,subID)
-
+% @=============================================================================
+% This function is part of the Brainstorm software:
+% https://neuroimage.usc.edu/brainstorm
+%
+% Copyright (c)2000-2019 University of Southern California & McGill University
+% This software is distributed under the terms of the GNU General Public License
+% as published by the Free Software Foundation. Further details on the GPLv3
+% license can be found at http://www.gnu.org/copyleft/gpl.html.
+%
+% FOR RESEARCH PURPOSES ONLY. THE SOFTWARE IS PROVIDED "AS IS," AND THE
+% UNIVERSITY OF SOUTHERN CALIFORNIA AND ITS COLLABORATORS DO NOT MAKE ANY
+% WARRANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
+% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, NOR DO THEY ASSUME ANY
+% LIABILITY OR RESPONSIBILITY FOR THE USE OF THIS SOFTWARE.
+%
+% For more information type "brainstorm license" at command prompt.
+% =============================================================================@
+%
+% Author: Francois Tadel, 2014-2016
+%
+%
 % Updaters:
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
@@ -27,10 +47,10 @@ end
 if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
     mkdir(fullfile(report_output_path,'Reports',ProtocolName));
 end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',subID,'.html']);
+report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'.html']);
 iter = 2;
 while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,['Report_',subID,'_Iter_', num2str(iter),'.html']);
+   report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'_Iter_', num2str(iter),'.html']);
    iter = iter + 1;
 end  
 
@@ -181,9 +201,11 @@ close(hFigMri15);
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
-
-
+if(selected_data_set.use_raw_data)
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
+else
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, '@intra','channel.mat');
+end
 
 hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
 hFigMri16      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
@@ -247,17 +269,25 @@ bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
 
 % Closing figure
 close(hFigSurf24)
+
 %%
 %% Get Protocol information
 %%
-
 headmodel_options = struct();
 headmodel_options.Comment = 'OpenMEEG BEM';
-headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID]);
+if(selected_data_set.use_raw_data)
+    headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID]);
+else
+    headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@intra');
+end
 headmodel_options.HeadModelType = 'surface';
 
 % Uploading Channels
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
+if(selected_data_set.use_raw_data)
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
+else    
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, '@intra','channel.mat');
+end
 BSTChannels = load(BSTChannelsFile);
 headmodel_options.Channel = BSTChannels.Channel;
 
@@ -318,13 +348,20 @@ BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
 cortex = load(BSTCortexFile);
 head = load(BSTScalpFile);
 % Uploading Gain matrix
-BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'headmodel_surf_openmeeg.mat');
+if(selected_data_set.use_raw_data)
+    BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'headmodel_surf_openmeeg.mat');
+else
+    BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@intra','headmodel_surf_openmeeg.mat');
+end
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
+% Uploading Channels Loc
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
 
+%%
+%% Ploting sensors and sources on the scalp and cortex
 %%
 [hFig25] = view3D_K(Ke,cortex,head,channels,17);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);

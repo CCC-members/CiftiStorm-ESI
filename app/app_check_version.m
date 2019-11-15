@@ -25,8 +25,8 @@ try
         online = webread(url,options);
         
         if(local.generals.version_number < online.generals.version_number)
-            answer = questdlg({'There a new version available of BC-VARETA.',' Do you want to update the laster version?'}, ...
-                'Update BC-VARETA', ...
+            answer = questdlg({'There a new version available of BrainStorm Protocol pipeline.',' Do you want to update the laster version?'}, ...
+                'Update', ...
                 'Yes','No','Close');
             % Handle response
             switch answer
@@ -46,7 +46,7 @@ try
                     
                     
                     %% Download lasted version
-                    filename = strcat('BCV_lasted_version.zip');
+                    filename = strcat('BST_P_lasted_version.zip');
                     disp(strcat("Downloading lasted version......."));
                     jObj.setBusyText(strcat("Downloading lasted version "));
                     
@@ -64,8 +64,8 @@ try
                     pause(1);
                     delete(filename);
                     
-                    movefile( strcat('BC-VARETA_Toolbox-master',filesep,'*'), pwd);
-                    rmdir BC-VARETA_Toolbox-master ;
+                    movefile( strcat('BST_P_lasted_version',filesep,'*'), pwd);
+                    rmdir BST_P_lasted_version ;
                     
                     jObj.stop;
                     jObj.setBusyText('All done!');
