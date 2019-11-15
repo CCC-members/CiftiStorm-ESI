@@ -17,10 +17,11 @@
 
 
 %% Preparing WorkSpace
-restoredefaultpath;
 clc;
 close all;
 clear all;
+restoredefaultpath;
+
 %%
 %------------ Preparing properties --------------------
 % brainstorm('stop');
@@ -36,11 +37,13 @@ selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.v
 
 
 %% ------------ Checking MatLab compatibility ----------------
+disp('-->> Checking installed matlab version');
 if(~app_check_matlab_version())
    return;
 end
 
 %% ------------  Checking updates --------------------------
+disp('-->> Checking project laster version');
 app_check_version;
 
 %%

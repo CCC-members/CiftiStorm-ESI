@@ -23,7 +23,7 @@ try
         matlab.net.http.HTTPOptions.VerifyServerName = false;
         options = weboptions('ContentType','json','Timeout',Inf,'RequestMethod','auto');
         online = webread(url,options);
-        
+        disp('-->> Comparing local and master version');
         if(local.generals.version_number < online.generals.version_number)
             answer = questdlg({'There a new version available of BrainStorm Protocol pipeline.',' Do you want to update the laster version?'}, ...
                 'Update', ...
