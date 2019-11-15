@@ -13,7 +13,7 @@
 try
     
     
-    if(app_connection_status())
+    if(isnetav())
         
         % loading local data
         local = jsondecode(fileread(strcat('app_properties.json')));
@@ -64,8 +64,8 @@ try
                     pause(1);
                     delete(filename);
                     
-                    movefile( strcat('BST_P_lasted_version',filesep,'*'), pwd);
-                    rmdir BST_P_lasted_version ;
+                    movefile( strcat('BrainStorm_Protocol-master',filesep,'*'), pwd);
+                    rmdir BrainStorm_Protocol-master ;
                     
                     jObj.stop;
                     jObj.setBusyText('All done!');
