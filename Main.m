@@ -4,22 +4,22 @@
 
 
 % Scripted leadfield pipeline for Freesurfer anatomy files
-% Brainstorm (25-Sep-2019)
+% Brainstorm (25-Sep-2019) or higher
 %
 
 
 % Authors
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
-% - Usama Riaz
 %
-%    September 25, 2019
+%    November 15, 2019
 
 
 %% Preparing WorkSpace
 clc;
 close all;
 clear all;
+disp('-->> Starting process');
 restoredefaultpath;
 
 %%
@@ -47,7 +47,7 @@ disp('-->> Checking project laster version');
 app_check_version;
 
 %%
-disp('------------Preparing BrainStorm properties ---------------');
+disp('-->> Preparing BrainStorm properties.');
 bst_path =  app_properties.bst_path;
 console = false;
 
