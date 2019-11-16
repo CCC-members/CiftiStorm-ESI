@@ -39,7 +39,7 @@ selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.v
 %% ------------ Checking MatLab compatibility ----------------
 disp('-->> Checking installed matlab version');
 if(~app_check_matlab_version())
-   return;
+    return;
 end
 
 %% ------------  Checking updates --------------------------
@@ -139,7 +139,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     %% Process selected dataset and compute the leadfield subjects
     selected_datataset_process(selected_data_set);
     
-    
+    %% Stoping BrainStorm
     brainstorm('stop');
     
 else

@@ -11,18 +11,18 @@ if(isnumeric(selected_data_set.id))
         for j=1:size(subjects,1)
             subject_name = subjects(j).name;
             if(subject_name ~= '.' & string(subject_name) ~="..")
-                if( mod(Protocol_count,10) == 0  )
+                if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
                     ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
                     gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
                 end
                 disp(strcat('-->> Processing subject: ', subject_name));
                 
-                str_function = strcat(selected_data_set.function,'("',subject_name,'","',ProtocolName_R,'")');
+                str_function = strcat(selected_data_set.function,'(''',subject_name,''',''',ProtocolName_R,''')');
                 eval(str_function);
                 
                 Protocol_count = Protocol_count + 1;
-                if( mod(Protocol_count,10) == 0  || j == size(subjects,1))
+                if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
                     % Genering Manual QC file
                     generate_MaQC_file();
                 end

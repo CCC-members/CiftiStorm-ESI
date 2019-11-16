@@ -36,8 +36,6 @@ if(isfield(selected_data_set, 'eeg_data_path'))
 end
 hcp_data_path = char(selected_data_set.hcp_data_path);
 non_brain_path = char(selected_data_set.non_brain_data_path);
-SubjectName = char(subID);
-ProtocolName = char(ProtocolName);
 
 %%
 %% Checking the report output structure
@@ -56,10 +54,10 @@ end
 if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
     mkdir(fullfile(report_output_path,'Reports',ProtocolName));
 end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,[SubjectName,'.html']);
+report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'.html']);
 iter = 2;
 while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,[SubjectName,'_Iter_', num2str(iter),'.html']);
+   report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'_Iter_', num2str(iter),'.html']);
    iter = iter + 1;
 end  
 
@@ -106,8 +104,8 @@ end
 %% ===== IMPORT ANATOMY =====
 %%
 % Start a new report
-bst_report('Start',['Protocol for subject:' , SubjectName]);
-bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
+bst_report('Start',['Protocol for subject:' , subID]);
+bst_report('Info',    '', [], ['Protocol for subject:' , subID])
 
 % Build the path of the files to import
 AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
@@ -116,14 +114,14 @@ AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
 %% Process: Import MRI
 %%
 sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
-    'subjectname', SubjectName, ...
+    'subjectname', subID, ...
     'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
 
 %%
 %% Quality control
 %%
 % Get subject definition
-sSubject = bst_get('Subject', SubjectName);
+sSubject = bst_get('Subject', subID);
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -141,11 +139,11 @@ close([hFigMri1 hFigMri2 hFigMri3]);
 %%
 %% Process: Import surfaces 
 %%
-L_surf = fullfile(AnatDir,'Native',[SubjectName,'.L.midthickness.native.surf.gii']);
-R_surf = fullfile(AnatDir,'Native',[SubjectName,'.R.midthickness.native.surf.gii']);
+L_surf = fullfile(AnatDir,'Native',[subID,'.L.midthickness.native.surf.gii']);
+R_surf = fullfile(AnatDir,'Native',[subID,'.R.midthickness.native.surf.gii']);
 if(selected_data_set.selected_surf ~= "native")
-    L_surf = fullfile(AnatDir,'fsaverage_LR32k',[SubjectName,'.L.midthickness.32k_fs_LR.surf.gii']);
-    R_surf = fullfile(AnatDir,'fsaverage_LR32k',[SubjectName,'.R.midthickness.32k_fs_LR.surf.gii']);
+    L_surf = fullfile(AnatDir,'fsaverage_LR32k',[subID,'.L.midthickness.32k_fs_LR.surf.gii']);
+    R_surf = fullfile(AnatDir,'fsaverage_LR32k',[subID,'.R.midthickness.32k_fs_LR.surf.gii']);
 end
 
 nverthead = selected_data_set.process_import_surfaces.nverthead;
@@ -153,12 +151,12 @@ nvertcortex = selected_data_set.process_import_surfaces.nvertcortex;
 nvertskull = selected_data_set.process_import_surfaces.nvertskull;
 
 sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
-    'subjectname', SubjectName, ...
-    'headfile',    {fullfile(non_brain_path,SubjectName,[SubjectName,'_outskin_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'subjectname', subID, ...
+    'headfile',    {fullfile(non_brain_path,subID,[subID,'_outskin_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
     'cortexfile1', {L_surf, 'GII-MNI'}, ...
     'cortexfile2', {R_surf, 'GII-MNI'}, ...
-    'innerfile',   {fullfile(non_brain_path,SubjectName,[SubjectName,'_inskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
-    'outerfile',   {fullfile(non_brain_path,SubjectName,[SubjectName,'_outskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'innerfile',   {fullfile(non_brain_path,subID,[subID,'_inskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'outerfile',   {fullfile(non_brain_path,subID,[subID,'_outskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
     'nverthead',   nverthead, ...
     'nvertcortex', nvertcortex, ...
     'nvertskull',  nvertskull);
@@ -167,7 +165,7 @@ sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, []
 %% Quality control
 %%
 % Get subject definition and subject files
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
 InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
@@ -230,7 +228,7 @@ close(hFigSurf10);
 %% Process: Generate BEM surfaces
 %%
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
-    'subjectname', SubjectName, ...
+    'subjectname', subID, ...
     'nscalp',      1922, ...
     'nouter',      1922, ...
     'ninner',      1922, ...
@@ -240,7 +238,7 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
 %% Quality Control
 %%
 % Get subject definition and subject files
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
 InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
@@ -283,14 +281,14 @@ close(hFigSurf14);
 %% Process: Generate SPM canonical surfaces
 %%
 sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
-    'subjectname', SubjectName, ...
+    'subjectname', subID, ...
     'resolution',  2);  % 8196
 
 %%
 %% Quality control
 %%
 % Get subject definition and subject files
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
@@ -303,7 +301,7 @@ close(hFigMri15);
 %%
 %% ===== ACCESS RECORDINGS =====
 %%
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 [sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
 FileFormat = 'BST';  
@@ -318,7 +316,7 @@ FileFormat = 'BST';
 %%
 %% Process: Set BEM Surfaces
 %%
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
+[sSubject, iSubject] = bst_get('Subject', subID);
 db_surface_default(iSubject, 'Scalp', 5);
 db_surface_default(iSubject, 'OuterSkull', 6);
 db_surface_default(iSubject, 'InnerSkull', 7);
@@ -330,7 +328,7 @@ db_surface_default(iSubject, 'Cortex', 1);
 % Get Protocol information
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
-[sSubject] = bst_get('Subject', SubjectName);
+[sSubject] = bst_get('Subject', subID);
 subjectSubDir = bst_fileparts(sSubject.FileName);
 
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
@@ -354,7 +352,7 @@ bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
+[sSubject, iSubject] = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 
 hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
@@ -374,7 +372,7 @@ hFigMri19      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
 bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
 
 % View sources on Scalp
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
+[sSubject, iSubject] = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
@@ -400,7 +398,7 @@ close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFi
 %%
 %% Process: Import Atlas
 %%
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
+[sSubject, iSubject] = bst_get('Subject', subID);
 % 
 LabelFile = {fullfile(AnatDir,'aparc+aseg.nii.gz'),'MRI-MASK-MNI'};
 script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
@@ -432,7 +430,7 @@ close(hFigSurf24)
 %%
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
-[sSubject] = bst_get('Subject', SubjectName);
+[sSubject] = bst_get('Subject', subID);
 subjectSubDir = bst_fileparts(sSubject.FileName);
 
 headmodel_options = struct();
