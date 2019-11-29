@@ -24,28 +24,47 @@ protocol_report_path = fullfile(report_output_path,'Reports',ProtocolName);
 if(isfolder(protocol_report_path))   
     
     % Copying the template MaQC file to protocol report path
-    MaQC_file = fullfile(protocol_report_path,[ProtocolName,'_MaQC.xlsx']);    
+    MaQC_file = fullfile(protocol_report_path,[ProtocolName,'_MaQC3.xlsx']);    
     MaQC_template_file = strcat('tools',filesep,'Template_MaQC.xlsx');
     copyfile( MaQC_template_file , MaQC_file);
       
-    Subject_ID = subjects;
-    MRI_Segmentation = cell(size(Subject_ID,1),1);
-    Scalp_registration= cell(size(Subject_ID,1),1);
-    Cortex_registration = cell(size(Subject_ID,1),1);
-    OuterSkull_registration = cell(size(Subject_ID,1),1);
-    InnerSkull_registration = cell(size(Subject_ID,1),1);
-    Cortex = cell(size(Subject_ID,1),1);
-    BEM_surfaces_registration = cell(size(Subject_ID,1),1);
-    SPM_Scalp_Envelope = cell(size(Subject_ID,1),1);
-    Sensor_Projection = cell(size(Subject_ID,1),1);
-    Field_views = cell(size(Subject_ID,1),1);
- 
-    xlswrite(MaQC_file, {ProtocolName}, 'Report', 'D2');
-    T = table(Subject_ID,MRI_Segmentation,Scalp_registration,Cortex_registration,OuterSkull_registration,...
-        InnerSkull_registration,Cortex,BEM_surfaces_registration,...
-        SPM_Scalp_Envelope,Sensor_Projection,Field_views,...
-        'RowNames',subjects);       
-    writetable(T,MaQC_file,'Sheet','Report','Range','B3');
+    Subject_ID = subjects;    
+    T = table(Subject_ID,'RowNames',subjects);
+    for p = 1 : size(MaQC_params,1)        
+         param = string(MaQC_params(p));
+         param = strrep(param,' ','_');
+         colum = cell(size(Subject_ID,1),1);
+         T = [T table(colum, 'VariableNames', {char(param)})];        
+    end
+    %% Deleting rows
+%     subjects_count = size(Subject_ID,1);   
+%     rows_count = selected_data_set.protocol_subjet_count; 
+%     Excel = actxserver('Excel.Application');
+%     Workbook = Excel.Workbooks.Open(MaQC_file);
+%     sheet1=Excel.Worksheets.get('Item','Report');
+%     for count = 1 : (rows_count - subjects_count)
+%         sheet1.Rows.Item(4).Delete;
+%     end
+%     Workbook.Save;
+%     Workbook.Close;
+%     delete(Excel);
+    
+    %% 
+    
+    Excel = actxserver('Excel.Application');
+    Workbook = Excel.Workbooks.Open(MaQC_file);
+    NewSheet=Excel.Worksheets.get('Item','Report');
+    for i = 2 : size(MaQC_params,1)
+        NewSheet.Columns.Item(i).columnWidth = 50;
+    end
+    Excel.Workbook.Save;
+    Excel.Workbook.Close;
+    invoke(Excel, 'Quit');
+    delete(Excel);
+    
+    xlswrite(MaQC_file, {ProtocolName}, 'Report', 'D7');     
+    writetable(T,MaQC_file,'Sheet','Report','Range','B8');    
+
 end
 
 end

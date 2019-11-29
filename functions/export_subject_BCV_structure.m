@@ -1,4 +1,22 @@
-function [] = export_subject_BCV(sSubject)
+function [] = export_subject_BCV_structure(selected_data_set)
+
+%%
+%% Get Protocol information
+%%
+ProtocolInfo = bst_get('ProtocolInfo');
+% Get subject directory
+[sSubject] = bst_get('Subject', subID);
+subjectSubDir = bst_fileparts(sSubject.FileName);
+
+
+prefix = '@intra';
+if(isfield(selected_data_set, 'eeg_data_path'))
+    eeg_data_path = char(selected_data_set.eeg_data_path);
+    if(~isequal(eeg_data_path,"none"))
+        prefix = '@raw';
+    end
+end
+
 
 
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));

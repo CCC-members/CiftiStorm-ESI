@@ -532,7 +532,9 @@ close(hFig25)
 %%
 %% Export Subject to BC-VARETA
 %%
-% export_subject_BCV(sSubject);
+disp(['-->> Export subject:' , subID, ' to BC-VARETA structure']);
+bst_report('Info',    '', [], 'Export process to BC-VARETA structure')
+export_subject_BCV_structure(selected_data_set);
 
 %%
 %% Save and display report
@@ -541,5 +543,5 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
-disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
+disp([10 '-->> BrainStorm Protocol: Done.' 10]);
 
