@@ -17,19 +17,13 @@ if(isfield(selected_data_set, 'eeg_data_path'))
     end
 end
 
-
-
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
-selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
-selected_data_set = selected_data_set{1,1};
 bcv_path = selected_data_set.bcv_input_path;
-
 if(~isfolder(bcv_path))
     mkdir(bcv_path);
 end
 
 %% Creating subject folder structure
-disp('BST-P ->> Creating subject folder structure.');
+disp('-->> Creating subject folder structure.');
 subject_path = fullfile(bcv_path,sSubject.Name);
 mkdir(subject_path);
 eeg_path = fullfile(subject_path,'eeg');
@@ -47,10 +41,6 @@ mkdir(surf_path);
 %% Uploding Subject file into BrainStorm Protocol
 disp('BST-P ->> Uploding Subject file into BrainStorm Protocol.')
 
-
-
-
-
 process_waitbar = waitbar(0,strcat('Importing data subject: ' , subject_name ));
 
 [output_subject] = create_data_structure(bcv_input_folder,subject_name);
@@ -60,91 +50,30 @@ chanlocs = '';
 K_6k = double([]);
 orig_leadfield = '';
 
-for i=1:size(sub_folders,1)
-    subfolder = sub_folders(i).name;
-    if(isfolder(fullfile(subject,subfolder)) & subfolder ~= '.' & string(subfolder) ~="..")
-        if(contains(subfolder,'data','IgnoreCase',true))
-            waitbar(0.25,process_waitbar,strcat('Genering eeg file for: ' , subject_name ));
-            
-            files=dir(fullfile(subject,subfolder));
-            if(numel(files)>2  &  contains(files(3).name,'.mat'))
-                filename_resting = files(3).name;
-                if(isfile(fullfile(subject,subfolder,filename_resting)))
-                    disp (">> Genering eeg file");
-                    load(fullfile(subject,subfolder,filename_resting));
-                    data = result.data;
-                    save(strcat(output_subject,filesep,'eeg',filesep,'eeg.mat'),'data');
-                    chanlocs = result.chanlocs;
-                end
-            end
-        end
-        if(contains(subfolder,'brainstorm','IgnoreCase',true))
-            brainstorm_folder = subfolder;
-            waitbar(0.5,process_waitbar,strcat('Genering leadfield file for: ' , subject_name ));
-            
-            data_dir = fullfile(subject,subfolder,'data');
-            files_data = dir(data_dir);
-            load(fullfile(data_dir,'channel.mat'));
-            all_channel = Channel;
-            for h = 1 : size(files_data,1)
-                file_data = files_data(h).name;
-                if(contains(file_data,'headmodel','IgnoreCase',true))
-                    load(strcat(data_dir,filesep,file_data));
-                    orig_leadfield = bst_gain_orient(Gain, GridOrient);
-                end
-            end
-            
-            
-            
-        end
-    end
-end
+waitbar(0.25,process_waitbar,strcat('Genering eeg file for: ' , subject_name ));
+
+disp ("-->> Genering eeg file");
+load(fullfile(subject,subfolder,filename_resting));
+data = result.data;
+save(strcat(output_subject,filesep,'eeg',filesep,'eeg.mat'),'data');
+
+waitbar(0.5,process_waitbar,strcat('Genering leadfield file for: ' , subject_name ));
+
+
+load(fullfile(data_dir,'channel.mat'));
+all_channel = Channel;
+
+load(strcat(data_dir,filesep,file_data));
+orig_leadfield = bst_gain_orient(Gain, GridOrient);
+                    
+
 %----- Genering leadfield file -----------------------------------
 %----- Delete bad channels -----------------------------------
 disp (">> Genering leadfield file");
 
-reduced_channel = struct;
-if(~isempty(chanlocs))
-    conv_ASA343 = {length(chanlocs)};
-    
-    for p = 1 : length(chanlocs)
-        true_label = chanlocs(p).labels;
-        for o = 1 : length(all_channel)
-            orig_label = all_channel(o).Name;
-            if(isequal(true_label,orig_label))
-                row = orig_leadfield(o,:);
-                K_6k(end + 1,:) =  row;
-                conv_ASA343(p) = {o};
-                if (p == 1)
-                    for fn = fieldnames(all_channel)'
-                        reduced_channel(p).(fn{1}) = all_channel(o).(fn{1});
-                    end
-                else
-                    reduced_channel(p) = all_channel(o);
-                end
-                break;
-            end
-        end
-        if (~isequal(length(true_label),length(K_6k)))
-            row = orig_leadfield(end,:);
-            K_6k(end + 1,:) =  row;
-            conv_ASA343(end + 1) = {length(all_channel)};
-            reduced_channel(end + 1) = all_channel(end);
-        end
-        save(strcat(output_subject,filesep,'leadfield',filesep,'leadfield.mat'),'K_6k');
+save(strcat(output_subject,filesep,'leadfield',filesep,'leadfield.mat'),'K_6k');
         
-    end
-else
-    chanlocs = all_channel;
-    reduced_channel = all_channel;
-    K_6k = orig_leadfield;
-    conv_ASA343 = {length(all_channel)};
-    for i = 1:length(all_channel)
-        conv_ASA343(i)= {i} ;
-    end   
-     save(strcat(output_subject,filesep,'leadfield',filesep,'leadfield.mat'),'K_6k');
-end
-
+ 
 %  -------- Genering scalp file -------------------------------
 disp (">> Genering scalp file");
 % ---- Geting ASA_343 -----------------------

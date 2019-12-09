@@ -532,9 +532,9 @@ close(hFig25)
 %%
 %% Export Subject to BC-VARETA
 %%
-disp(['-->> Export subject:' , subID, ' to BC-VARETA structure']);
+disp(['BC-V -->> Export subject:' , subID, ' to BC-VARETA structure']);
 bst_report('Info',    '', [], 'Export process to BC-VARETA structure')
-export_subject_BCV_structure(selected_data_set);
+%export_subject_BCV_structure(selected_data_set);
 
 %%
 %% Save and display report
