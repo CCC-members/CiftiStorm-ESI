@@ -30,8 +30,8 @@ if(isnumeric(selected_data_set.id))
                 %%
                 Protocol_count = Protocol_count + 1;
                 if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
-                    % Genering Manual QC file
-                    generate_MaQC_file();
+                    % Genering Manual QC file (need to check)
+%                     generate_MaQC_file();
                 end
             end
         end

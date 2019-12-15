@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%               Brainstorm Protocol for Head Model
+%%         Brainstorm Protocol for Automatic Head Model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -35,6 +35,11 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
+%% Printing data information
+disp(strcat("-->> Name:",app_properties.generals.name));
+disp(strcat("-->> Version:",app_properties.generals.version));
+disp(strcat("-->> Version date:",app_properties.generals.version_date));
+disp("=======================================================");
 
 %% ------------ Checking MatLab compatibility ----------------
 disp('-->> Checking installed matlab version');
@@ -131,11 +136,10 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
             saveJSON(app_properties,strcat('app_properties.json'));
         end
     end
-    
-    BrainstormDbDir = bst_get('BrainstormDbDir');
-    app_properties.bs_db_path = BrainstormDbDir;
-    saveJSON(app_properties,strcat('app',filesep,'app_properties.json'));
-    
+    if(~isequal( app_properties.bst_db_path,"local"))
+       bst_set('BrainstormDbDir', app_properties.bst_db_path);
+    end
+        
     %% Process selected dataset and compute the leadfield subjects
     selected_datataset_process(selected_data_set);
     
