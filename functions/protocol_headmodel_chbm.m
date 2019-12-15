@@ -72,33 +72,11 @@ nameLayout = selected_data_set.process_import_channel.channel_layout_name;
 
 iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
 iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
-
 ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;   
 channel_layout= load(ChannelFile);
 
-if(~isequal(selected_data_set.process_import_channel.channel_label_file,'none'))
-    % Checking if label file match with selected channel layout
-    user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
-    if(is_match_labels_vs_channel_layout(user_labels,channel_layout.Channel))
-        disp("-->> Labels file is matching whit the selected Channel Layout.");
-        disp("-->> Removing channels from Labels file.");
-        tmp_path = selected_data_set.tmp_path;
-        if(isequal(tmp_path,'local'))
-            tmp_path = pwd;            
-        end
-        tmp_path = fullfile(tmp_path,'tmp');
-        mkdir(tmp_path);        
-        [~,name,ext] = fileparts(ChannelFile);
-        ChannelFile = fullfile(tmp_path,[name,ext]);
-        ChannelFile = remove_channels_from_layout(user_labels,channel_layout,ChannelFile);
-    else
-        msg = '-->> Some labels don''t match whit the selected Channel Layout.';
-        fprintf(2,msg);
-        disp('');
-        brainstorm stop;
-        return;
-    end
-end
+%% reduce channel by preprocessed eeg or user labels
+[ChannelFile] = reduce_channel_BY_prep_eeg_OR_user_labels(selected_data_set,channel_layout,ChannelFile,subID);
 
 %%
 %% ===== IMPORT ANATOMY =====
@@ -276,7 +254,6 @@ bst_report('Snapshot',hFigSurf14,[],'BEM surfaces registration back view', [200,
 
 close(hFigSurf14);
 
-
 %%
 %% Process: Generate SPM canonical surfaces
 %%
@@ -305,7 +282,7 @@ sSubject       = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 [sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
 FileFormat = 'BST';  
-
+iStudy = (iStudy * 2) - 1;
 %%
 %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
 % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
@@ -515,7 +492,7 @@ channels = channels';
 %%
 %% Ploting sensors and sources on the scalp and cortex
 %%
-[hFig25] = view3D_K(Ke,cortex,head,channels,62);
+[hFig25] = view3D_K(Ke,cortex,head,channels,17);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
 bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
@@ -528,13 +505,6 @@ bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 
 % Closing figure
 close(hFig25)
-
-%%
-%% Export Subject to BC-VARETA
-%%
-disp(['BC-V -->> Export subject:' , subID, ' to BC-VARETA structure']);
-bst_report('Info',    '', [], 'Export process to BC-VARETA structure')
-export_subject_BCV_structure(selected_data_set,subID);
 
 %%
 %% Save and display report

@@ -1,5 +1,5 @@
 function selected_datataset_process(selected_data_set)
-try
+% try
 if(isnumeric(selected_data_set.id))
     if(is_check_dataset_properties(selected_data_set))
         disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
@@ -14,13 +14,20 @@ if(isnumeric(selected_data_set.id))
                 if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
                     ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
-                    gui_brainstorm('CreateProtocol',ProtocolName_R , 0, 0);
+                    gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
                 end
                 disp(strcat('-->> Processing subject: ', subject_name));
                 
                 str_function = strcat(selected_data_set.function,'(''',subject_name,''',''',ProtocolName_R,''')');
                 eval(str_function);
                 
+                %%
+                %% Export Subject to BC-VARETA
+                %%
+                disp(['BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure']);               
+                export_subject_BCV_structure(selected_data_set,subject_name);
+                
+                %%
                 Protocol_count = Protocol_count + 1;
                 if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
                     % Genering Manual QC file
@@ -54,10 +61,10 @@ else
         end
     end
 end
-catch
-    brainstorm stop;
-    fprintf(2,strcat("\n -->> Protocol stoped \n"));
-    msgText = getReport(exception);
-    fprintf(2,strcat("\n ->> ", msgText, "\n"));   
-end
+% catch exception
+%     brainstorm stop;
+%     fprintf(2,strcat("\n -->> Protocol stoped \n"));
+%     msgText = getReport(exception);
+%     fprintf(2,strcat("\n -->> ", string(msgText), "\n"));   
+% end
 end
