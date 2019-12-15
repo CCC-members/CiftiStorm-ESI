@@ -26,7 +26,8 @@ elseif(isfield(selected_data_set, 'preprocessed_eeg') )
             [hdr, data] = import_eeg_format(eeg_file,selected_data_set.preprocessed_eeg.format);
             labels = hdr.label;
             labels = strrep(labels,'REF','');
-            [channel_layout] = remove_channels_from_layout(labels,channel_layout);           
+            [channel_layout] = remove_channels_from_layout(labels,channel_layout);  
+            [channel_layout] = sort_channels_by_labels(labels,channel_layout);
         else
             
         end
