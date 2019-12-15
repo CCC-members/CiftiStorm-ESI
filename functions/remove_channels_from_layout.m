@@ -1,4 +1,4 @@
-function ChannelFile = remove_channels_from_layout(labels,channel_layout,ChannelFile)
+function [channel_layout] = remove_channels_from_layout(labels,channel_layout)
 from = 1;
 limit = length(channel_layout.Channel);
 while(from <= limit)
@@ -10,7 +10,5 @@ while(from <= limit)
         from = from + 1;
     end
 end
-disp('-->> Saving new channel file in tmp folder.')
-save(ChannelFile,'-struct','channel_layout');
 end
 

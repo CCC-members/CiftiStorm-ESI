@@ -3,7 +3,7 @@ function valided = is_check_dataset_properties(selected_dataset)
 valided = true;
 
 if(isfield(selected_dataset, 'eeg_data_path'))
-    if(~isfolder(selected_dataset.eeg_data_path) && selected_dataset.eeg_data_path ~= "all")
+    if(~isfolder(selected_dataset.eeg_data_path) && selected_dataset.eeg_data_path ~= "none")
         valided = false;
         fprintf(2,'\n ->> Error: The EEG folder don''t exist\n');
         return;

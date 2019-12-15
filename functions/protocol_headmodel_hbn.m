@@ -34,11 +34,9 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
-eeg_data_path = char(selected_data_set.eeg_data_path);
-hcp_data_path = char(selected_data_set.hcp_data_path);
-non_brain_path = char(selected_data_set.non_brain_data_path);
-subID = char(subID);
-ProtocolName = char(ProtocolName);
+eeg_data_path = selected_data_set.eeg_data_path;
+hcp_data_path = selected_data_set.hcp_data_path;
+non_brain_path = selected_data_set.non_brain_data_path;
 
 ID = strsplit(subID,'-');
 ID = ID(2);
@@ -82,8 +80,6 @@ bst_report('Info',    '', [], ['Protocol for subject:' , SubjectName])
 % Build the path of the files to import
 AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
 RawFile    = char(fullfile(eeg_data_path, SubjectName, 'EEG', 'raw', 'mff_format', SubjectName));
- 
-
 
 % Process: Import MRI
 sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
