@@ -37,8 +37,9 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     disp ("-->> Genering leadfield file");
     BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,prefix,'headmodel_surf_openmeeg.mat');
     BSTHeadModel = load(BSTHeadModelFile);
-    Ke = BSTHeadModel.Gain;    
-    
+    Ke = BSTHeadModel.Gain; 
+    GridOrient = BSTHeadModel.GridOrient;
+    GridAtlas = BSTHeadModel.GridAtlas;
     %%
     %% Genering surf file
     %%
@@ -77,7 +78,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
         end
     end
     
-    save(strcat(output_subject,filesep,'leadfield',filesep,'leadfield.mat'),'Ke');
+    save(strcat(output_subject,filesep,'leadfield',filesep,'leadfield.mat'),'Ke','GridOrient','GridAtlas');
     save(strcat(output_subject,filesep,'surf',filesep,'surf.mat'),'Sc');
     save(strcat(output_subject,filesep,'scalp',filesep,'scalp.mat'),'Ceeg','Sh');
     
