@@ -7,12 +7,14 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     ProtocolInfo = bst_get('ProtocolInfo');
     % Get subject directory
     [sSubject] = bst_get('Subject', subID);
+    if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
+        return;
+    end
     subjectSubDir = bst_fileparts(sSubject.FileName);    
     
     prefix = '@intra';
-    if(isfield(selected_data_set, 'eeg_data_path'))
-        eeg_data_path = char(selected_data_set.eeg_data_path);
-        if(~isequal(eeg_data_path,"none"))
+    if(isfield(selected_data_set, 'use_raw_data'))
+        if(isequal(selected_data_set.use_raw_data,true))
             prefix = ['@raw',subjectSubDir];
         end
     end
@@ -35,8 +37,11 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     %%
     
     disp ("-->> Genering leadfield file");
-    BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,prefix,'headmodel_surf_openmeeg.mat');
-    BSTHeadModel = load(BSTHeadModelFile);
+    BSTHeadMOdelBaseFile = fullfile(ProtocolInfo.STUDIES,subjectSubDir,prefix);
+    BSTHeadModelFiles = dir(fullfile(BSTHeadMOdelBaseFile,'headmodel_surf_openmeeg*.mat'));
+    [~,idx] = sort([BSTHeadModelFiles.datenum]);
+    BSTHeadModelFile = BSTHeadModelFiles(idx(end));
+    BSTHeadModel = load(fullfile(BSTHeadModelFile.folder,BSTHeadModelFile.name));
     Ke = BSTHeadModel.Gain; 
     GridOrient = BSTHeadModel.GridOrient;
     GridAtlas = BSTHeadModel.GridAtlas;

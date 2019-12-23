@@ -213,16 +213,29 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
     'thickness',   4);
 
 %%
-%% Quality Control
+%% Get subject definition and subject files
 %%
-% Get subject definition and subject files
-sSubject       = bst_get('Subject', subID);
+sSubject       = bst_get('Subject', SubjectName);
+CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+
+%%
+%% Forcing dipoles inside innerskull
+%%
+tess_force_envelope(CortexFile, InnerSkullFile);
+
+%%
+%% Get subject definition and subject files
+%%
+sSubject       = bst_get('Subject', SubjectName);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
 InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
+%%
+%% Quality control
+%%
 hFigSurf11 = script_view_surface(CortexFile, [], [], [],'top');
 hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);

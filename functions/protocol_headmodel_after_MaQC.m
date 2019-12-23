@@ -68,6 +68,9 @@ ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject definition
 sSubject = bst_get('Subject', subID);
 % Get MRI file and surface files
+if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
+    return;
+end
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
 bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
@@ -270,6 +273,15 @@ bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
 % Closing figure
 close(hFigSurf24)
 
+
+%%
+%% Forcing dipoles inside innerskull
+%%
+script_tess_force_envelope(CortexFile, InnerSkullFile);
+
+% Get subject definition and subject files
+sSubject       = bst_get('Subject', subID);
+
 %%
 %% Get Protocol information
 %%
@@ -338,7 +350,10 @@ headmodel_options.isSplit = false;
 headmodel_options.SplitLength = 4000;
 
 
- [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
+%%
+%% Recomputing Head Model
+%%
+[headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
 %%
 %% Quality control 

@@ -57,8 +57,22 @@ else
                 disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
                 str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
                 eval(str_function);
+                
+                 %%
+                %% Export Subject to BC-VARETA
+                %%
+                disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);               
+                export_subject_BCV_structure(selected_data_set,char(subjectID));
             end
         end
+    elseif(isequal(selected_data_set.id,'export_to_BCV'))
+        new_bst_DB = selected_data_set.bst_db_path;
+        bst_set('BrainstormDbDir', new_bst_DB);
+        
+        gui_brainstorm('UpdateProtocolsList');
+        db_import(new_bst_DB);
+        
+    else
     end
 end
 % catch exception
