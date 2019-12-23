@@ -32,8 +32,16 @@ addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'guide'));
 %app_properties = jsondecode(fileread(strcat('properties',filesep,'app_properties.json')));
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+
+if(~isempty(app_properties.selected_data_set.value) && isnumeric(double(app_properties.selected_data_set.value)))
+
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
-selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
+try
+    selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
+catch
+    fprintf(2,"\n ->> Error: The selected_data_set.value in aap\\app_properties.json file have to be a number \n");
+end
+
 
 %% Printing data information
 disp(strcat("-->> Name:",app_properties.generals.name));
@@ -123,6 +131,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
     addpath(app_properties.spm_path);
     
     %---------------- Starting BrainStorm-----------------------
+    brainstorm reset
     if ~brainstorm('status')
         if(console)
             brainstorm nogui local
@@ -150,5 +159,9 @@ else
     fprintf(2,'\n ->> Error: The spm path or brainstorm path are wrong.');
 end
 
-
+else 
+    fprintf(2,"\n ->> Error: The selected_data_set.value in aap\\app_properties.json file have to be a number \n");
+    disp("______________________________________________________________________________________________");
+    disp("Please configure aap\app_properties.json and aap\app_protocols.json files correctly. ")
+end
 
