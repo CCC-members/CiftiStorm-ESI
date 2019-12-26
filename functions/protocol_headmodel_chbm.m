@@ -378,7 +378,7 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
 head = load(BSTScalpFile);
 
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, '@intra','channel.mat');
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
 BSTChannels = load(BSTChannelsFile);
 channels = [BSTChannels.Channel.Loc];
 channels = channels';
