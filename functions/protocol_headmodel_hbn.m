@@ -208,11 +208,12 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
 %%
 sSubject       = bst_get('Subject', SubjectName);
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 
 %%
 %% Forcing dipoles inside innerskull
 %%
-tess_force_envelope(CortexFile, InnerSkullFile);
+script_tess_force_envelope(CortexFile, InnerSkullFile);
 
 %%
 %% Get subject definition and subject files
@@ -223,6 +224,11 @@ CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
 InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+iCortex        = sSubject.iCortex;
+iAnatomy       = sSubject.iAnatomy;
+iInnerSkull    = sSubject.iInnerSkull;
+iOuterSkull    = sSubject.iOuterSkull;
+iScalp         = sSubject.iScalp;
 
 %%
 %% Quality Control
@@ -323,12 +329,11 @@ sFiles = bst_process('CallProcess', 'process_import_channel', sFiles, [], ...
 %%
 %% Process: Set BEM Surfaces
 %%
-
-[sSubject, iSubject] = bst_get('Subject', SubjectName);
-db_surface_default(iSubject, 'Scalp', 5);
-db_surface_default(iSubject, 'OuterSkull', 6);
-db_surface_default(iSubject, 'InnerSkull', 7);
-db_surface_default(iSubject, 'Cortex', 1);
+[sSubject, iSubject] = bst_get('Subject', subID);
+db_surface_default(iSubject, 'Scalp', iScalp);
+db_surface_default(iSubject, 'OuterSkull', iOuterSkull);
+db_surface_default(iSubject, 'InnerSkull', iInnerSkull);
+db_surface_default(iSubject, 'Cortex', iCortex);
 
 %%
 %% Process: Project electrodes on scalp

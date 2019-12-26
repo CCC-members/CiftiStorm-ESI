@@ -31,11 +31,68 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
-if(isfield(selected_data_set, 'eeg_data_path'))
-    eeg_data_path = char(selected_data_set.eeg_data_path);
+%%
+%% Preparing Subject files
+%%
+
+% MRI File
+[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.file_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+T1w_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+
+% Cortex Surfaces
+[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.L_surface_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+L_surface_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+
+[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.R_surface_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+R_surface_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+
+[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.Atlas_seg_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+Atlas_seg_location = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+
+if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
+    fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+    disp(string(T1w_file));
+    disp(string(L_surface_file));
+    disp(string(R_surface_file));
+    disp(string(Atlas_seg_location));
+    fprintf(2,strcat('\n -->> Do not exist. \n'));
+    fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    return;
 end
-hcp_data_path = char(selected_data_set.hcp_data_path);
-non_brain_path = char(selected_data_set.non_brain_data_path);
+
+% Non-Brain surface files
+[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.head_file_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+head_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+
+[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.outerfile_file_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+outerskull_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+
+[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.innerfile_file_location);
+filepath = strrep(filepath,'SubID',subID);
+file_name = strrep(name,'SubID',subID);
+innerskull_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+
+if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
+    fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+    disp(string(T1w_file));
+    disp(string(L_surface_file));
+    disp(string(R_surface_file));
+    fprintf(2,strcat('\n -->> Do not exist. \n'));
+    fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    return;
+end
 
 %%
 %% Checking the report output structure
@@ -85,21 +142,20 @@ channel_layout= load(ChannelFile);
 bst_report('Start',['Protocol for subject:' , subID]);
 bst_report('Info',    '', [], ['Protocol for subject:' , subID])
 
-% Build the path of the files to import
-AnatDir    = char(fullfile(hcp_data_path, subID, 'T1w'));
 
 %%
 %% Process: Import MRI
 %%
 sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
     'subjectname', subID, ...
-    'mrifile',     {fullfile(AnatDir,'T1w.nii.gz'), 'ALL-MNI'});
+    'mrifile',     {T1w_file, 'ALL-MNI'});
 
 %%
 %% Quality control
 %%
 % Get subject definition
 sSubject = bst_get('Subject', subID);
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -117,24 +173,17 @@ close([hFigMri1 hFigMri2 hFigMri3]);
 %%
 %% Process: Import surfaces 
 %%
-L_surf = fullfile(AnatDir,'Native',[subID,'.L.midthickness.native.surf.gii']);
-R_surf = fullfile(AnatDir,'Native',[subID,'.R.midthickness.native.surf.gii']);
-if(selected_data_set.selected_surf ~= "native")
-    L_surf = fullfile(AnatDir,'fsaverage_LR32k',[subID,'.L.midthickness.32k_fs_LR.surf.gii']);
-    R_surf = fullfile(AnatDir,'fsaverage_LR32k',[subID,'.R.midthickness.32k_fs_LR.surf.gii']);
-end
-
 nverthead = selected_data_set.process_import_surfaces.nverthead;
 nvertcortex = selected_data_set.process_import_surfaces.nvertcortex;
 nvertskull = selected_data_set.process_import_surfaces.nvertskull;
 
 sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
     'subjectname', subID, ...
-    'headfile',    {fullfile(non_brain_path,subID,[subID,'_outskin_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
-    'cortexfile1', {L_surf, 'GII-MNI'}, ...
-    'cortexfile2', {R_surf, 'GII-MNI'}, ...
-    'innerfile',   {fullfile(non_brain_path,subID,[subID,'_inskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
-    'outerfile',   {fullfile(non_brain_path,subID,[subID,'_outskull_mesh.nii.gz']), 'MRI-MASK-MNI'}, ...
+    'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
+    'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
+    'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
+    'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
+    'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
     'nverthead',   nverthead, ...
     'nvertcortex', nvertcortex, ...
     'nvertskull',  nvertskull);
@@ -215,23 +264,29 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
 %%
 %% Get subject definition and subject files
 %%
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 
 %%
 %% Forcing dipoles inside innerskull
 %%
-tess_force_envelope(CortexFile, InnerSkullFile);
+script_tess_force_envelope(CortexFile, InnerSkullFile);
 
 %%
 %% Get subject definition and subject files
 %%
-sSubject       = bst_get('Subject', SubjectName);
+sSubject       = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
 InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+iCortex        = sSubject.iCortex;
+iAnatomy       = sSubject.iAnatomy;
+iInnerSkull    = sSubject.iInnerSkull;
+iOuterSkull    = sSubject.iOuterSkull;
+iScalp         = sSubject.iScalp;
 
 %%
 %% Quality control
@@ -291,26 +346,23 @@ close(hFigMri15);
 %%
 %% ===== ACCESS RECORDINGS =====
 %%
-sSubject       = bst_get('Subject', subID);
-MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-[sStudy, iStudy, iItem] = bst_get('MriFile', MriFile);
 FileFormat = 'BST';  
-iStudy = (iStudy * 2) - 1;
+
 %%
 %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
 % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
 %%
-[Output, ChannelFile, FileFormat] = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
+[Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
 
 %%
 %% Process: Set BEM Surfaces
 %%
 [sSubject, iSubject] = bst_get('Subject', subID);
-db_surface_default(iSubject, 'Scalp', 5);
-db_surface_default(iSubject, 'OuterSkull', 6);
-db_surface_default(iSubject, 'InnerSkull', 7);
-db_surface_default(iSubject, 'Cortex', 1);
+db_surface_default(iSubject, 'Scalp', iScalp);
+db_surface_default(iSubject, 'OuterSkull', iOuterSkull);
+db_surface_default(iSubject, 'InnerSkull', iInnerSkull);
+db_surface_default(iSubject, 'Cortex', iCortex);
 
 %%
 %% Project electrodes on the scalp surface.
@@ -320,6 +372,7 @@ ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject] = bst_get('Subject', subID);
 subjectSubDir = bst_fileparts(sSubject.FileName);
+sStudy = bst_get('Study', iStudies);
 
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
