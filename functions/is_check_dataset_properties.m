@@ -2,8 +2,15 @@ function valided = is_check_dataset_properties(selected_dataset)
 
 valided = true;
 
-if(isfield(selected_dataset, 'eeg_data_path'))
-    if(~isfield(selected_dataset.eeg_data_path, 'base_path') || (~isfolder(selected_dataset.eeg_data_path.base_path) && selected_dataset.eeg_data_path.base_path ~= "none"))
+if(isfield(selected_dataset, 'eeg_raw_data_path'))
+    if(~isfield(selected_dataset.eeg_raw_data_path, 'base_path') || (~isfolder(selected_dataset.eeg_raw_data_path.base_path) && selected_dataset.eeg_raw_data_path.base_path ~= "none"))
+        valided = false;
+        fprintf(2,'\n -->> Error: The EEG Raw folder don''t exist\n');
+        return;
+    end 
+end
+if(isfield(selected_dataset, 'preprocessed_eeg'))
+    if(~isfield(selected_dataset.preprocessed_eeg, 'base_path') || (~isfolder(selected_dataset.preprocessed_eeg.base_path) && selected_dataset.preprocessed_eeg.base_path ~= "none"))
         valided = false;
         fprintf(2,'\n -->> Error: The EEG folder don''t exist\n');
         return;

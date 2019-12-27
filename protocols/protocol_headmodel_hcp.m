@@ -148,12 +148,16 @@ end
 if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
     mkdir(fullfile(report_output_path,'Reports',ProtocolName));
 end
-report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'.html']);
+if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName,subID)))
+    mkdir(fullfile(report_output_path,'Reports',ProtocolName,subID));
+end
+subject_report_path = fullfile(report_output_path,'Reports',ProtocolName,subID);
+report_name = fullfile(subject_report_path,[subID,'.html']);
 iter = 2;
 while(isfile(report_name))   
-   report_name = fullfile(report_output_path,'Reports',ProtocolName,[subID,'_Iter_', num2str(iter),'.html']);
+   report_name = fullfile(subject_report_path,[subID,'_Iter_', num2str(iter),'.html']);
    iter = iter + 1;
-end
+end 
 
 %%
 %% Start a new report
@@ -218,16 +222,24 @@ bst_save(BstMriFile, sMri, 'v7');
 %%
 % Get subject definition
 sSubject = bst_get('Subject', subID);
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+if(~isempty(iStudies))
+else
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
 bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
+saveas( hFigMri1,fullfile(subject_report_path,'MRI Axial view.fig'));
 
 hFigMri2 = view_mri_slices(MriFile, 'y', 20);
 bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,750,475]);
+saveas( hFigMri2,fullfile(subject_report_path,'MRI Coronal view.fig'));
 
 hFigMri3 = view_mri_slices(MriFile, 'z', 20);
 bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
+saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
 
 close([hFigMri1 hFigMri2 hFigMri3]);
 %%
@@ -263,18 +275,18 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
 hFigMriSurf = view_mri(MriFile, CortexFile);
-
 %
 hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
 bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
-
+saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
 %
 hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
 bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
-
+saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
 %
 hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
 bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
+saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
 
 % Closing figures
 close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
@@ -282,14 +294,15 @@ close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
 %
 hFigMri7 = view_mri(MriFile, ScalpFile);
 bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
-
+saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
 %
 hFigMri8 = view_mri(MriFile, OuterSkullFile);
 bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
-
+saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
 %
 hFigMri9 = view_mri(MriFile, InnerSkullFile);
 bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
+saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
 
 % Closing figures
 close([hFigMri7 hFigMri8 hFigMri9]);
@@ -297,7 +310,7 @@ close([hFigMri7 hFigMri8 hFigMri9]);
 % 
 hFigSurf10 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
-
+saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D top view.fig'));
 %
 figure_3d('SetStandardView', hFigSurf10, 'left');
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
@@ -358,7 +371,7 @@ hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
-
+saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration top view.fig'));
 close(hFigSurf11);
 
 hFigSurf12 = script_view_surface(CortexFile, [], [], [],'left');
@@ -401,7 +414,7 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 %
 hFigMri15 = view_mri(MriFile, ScalpFile);
 bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
-
+saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
 % Close figures
 close(hFigMri15);
 
@@ -433,6 +446,7 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 hFigScalp16      = script_view_surface(ScalpFile, [], [], [], 'front');
 [hFigScalp16, iDS, iFig] = view_helmet(sFiles.ChannelFile, hFigScalp16);
 bst_report('Snapshot',hFigScalp16,[],'Sensor-Helmet registration front view', [200,200,750,475]);
+saveas( hFigMri16,fullfile(subject_report_path,'Sensor-Helmet registration front view.fig'));
 
 hFigScalp17      = script_view_surface(ScalpFile, [], [], [], 'left');
 [hFigScalp17, iDS, iFig] = view_helmet(sFiles.ChannelFile, hFigScalp17);
@@ -452,6 +466,7 @@ close([hFigScalp16 hFigScalp17 hFigScalp18 hFigScalp19]);
 [hFigMri20, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'4D', 'scalp', 0, 0);
 view(90,360)
 bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration front view', [200,200,750,475]);
+saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration front view.fig'));
 
 view(180,360)
 bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration left view', [200,200,750,475]);
@@ -470,6 +485,7 @@ close(hFigMri20);
 [hFigMri21, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'MEG', 'scalp');
 view(90,360)
 bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration front view', [200,200,750,475]);
+saveas( hFigMri21,fullfile(subject_report_path,'4D coils-Scalp registration front view.fig'));
 
 view(180,360)
 bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration left view', [200,200,750,475]);
@@ -499,7 +515,7 @@ script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 CortexFile = sSubject.Surface(sSubject.iCortex).FileName;
 hFigSurf24 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
-
+saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
 %
 figure_3d('SetStandardView', hFigSurf24, 'left');
 bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
@@ -521,12 +537,12 @@ close(hFigSurf24)
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject] = bst_get('Subject', subID);
-subjectSubDir = bst_fileparts(sSubject.FileName);
+
 iStudy = ProtocolInfo.iStudy;
  sStudy = bst_get('Study', iStudy);
 headmodel_options = struct();
-headmodel_options.Comment = 'Overlapping spheres'; %OpenMEEG BEM
-headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, sStudy.Name);
+headmodel_options.Comment = 'Overlapping spheres'; % for EEG 'OpenMEEG BEM'
+headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name);
 headmodel_options.HeadModelType = 'surface';
 
 % Uploading Channels
@@ -599,27 +615,34 @@ headmodel_options.SaveFile  = true;
 %% Process Head Model
 %%
 [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
+sStudy = bst_get('Study', iStudies);
+% If a new head model is available
+sHeadModel = db_template('headmodel');
+sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
+sHeadModel.Comment       = headmodel_options.Comment;
+sHeadModel.HeadModelType = headmodel_options.HeadModelType;
+% Update Study structure
+iHeadModel = length(sStudy.HeadModel) + 1;
+sStudy.HeadModel(iHeadModel) = sHeadModel;
+sStudy.iHeadModel = iHeadModel;
+% Update DataBase
+bst_set('Study', iStudies, sStudy);
+db_save();
 
 %%
 %% Quality control 
 %%
-
 ProtocolInfo = bst_get('ProtocolInfo');
-% Get subject directory
-[sSubject] = bst_get('Subject', subID);
-subjectSubDir = bst_fileparts(sSubject.FileName);
-iStudy = ProtocolInfo.iStudy;
-sStudy = bst_get('Study', iStudy);
-BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
+
+BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
 cortex = load(BSTCortexFile);
 
-BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
 head = load(BSTScalpFile);
 
 %%
 %% Uploading Gain matrix
 %%
-BSTHeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir, sStudy.Name,'headmodel_surf_os_meg.mat');
+BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
 
@@ -644,6 +667,8 @@ end
 [hFig25] = view3D_K(Ke,cortex,head,channels,200);
 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
 view(0,360)
+saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
+
 bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
 view(1,180)
 bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
@@ -654,11 +679,6 @@ bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
 
 % Closing figure
 close(hFig25)
-
-%%
-%% Export Subject to BC-VARETA
-%%
-% export_subject_BCV(sSubject);
 
 %%
 %% Save and display report
