@@ -17,10 +17,10 @@ if(isfield(selected_data_set, 'process_import_channel') ...
         return;
     end
 elseif(isfield(selected_data_set, 'preprocessed_eeg') )
-    if(~isequal(selected_data_set.preprocessed_eeg.path,'none'))
+    if(~isequal(selected_data_set.preprocessed_eeg.base_path,'none'))
         [filepath,name,ext]= fileparts(selected_data_set.preprocessed_eeg.file_location);
         file_name = strrep(name,'SubID',subID);
-        eeg_file = fullfile(selected_data_set.preprocessed_eeg.path,subID,filepath,[file_name,ext]);
+        eeg_file = fullfile(selected_data_set.preprocessed_eeg.base_path,subID,filepath,[file_name,ext]);
         if(isfile(eeg_file))
             disp ("-->> Genering eeg file");
             [hdr, data] = import_eeg_format(eeg_file,selected_data_set.preprocessed_eeg.format);

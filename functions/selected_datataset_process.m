@@ -2,9 +2,10 @@ function selected_datataset_process(selected_data_set)
 % try
 if(isnumeric(selected_data_set.id))
     if(is_check_dataset_properties(selected_data_set))
-        disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path ));
+        disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
         ProtocolName = selected_data_set.protocol_name;
-        subjects = dir(selected_data_set.hcp_data_path);
+        [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);        
+        subjects = dir(base_path);
         subjects_process_error = [];
         subjects_processed =[];
         Protocol_count = 0;
@@ -14,10 +15,18 @@ if(isnumeric(selected_data_set.id))
                 if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
                     ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                    bst_db_path = bst_get('BrainstormDbDir');
+                    if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
+                        protocol_folder = fullfile(bst_db_path,ProtocolName_R);
+                        rmdir(protocol_folder, 's');
+                    end
                     gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
                 end
+                if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
+                    subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
+                end
                 disp(strcat('-->> Processing subject: ', subject_name));
-                
+                db_add_subject(subject_name);
                 str_function = strcat(selected_data_set.function,'(''',subject_name,''',''',ProtocolName_R,''')');
                 eval(str_function);
                 

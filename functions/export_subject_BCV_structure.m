@@ -6,18 +6,17 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
 % try
     ProtocolInfo = bst_get('ProtocolInfo');
     % Get subject directory
-    [sSubject] = bst_get('Subject', subID);
+    sSubject = bst_get('Subject', subID);
+    [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+    if(~isempty(iStudies))
+    else
+        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+    end
+    sStudy = bst_get('Study', iStudies);
     if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
         return;
     end
     subjectSubDir = bst_fileparts(sSubject.FileName);    
-    
-    prefix = '@intra';
-    if(isfield(selected_data_set, 'use_raw_data'))
-        if(isequal(selected_data_set.use_raw_data,true))
-            prefix = ['@raw',subjectSubDir];
-        end
-    end
     
     bcv_path = selected_data_set.bcv_input_path;
     if(~isfolder(bcv_path))
@@ -37,11 +36,8 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     %%
     
     disp ("-->> Genering leadfield file");
-    BSTHeadMOdelBaseFile = fullfile(ProtocolInfo.STUDIES,subjectSubDir,prefix);
-    BSTHeadModelFiles = dir(fullfile(BSTHeadMOdelBaseFile,'headmodel_surf_openmeeg*.mat'));
-    [~,idx] = sort([BSTHeadModelFiles.datenum]);
-    BSTHeadModelFile = BSTHeadModelFiles(idx(end));
-    BSTHeadModel = load(fullfile(BSTHeadModelFile.folder,BSTHeadModelFile.name));
+    BSTHeadModelFiles = fullfile(ProtocolInfo.STUDIES,sStudy.HeadModel.FileName);
+    BSTHeadModel = load(BSTHeadModelFiles);
     Ke = BSTHeadModel.Gain; 
     GridOrient = BSTHeadModel.GridOrient;
     GridAtlas = BSTHeadModel.GridAtlas;
@@ -57,7 +53,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     %% Genering scalp file
     %%
     disp ("-->> Genering scalp file");
-    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subjectSubDir,prefix,'channel.mat');
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
     Ceeg = load(BSTChannelsFile);
     
     ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
