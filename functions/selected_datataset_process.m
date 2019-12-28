@@ -4,7 +4,8 @@ if(isnumeric(selected_data_set.id))
     if(is_check_dataset_properties(selected_data_set))
         disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
         ProtocolName = selected_data_set.protocol_name;
-        subjects = dir(selected_data_set.hcp_data_path.base_path);
+        [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);        
+        subjects = dir(base_path);
         subjects_process_error = [];
         subjects_processed =[];
         Protocol_count = 0;
@@ -20,6 +21,9 @@ if(isnumeric(selected_data_set.id))
                         rmdir(protocol_folder, 's');
                     end
                     gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
+                end
+                if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
+                    subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
                 end
                 disp(strcat('-->> Processing subject: ', subject_name));
                 db_add_subject(subject_name);

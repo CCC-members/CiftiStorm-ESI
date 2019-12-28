@@ -37,28 +37,20 @@ selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.v
 %%
 %% Preparing Subject files
 %%
-
 % MRI File
-[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.file_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-T1w_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
+filepath = strrep(selected_data_set.hcp_data_path.file_location,'SubID',subID);
+T1w_file = fullfile(base_path,filepath);
 
 % Cortex Surfaces
-[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.L_surface_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-L_surface_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+filepath = strrep(selected_data_set.hcp_data_path.L_surface_location,'SubID',subID);
+L_surface_file = fullfile(base_path,filepath);
 
-[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.R_surface_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-R_surface_file = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+filepath = strrep(selected_data_set.hcp_data_path.R_surface_location,'SubID',subID);
+R_surface_file = fullfile(base_path,filepath);
 
-[filepath,name,ext]= fileparts(selected_data_set.hcp_data_path.Atlas_seg_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-Atlas_seg_location = fullfile(selected_data_set.hcp_data_path.base_path,subID,filepath,[file_name,ext]);
+filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',subID);
+Atlas_seg_location = fullfile(base_path,filepath);
 
 if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
     fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
@@ -72,23 +64,18 @@ if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~i
 end
 
 % Non-Brain surface files
-[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.head_file_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-head_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+base_path =  strrep(selected_data_set.non_brain_data_path.base_path,'SubID',subID);
+filepath = strrep(selected_data_set.non_brain_data_path.head_file_location,'SubID',subID);
+head_file = fullfile(base_path,filepath);
 
-[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.outerfile_file_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-outerskull_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+filepath =  strrep(selected_data_set.non_brain_data_path.outerfile_file_location,'SubID',subID);
+outerskull_file = fullfile(base_path,filepath);
 
-[filepath,name,ext]= fileparts(selected_data_set.non_brain_data_path.innerfile_file_location);
-filepath = strrep(filepath,'SubID',subID);
-file_name = strrep(name,'SubID',subID);
-innerskull_file = fullfile(selected_data_set.non_brain_data_path.base_path,subID,filepath,[file_name,ext]);
+filepath = strrep(selected_data_set.non_brain_data_path.innerfile_file_location,'SubID',subID);
+innerskull_file = fullfile(base_path,filepath);
 
 if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
-    fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+    fprintf(2,strcat('\n -->> Error: The Non-brain surfaces: \n'));
     disp(string(T1w_file));
     disp(string(L_surface_file));
     disp(string(R_surface_file));
@@ -98,6 +85,31 @@ if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
 end
 
 % eeg raw data files
+base_path =  strrep(selected_data_set.eeg_raw_data_path.base_path,'SubID',subID);
+filepath = strrep(selected_data_set.eeg_raw_data_path.file_location,'SubID',subID);
+raw_eeg = fullfile(base_path,filepath);
+
+if(selected_data_set.eeg_raw_data_path.isfile)
+    if(~isfile(raw_eeg))
+        fprintf(2,strcat('\n -->> Error: The EEG Raw data: \n'));
+        disp(string(raw_eeg));
+        fprintf(2,strcat('\n -->> Do not exist or is not a file. \n'));
+        fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+        return;
+    end
+else
+    if(~isfolder(raw_eeg))
+%         if(~isequal(selected_data_set.eeg_raw_data_path.))
+        fprintf(2,strcat('\n -->> Error: The EEG Raw data: \n'));
+        disp(string(raw_eeg));
+        fprintf(2,strcat('\n -->> Do not exist or is not a folder. \n'));
+        fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+        return;
+    end
+    if(isequal(selected_data_set.eeg_raw_data_path.data_format,'mff'))
+        
+    end
+end
 
 %%
 %% Checking the report output structure
