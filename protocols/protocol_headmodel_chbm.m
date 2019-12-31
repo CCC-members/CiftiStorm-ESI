@@ -175,7 +175,6 @@ saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
 
 close([hFigMri1 hFigMri2 hFigMri3]);
 
-
 %%
 %% Process: Import surfaces 
 %%
@@ -428,6 +427,9 @@ hFigMri19      = script_view_mri_3d(MriFile, [], [], [], 'back');
 hFigMri19      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
 bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
 
+% Close figures
+close([hFigMri16 hFigMri17 hFigMri18 hFigMri19]);
+
 % View sources on Scalp
 [sSubject, iSubject] = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
@@ -451,7 +453,7 @@ hFigMri23      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
 bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
-close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+close([hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
 
 %%
 %% Process: Import Atlas
