@@ -1,4 +1,4 @@
-function protocol_headmodel_chbm(subID,ProtocolName)
+function [processed] = protocol_headmodel_chbm(subID,ProtocolName)
 % TUTORIAL: Script that reproduces the results of the online tutorials.
 %
 %
@@ -58,6 +58,7 @@ if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~i
     disp(string(Atlas_seg_location));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;    
     return;
 end
 
@@ -79,8 +80,14 @@ if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
     disp(string(R_surface_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
+
+%%
+%% Creating subject in Protocol
+%%
+db_add_subject(subID);
 
 %%
 %% Checking the report output structure
@@ -147,11 +154,11 @@ sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
 %%
 % Get subject definition
 sSubject = bst_get('Subject', subID);
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-if(~isempty(iStudies))
-else
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-end
+% [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+% if(~isempty(iStudies))
+% else
+% [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+% end
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -352,6 +359,13 @@ FileFormat = 'BST';
 %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
 % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
 %%
+sSubject = bst_get('Subject', subID);
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+if(~isempty(iStudies))
+else
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
+
 [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
 
@@ -546,6 +560,7 @@ sHeadModel.HeadModelType = headmodel_options.HeadModelType;
 iHeadModel = length(sStudy.HeadModel) + 1;
 sStudy.HeadModel(iHeadModel) = sHeadModel;
 sStudy.iHeadModel = iHeadModel;
+sStudy.iChannel = length(sStudy.Channel);
 % Update DataBase
 bst_set('Study', iStudies, sStudy);
 db_save();
@@ -594,5 +609,6 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
+processed = true;
 disp([10 '-->> BrainStorm Protocol: Done.' 10]);
 

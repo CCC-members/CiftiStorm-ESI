@@ -1,4 +1,4 @@
-function protocol_headmodel_hbn(subID,ProtocolName)
+function [processed] = protocol_headmodel_hbn(subID,ProtocolName)
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -60,6 +60,7 @@ if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~i
     disp(string(Atlas_seg_location));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
 
@@ -81,6 +82,7 @@ if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
     disp(string(R_surface_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
 
@@ -95,6 +97,7 @@ if(selected_data_set.eeg_raw_data_path.isfile)
         disp(string(raw_eeg));
         fprintf(2,strcat('\n -->> Do not exist or is not a file. \n'));
         fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+        processed = false;
         return;
     end
 else
@@ -104,12 +107,18 @@ else
         disp(string(raw_eeg));
         fprintf(2,strcat('\n -->> Do not exist or is not a folder. \n'));
         fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+        processed = false;
         return;
     end
     if(isequal(selected_data_set.eeg_raw_data_path.data_format,'mff'))
         
     end
 end
+
+%%
+%% Creating subject in Protocol
+%%
+db_add_subject(subID);
 
 %%
 %% Checking the report output structure
@@ -607,5 +616,6 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
+processed = true;
 disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
 

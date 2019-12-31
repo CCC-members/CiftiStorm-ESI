@@ -4,7 +4,7 @@ if(isnumeric(selected_data_set.id))
     if(is_check_dataset_properties(selected_data_set))
         disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
         ProtocolName = selected_data_set.protocol_name;
-        [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);        
+        [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);
         subjects = dir(base_path);
         subjects_process_error = [];
         subjects_processed =[];
@@ -26,25 +26,25 @@ if(isnumeric(selected_data_set.id))
                     subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
                 end
                 disp(strcat('-->> Processing subject: ', subject_name));
-                db_add_subject(subject_name);
-                str_function = strcat(selected_data_set.function,'(''',subject_name,''',''',ProtocolName_R,''')');
+                str_function = strcat('[processed]=',selected_data_set.function,'(''',subject_name,''',''',ProtocolName_R,''');');
                 eval(str_function);
                 
                 %%
                 %% Export Subject to BC-VARETA
                 %%
-                disp(['BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure']);               
-                export_subject_BCV_structure(selected_data_set,subject_name);
-                
+                if(processed)
+                    disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+                    export_subject_BCV_structure(selected_data_set,subject_name);
+                end
                 %%
                 Protocol_count = Protocol_count + 1;
                 if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
                     % Genering Manual QC file (need to check)
-%                     generate_MaQC_file();
+                    %                     generate_MaQC_file();
                 end
             end
         end
-        
+        disp(strcat('-->> Process finished....'));
         save report.mat subjects_processed subjects_process_error;
     end
 else
@@ -67,10 +67,10 @@ else
                 str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
                 eval(str_function);
                 
-                 %%
+                %%
                 %% Export Subject to BC-VARETA
                 %%
-                disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);               
+                disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);
                 export_subject_BCV_structure(selected_data_set,char(subjectID));
             end
         end
@@ -88,6 +88,6 @@ end
 %     brainstorm stop;
 %     fprintf(2,strcat("\n -->> Protocol stoped \n"));
 %     msgText = getReport(exception);
-%     fprintf(2,strcat("\n -->> ", string(msgText), "\n"));   
+%     fprintf(2,strcat("\n -->> ", string(msgText), "\n"));
 % end
 end
