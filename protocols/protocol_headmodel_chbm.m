@@ -1,4 +1,4 @@
-function protocol_headmodel_chbm(subID,ProtocolName)
+function [processed] = protocol_headmodel_chbm(subID,ProtocolName)
 % TUTORIAL: Script that reproduces the results of the online tutorials.
 %
 %
@@ -58,6 +58,7 @@ if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~i
     disp(string(Atlas_seg_location));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;    
     return;
 end
 
@@ -79,8 +80,14 @@ if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
     disp(string(R_surface_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
+
+%%
+%% Creating subject in Protocol
+%%
+db_add_subject(subID);
 
 %%
 %% Checking the report output structure
@@ -147,11 +154,11 @@ sFiles = bst_process('CallProcess', 'process_import_mri', [], [], ...
 %%
 % Get subject definition
 sSubject = bst_get('Subject', subID);
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-if(~isempty(iStudies))
-else
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-end
+% [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+% if(~isempty(iStudies))
+% else
+% [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+% end
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -167,7 +174,6 @@ bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
 saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
 
 close([hFigMri1 hFigMri2 hFigMri3]);
-
 
 %%
 %% Process: Import surfaces 
@@ -352,6 +358,13 @@ FileFormat = 'BST';
 %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
 % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)  
 %%
+sSubject = bst_get('Subject', subID);
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+if(~isempty(iStudies))
+else
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
+
 [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
 
 
@@ -414,6 +427,9 @@ hFigMri19      = script_view_mri_3d(MriFile, [], [], [], 'back');
 hFigMri19      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
 bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
 
+% Close figures
+close([hFigMri16 hFigMri17 hFigMri18 hFigMri19]);
+
 % View sources on Scalp
 [sSubject, iSubject] = bst_get('Subject', subID);
 MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
@@ -437,7 +453,7 @@ hFigMri23      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
 bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
-close([hFigMri16 hFigMri17 hFigMri18 hFigMri19 hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+close([hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
 
 %%
 %% Process: Import Atlas
@@ -546,6 +562,7 @@ sHeadModel.HeadModelType = headmodel_options.HeadModelType;
 iHeadModel = length(sStudy.HeadModel) + 1;
 sStudy.HeadModel(iHeadModel) = sHeadModel;
 sStudy.iHeadModel = iHeadModel;
+sStudy.iChannel = length(sStudy.Channel);
 % Update DataBase
 bst_set('Study', iStudies, sStudy);
 db_save();
@@ -594,5 +611,6 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
+processed = true;
 disp([10 '-->> BrainStorm Protocol: Done.' 10]);
 

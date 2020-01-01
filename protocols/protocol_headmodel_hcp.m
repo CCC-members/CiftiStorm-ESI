@@ -1,4 +1,4 @@
-function protocol_headmodel_hcp(subID,ProtocolName)
+function [processed] = protocol_headmodel_hcp(subID,ProtocolName)
 % TUTORIAL_HCP: Script that reproduces the results of the online tutorial "Human Connectome Project: Resting-state MEG".
 %
 % CORRESPONDING ONLINE TUTORIALS:
@@ -60,14 +60,44 @@ filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',sub
 Atlas_seg_location = fullfile(base_path,filepath);
 
 if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
-    fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
-    disp(string(T1w_file));
-    disp(string(L_surface_file));
-    disp(string(R_surface_file));
-    disp(string(Atlas_seg_location));
-    fprintf(2,strcat('\n -->> Do not exist. \n'));
-    fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
-    return;
+    if(isfile(T1w_file) && ~isfile(L_surface_file) && ~isfile(R_surface_file))
+        if(isfield(selected_data_set, 'brain_external_surface_path'))
+            base_path =  strrep(selected_data_set.brain_external_surface_path.base_path,'SubID',subID);
+            filepath = strrep(selected_data_set.brain_external_surface_path.L_surface_location,'SubID',subID);
+            L_surface_file = fullfile(base_path,filepath);
+            
+            filepath = strrep(selected_data_set.brain_external_surface_path.R_surface_location,'SubID',subID);
+            R_surface_file = fullfile(base_path,filepath);
+            if(~isfile(L_surface_file) || ~isfile(R_surface_file))
+                fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+                disp(string(L_surface_file));
+                disp(string(R_surface_file));
+                fprintf(2,strcat('\n -->> Do not exist. \n'));
+                fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+                processed = false;
+                return;
+            end
+        else
+            fprintf(2,strcat('\n -->> Error: You need to configure the cortex surfaces in at least one of follows field\n'));
+            disp(string(T1w_file));
+            disp("hcp_data_path");
+            disp("OR");
+            disp("brain_external_surface_path");
+            fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+            processed = false;
+            return;
+        end
+    else
+        fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+        disp(string(T1w_file));
+        disp(string(L_surface_file));
+        disp(string(R_surface_file));
+        disp(string(Atlas_seg_location));
+        fprintf(2,strcat('\n -->> Do not exist. \n'));
+        fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+        processed = false;
+        return;
+    end
 end
 
 % Non-Brain surface files
@@ -88,6 +118,7 @@ if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
     disp(string(R_surface_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
 
@@ -101,21 +132,28 @@ if(~isfile(MEG_file))
     disp(string(MEG_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
 
 % Transformation file
 base_path =  strrep(selected_data_set.meg_data_path.base_path,'SubID',subID);
 filepath = strrep(selected_data_set.meg_transformation_path.file_location,'SubID',subID);
-MEG_transformation_file = fullfile(base_path,subID,filepath);
+MEG_transformation_file = fullfile(base_path,filepath);
 if(~isfile(MEG_transformation_file))
     fprintf(2,strcat('\n -->> Error: The MEG tranformation file: \n'));
     disp(string(MEG_transformation_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+    processed = false;
     return;
 end
 
+
+%%
+%% Creating subject in Protocol
+%%
+db_add_subject(subID);
 
 %%
 %% Checking the report output structure
@@ -208,11 +246,6 @@ bst_save(BstMriFile, sMri, 'v7');
 %%
 % Get subject definition
 sSubject = bst_get('Subject', subID);
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-if(~isempty(iStudies))
-else
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-end
 % Get MRI file and surface files
 MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -432,7 +465,7 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 hFigScalp16      = script_view_surface(ScalpFile, [], [], [], 'front');
 [hFigScalp16, iDS, iFig] = view_helmet(sFiles.ChannelFile, hFigScalp16);
 bst_report('Snapshot',hFigScalp16,[],'Sensor-Helmet registration front view', [200,200,750,475]);
-saveas( hFigMri16,fullfile(subject_report_path,'Sensor-Helmet registration front view.fig'));
+saveas( hFigScalp16,fullfile(subject_report_path,'Sensor-Helmet registration front view.fig'));
 
 hFigScalp17      = script_view_surface(ScalpFile, [], [], [], 'left');
 [hFigScalp17, iDS, iFig] = view_helmet(sFiles.ChannelFile, hFigScalp17);
@@ -449,41 +482,41 @@ bst_report('Snapshot',hFigScalp19,[],'Sensor-Helmet registration back view', [20
 close([hFigScalp16 hFigScalp17 hFigScalp18 hFigScalp19]);
 
 % View 4D coils on Scalp
-[hFigMri20, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'4D', 'scalp', 0, 0);
+[hFigScalp20, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'4D', 'scalp', 0, 0);
 view(90,360)
-bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration front view', [200,200,750,475]);
-saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration front view.fig'));
+bst_report('Snapshot',hFigScalp20,[],'4D coils-Scalp registration front view', [200,200,750,475]);
+saveas( hFigScalp20,fullfile(subject_report_path,'Sensor-Scalp registration front view.fig'));
 
 view(180,360)
-bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration left view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp20,[],'4D coils-Scalp registration left view', [200,200,750,475]);
 
 view(0,360)
-bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration right view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp20,[],'4D coils-Scalp registration right view', [200,200,750,475]);
 
 view(270,360)
-bst_report('Snapshot',hFigMri20,[],'4D coils-Scalp registration back view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp20,[],'4D coils-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
-close(hFigMri20);
+close(hFigScalp20);
 
 
 % View 4D coils on Scalp
-[hFigMri21, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'MEG', 'scalp');
+[hFigScalp21, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'MEG', 'scalp');
 view(90,360)
-bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration front view', [200,200,750,475]);
-saveas( hFigMri21,fullfile(subject_report_path,'4D coils-Scalp registration front view.fig'));
+bst_report('Snapshot',hFigScalp21,[],'4D coils-Scalp registration front view', [200,200,750,475]);
+saveas( hFigScalp21,fullfile(subject_report_path,'4D coils-Scalp registration front view.fig'));
 
 view(180,360)
-bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration left view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp21,[],'4D coils-Scalp registration left view', [200,200,750,475]);
 
 view(0,360)
-bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration right view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp21,[],'4D coils-Scalp registration right view', [200,200,750,475]);
 
 view(270,360)
-bst_report('Snapshot',hFigMri21,[],'4D coils-Scalp registration back view', [200,200,750,475]);
+bst_report('Snapshot',hFigScalp21,[],'4D coils-Scalp registration back view', [200,200,750,475]);
 
 % Close figures
-close(hFigMri21);
+close(hFigScalp21);
 
 %%
 %% Process: Import Atlas
@@ -601,7 +634,10 @@ headmodel_options.SaveFile  = true;
 %% Process Head Model
 %%
 [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
-sStudy = bst_get('Study', iStudies);
+
+ProtocolInfo = bst_get('ProtocolInfo');
+iStudy = ProtocolInfo.iStudy;
+sStudy = bst_get('Study', iStudy);
 % If a new head model is available
 sHeadModel = db_template('headmodel');
 sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
@@ -611,8 +647,9 @@ sHeadModel.HeadModelType = headmodel_options.HeadModelType;
 iHeadModel = length(sStudy.HeadModel) + 1;
 sStudy.HeadModel(iHeadModel) = sHeadModel;
 sStudy.iHeadModel = iHeadModel;
+sStudy.iChannel = length(sStudy.Channel);
 % Update DataBase
-bst_set('Study', iStudies, sStudy);
+bst_set('Study', iStudy, sStudy);
 db_save();
 
 %%
@@ -623,6 +660,7 @@ ProtocolInfo = bst_get('ProtocolInfo');
 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
 cortex = load(BSTCortexFile);
 
+BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
 head = load(BSTScalpFile);
 
 %%
@@ -673,5 +711,6 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
+processed = true;
 disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
 
