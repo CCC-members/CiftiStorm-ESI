@@ -60,15 +60,44 @@ filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',sub
 Atlas_seg_location = fullfile(base_path,filepath);
 
 if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
-    fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
-    disp(string(T1w_file));
-    disp(string(L_surface_file));
-    disp(string(R_surface_file));
-    disp(string(Atlas_seg_location));
-    fprintf(2,strcat('\n -->> Do not exist. \n'));
-    fprintf(2,strcat('-->> Jumping to an other subject. \n'));
-    processed = false;
-    return;
+    if(isfile(T1w_file) && ~isfile(L_surface_file) && ~isfile(R_surface_file))
+        if(isfield(selected_data_set, 'brain_external_surface_path'))
+            base_path =  strrep(selected_data_set.brain_external_surface_path.base_path,'SubID',subID);
+            filepath = strrep(selected_data_set.brain_external_surface_path.L_surface_location,'SubID',subID);
+            L_surface_file = fullfile(base_path,filepath);
+            
+            filepath = strrep(selected_data_set.brain_external_surface_path.R_surface_location,'SubID',subID);
+            R_surface_file = fullfile(base_path,filepath);
+            if(~isfile(L_surface_file) || ~isfile(R_surface_file))
+                fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+                disp(string(L_surface_file));
+                disp(string(R_surface_file));
+                fprintf(2,strcat('\n -->> Do not exist. \n'));
+                fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+                processed = false;
+                return;
+            end
+        else
+            fprintf(2,strcat('\n -->> Error: You need to configure the cortex surfaces in at least one of follows field\n'));
+            disp(string(T1w_file));
+            disp("hcp_data_path");
+            disp("OR");
+            disp("brain_external_surface_path");
+            fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+            processed = false;
+            return;
+        end
+    else
+        fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+        disp(string(T1w_file));
+        disp(string(L_surface_file));
+        disp(string(R_surface_file));
+        disp(string(Atlas_seg_location));
+        fprintf(2,strcat('\n -->> Do not exist. \n'));
+        fprintf(2,strcat('-->> Jumping to an other subject. \n'));
+        processed = false;
+        return;
+    end
 end
 
 % Non-Brain surface files

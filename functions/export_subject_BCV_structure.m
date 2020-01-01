@@ -54,6 +54,22 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
     Sh = load(BSTScalpFile);  
     
+    %%
+    %% Genering inner skull file
+    %%
+    disp ("-->> Genering inner skull file");
+    InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+    BSTInnerSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
+    Sinn = load(BSTInnerSkullFile);  
+      
+     %%
+    %% Genering outer skull file
+    %%
+    disp ("-->> Genering outer skull file");
+    OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+    BSTOuterSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
+    Sout = load(BSTOuterSkullFile);  
+      
     %% Creating subject folder structure
     disp(strcat("-->> Saving BC-VARETA structure. Subject: ",sSubject.Name));
     [output_subject_dir] = create_data_structure(bcv_path,sSubject.Name,selected_data_set.modality);
@@ -63,6 +79,8 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
         subject_info.leadfield_dir = fullfile('leadfield','leadfield.mat');
         subject_info.surf_dir = fullfile('surf','surf.mat');
         subject_info.scalp_dir = fullfile('scalp','scalp.mat');
+        subject_info.innerskull_dir = fullfile('scalp','innerskull.mat');
+        subject_info.outerskull_dir = fullfile('scalp','outerskull.mat');
         subject_info.modality = selected_data_set.modality;
     end
     
@@ -80,13 +98,13 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 labels = hdr.label;
                 labels = strrep(labels,'REF','');
                 [Ceeg] = remove_channels_from_layout(labels,Ceeg);
-                disp ("-->> Saving eeg file");
+                
                 subject_info.eeg_dir = fullfile('eeg','eeg.mat');
-                subject_info.eeg_info = fullfile('eeg','eeg_info.mat');
+                subject_info.eeg_info_dir = fullfile('eeg','eeg_info.mat');
                 disp ("-->> Saving eeg_info file");
-                save(strcat(output_subject_dir,filesep,'eeg',filesep,'eeg_info.mat'),'hdr');
+                save(fullfile(output_subject_dir,'eeg','eeg_info.mat'),'hdr');
                 disp ("-->> Saving eeg file");
-                save(strcat(output_subject_dir,filesep,'eeg',filesep,'eeg.mat'),'data');
+                save(fullfile(output_subject_dir,'eeg','eeg.mat'),'data');
             end
         end
     end
@@ -115,7 +133,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                     data = [data trial];
                 end                
                 subject_info.meg_dir = fullfile('meg','meg.mat');
-                subject_info.meg_info = fullfile('meg','meg_info.mat');
+                subject_info.meg_info_dir = fullfile('meg','meg_info.mat');
                 disp ("-->> Saving meg_info file");
                 save(strcat(output_subject_dir,filesep,'meg',filesep,'meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
                 disp ("-->> Saving meg file");
@@ -124,11 +142,15 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
        end
     end   
     disp ("-->> Saving leadfield file");
-    save(strcat(output_subject_dir,filesep,'leadfield',filesep,'leadfield.mat'),'Ke','GridOrient','GridAtlas');
+    save(fullfile(output_subject_dir,'leadfield','leadfield.mat'),'Ke','GridOrient','GridAtlas');
     disp ("-->> Saving surf file");
-    save(strcat(output_subject_dir,filesep,'surf',filesep,'surf.mat'),'Sc');
+    save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc');
     disp ("-->> Saving scalp file");
-    save(strcat(output_subject_dir,filesep,'scalp',filesep,'scalp.mat'),'Ceeg','Sh');
+    save(fullfile(output_subject_dir,'scalp','scalp.mat'),'Ceeg','Sh');
+    disp ("-->> Saving inner skull file");
+    save(fullfile(output_subject_dir,'scalp','innerskull.mat'),'Sinn');
+    disp ("-->> Saving outer skull file");
+    save(fullfile(output_subject_dir,'scalp','outerskull.mat'),'Sout');
     disp ("-->> Saving subject file");
     save(fullfile(output_subject_dir,'subject.mat'),'subject_info');
     

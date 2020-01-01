@@ -42,6 +42,7 @@ if(isnumeric(selected_data_set.id))
                     % Genering Manual QC file (need to check)
                     %                     generate_MaQC_file();
                 end
+                disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
             end
         end
         disp(strcat('-->> Process finished....'));
