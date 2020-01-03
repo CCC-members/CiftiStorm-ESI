@@ -82,6 +82,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
         subject_info.innerskull_dir = fullfile('scalp','innerskull.mat');
         subject_info.outerskull_dir = fullfile('scalp','outerskull.mat');
         subject_info.modality = selected_data_set.modality;
+        subject_info.name = sSubject.Name;
     end
     
     %%
