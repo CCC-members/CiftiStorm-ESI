@@ -32,17 +32,16 @@ addpath(fullfile('protocols'));
 addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'guide'));
 %app_properties = jsondecode(fileread(strcat('properties',filesep,'app_properties.json')));
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+app_properties = jsondecode(fileread(fullfile('app','app_properties.json')));
 
 if(~isempty(app_properties.selected_data_set.value) && isnumeric(double(app_properties.selected_data_set.value)))
 
-app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
+app_protocols = jsondecode(fileread(fullfile('app','app_protocols.json')));
 try
     selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 catch
     fprintf(2,"\n ->> Error: The selected_data_set.value in aap\\app_properties.json file have to be a number \n");
 end
-
 
 %% Printing data information
 disp(strcat("-->> Name:",app_properties.generals.name));
