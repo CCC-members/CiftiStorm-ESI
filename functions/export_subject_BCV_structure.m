@@ -98,7 +98,10 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 [hdr, data] = import_eeg_format(eeg_file,selected_data_set.preprocessed_eeg.format);
                 labels = hdr.label;
                 labels = strrep(labels,'REF','');
-                [Ceeg] = remove_channels_from_layout(labels,Ceeg);
+                disp ("-->> Removing Channels  by preprocessed EEG");
+                [Ceeg,Ke] = remove_channels_and_leadfield_from_layout(labels,Ceeg,Ke);
+                disp ("-->> Sorting Channels and LeadField by preprocessed EEG");
+                [Ceeg,Ke] = sort_channels_and_leadfield_by_labels(label,Ceeg,Ke);
                 
                 subject_info.eeg_dir = fullfile('eeg','eeg.mat');
                 subject_info.eeg_info_dir = fullfile('eeg','eeg_info.mat');
@@ -124,8 +127,11 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 time = meg.data.time;
                 label = meg.data.label;
                 cfg = meg.data.cfg;
-%                 labels = strrep(labels,'REF','');
-                [Ceeg] = remove_channels_from_layout(label,Ceeg);
+                %                 labels = strrep(labels,'REF','');
+                disp ("-->> Removing Channels  by preprocessed MEG");
+                [Ceeg,Ke] = remove_channels_and_leadfield_from_layout(label,Ceeg,Ke);
+                disp ("-->> Sorting Channels and LeadField by preprocessed MEG");
+                [Ceeg,Ke] = sort_channels_and_leadfield_by_labels(label,Ceeg,Ke);
                 
                 data = [];
                 for i=1: length(meg.data.trial)
