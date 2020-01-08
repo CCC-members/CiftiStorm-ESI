@@ -145,7 +145,7 @@ if(isfolder(bst_path) || isfolder(app_properties.spm_path))
             saveJSON(app_properties,strcat('app_properties.json'));
         end
     end
-    if(~isequal( app_properties.bst_db_path,"local"))
+    if(~isequal( app_properties.bst_db_path,'local'))
        bst_set('BrainstormDbDir', app_properties.bst_db_path);
     end
         
