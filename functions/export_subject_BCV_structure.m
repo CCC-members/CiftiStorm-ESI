@@ -48,7 +48,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     %%
     disp ("-->> Genering scalp file");
     BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(sStudy.iChannel).FileName);
-    Ceeg = load(BSTChannelsFile);
+    Cdata = load(BSTChannelsFile);
     
     ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
     BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
@@ -99,9 +99,9 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 labels = hdr.label;
                 labels = strrep(labels,'REF','');
                 disp ("-->> Removing Channels  by preprocessed EEG");
-                [Ceeg,Ke] = remove_channels_and_leadfield_from_layout(labels,Ceeg,Ke);
+                [Cdata,Ke] = remove_channels_and_leadfield_from_layout(labels,Cdata,Ke);
                 disp ("-->> Sorting Channels and LeadField by preprocessed EEG");
-                [Ceeg,Ke] = sort_channels_and_leadfield_by_labels(label,Ceeg,Ke);
+                [Cdata,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata,Ke);
                 
                 subject_info.eeg_dir = fullfile('eeg','eeg.mat');
                 subject_info.eeg_info_dir = fullfile('eeg','eeg_info.mat');
@@ -129,9 +129,9 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 cfg = meg.data.cfg;
                 %                 labels = strrep(labels,'REF','');
                 disp ("-->> Removing Channels  by preprocessed MEG");
-                [Ceeg,Ke] = remove_channels_and_leadfield_from_layout(label,Ceeg,Ke);
+                [Cdata,Ke] = remove_channels_and_leadfield_from_layout(label,Cdata,Ke);
                 disp ("-->> Sorting Channels and LeadField by preprocessed MEG");
-                [Ceeg,Ke] = sort_channels_and_leadfield_by_labels(label,Ceeg,Ke);
+                [Cdata,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata,Ke);
                 
                 data = [];
                 for i=1: length(meg.data.trial)
@@ -153,7 +153,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     disp ("-->> Saving surf file");
     save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc');
     disp ("-->> Saving scalp file");
-    save(fullfile(output_subject_dir,'scalp','scalp.mat'),'Ceeg','Sh');
+    save(fullfile(output_subject_dir,'scalp','scalp.mat'),'Cdata','Sh');
     disp ("-->> Saving inner skull file");
     save(fullfile(output_subject_dir,'scalp','innerskull.mat'),'Sinn');
     disp ("-->> Saving outer skull file");
