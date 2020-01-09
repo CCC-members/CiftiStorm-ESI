@@ -143,13 +143,13 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 end                
                 subject_info.meg_dir = fullfile('meg','meg.mat');
                 subject_info.meg_info_dir = fullfile('meg','meg_info.mat');
-                subject_info.meg_dir = fullfile('meg','trials.mat');
+                subject_info.trials_dir = fullfile('meg','trials.mat');
                 disp ("-->> Saving meg_info file");
-                save(strcat(output_subject_dir,filesep,'meg',filesep,'meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
+                save(fullfile(output_subject_dir,'meg','meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
                 disp ("-->> Saving meg file");
-                save(strcat(output_subject_dir,filesep,'meg',filesep,'meg.mat'),'data');
+                save(fullfile(output_subject_dir,'meg','meg.mat'),'data');
                 disp ("-->> Saving meg trials file");
-                save(strcat(output_subject_dir,filesep,'meg',filesep,'trials.mat'),'trials');
+                save(fullfile(output_subject_dir,'meg','trials.mat'),'trials');
             end
        end
     end   
