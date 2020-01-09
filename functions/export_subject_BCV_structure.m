@@ -134,17 +134,22 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 [Cdata,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata,Ke);
                 
                 data = [];
+                trials = cell(1,length(meg.data.trial));
                 for i=1: length(meg.data.trial)
                     disp (strcat("-->> Indexing trial #: ",string(i)));
-                    trial = cell2mat(meg.data.trial(1,i));                    
+                    trial = cell2mat(meg.data.trial(1,i));
+                    trials{1,i} = trial;
                     data = [data trial];
                 end                
                 subject_info.meg_dir = fullfile('meg','meg.mat');
                 subject_info.meg_info_dir = fullfile('meg','meg_info.mat');
+                subject_info.meg_dir = fullfile('meg','trials.mat');
                 disp ("-->> Saving meg_info file");
                 save(strcat(output_subject_dir,filesep,'meg',filesep,'meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
                 disp ("-->> Saving meg file");
                 save(strcat(output_subject_dir,filesep,'meg',filesep,'meg.mat'),'data');
+                disp ("-->> Saving meg trials file");
+                save(strcat(output_subject_dir,filesep,'meg',filesep,'trials.mat'),'trials');
             end
        end
     end   
