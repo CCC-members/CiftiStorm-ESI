@@ -16,7 +16,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
     if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
         return;
     end
-    bcv_path = selected_data_set.bcv_input_path;
+    bcv_path = selected_data_set.bcv_config.export_path;
     if(~isfolder(bcv_path))
         mkdir(bcv_path);
     end
@@ -133,14 +133,9 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 disp ("-->> Sorting Channels and LeadField by preprocessed MEG");
                 [Cdata,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata,Ke);
                 
-                data = [];
-                trials = cell(1,length(meg.data.trial));
-                for i=1: length(meg.data.trial)
-                    disp (strcat("-->> Indexing trial #: ",string(i)));
-                    trial = cell2mat(meg.data.trial(1,i));
-                    trials{1,i} = trial;
-                    data = [data trial];
-                end                
+                data = [meg.data.trial];
+                trials = meg.data.trial;
+                               
                 subject_info.meg_dir = fullfile('meg','meg.mat');
                 subject_info.meg_info_dir = fullfile('meg','meg_info.mat');
                 subject_info.trials_dir = fullfile('meg','trials.mat');
