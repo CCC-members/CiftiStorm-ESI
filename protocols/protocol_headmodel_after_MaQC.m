@@ -204,11 +204,16 @@ close(hFigMri15);
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
-if(selected_data_set.use_raw_data)
-    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+if(~isempty(iStudies))
 else
-    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, '@intra','channel.mat');
+    [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 end
+sStudy = bst_get('Study', iStudies);
+if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
+    return;
+end
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(sStudy.iChannel).FileName);
 
 hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
 hFigMri16      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
