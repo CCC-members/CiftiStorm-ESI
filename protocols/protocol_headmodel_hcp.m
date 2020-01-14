@@ -4,18 +4,18 @@ function [processed] = protocol_headmodel_hcp(subID,ProtocolName)
 % CORRESPONDING ONLINE TUTORIALS:
 %     https://neuroimage.usc.edu/brainstorm/Tutorials/HCP-MEG
 %
-% INPUTS: 
+% INPUTS:
 %     tutorial_dir: Directory where the HCP files have been unzipped
 
 % @=============================================================================
 % This function is part of the Brainstorm software:
 % https://neuroimage.usc.edu/brainstorm
-% 
+%
 % Copyright (c)2000-2019 University of Southern California & McGill University
 % This software is distributed under the terms of the GNU General Public License
 % as published by the Free Software Foundation. Further details on the GPLv3
 % license can be found at http://www.gnu.org/copyleft/gpl.html.
-% 
+%
 % FOR RESEARCH PURPOSES ONLY. THE SOFTWARE IS PROVIDED "AS IS," AND THE
 % UNIVERSITY OF SOUTHERN CALIFORNIA AND ITS COLLABORATORS DO NOT MAKE ANY
 % WARRANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
@@ -137,16 +137,19 @@ if(~isfile(MEG_file))
 end
 
 % Transformation file
-base_path =  strrep(selected_data_set.meg_data_path.base_path,'SubID',subID);
+base_path =  strrep(selected_data_set.meg_transformation_path.base_path,'SubID',subID);
 filepath = strrep(selected_data_set.meg_transformation_path.file_location,'SubID',subID);
 MEG_transformation_file = fullfile(base_path,filepath);
-if(~isfile(MEG_transformation_file))
+if(~isfile(MEG_transformation_file) && ~isequal(base_path,'none'))
     fprintf(2,strcat('\n -->> Error: The MEG tranformation file: \n'));
     disp(string(MEG_transformation_file));
     fprintf(2,strcat('\n -->> Do not exist. \n'));
     fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
     processed = false;
     return;
+end
+if(isequal(base_path,'none'))
+    MEG_transformation_file = 'none';
 end
 
 
@@ -161,7 +164,7 @@ db_add_subject(subID);
 if(selected_data_set.report_output_path == "local")
     report_output_path = pwd;
 else
-    report_output_path = selected_data_set.report_output_path ;    
+    report_output_path = selected_data_set.report_output_path ;
 end
 if(~isfolder(report_output_path))
     mkdir(report_output_path);
@@ -178,10 +181,10 @@ end
 subject_report_path = fullfile(report_output_path,'Reports',ProtocolName,subID);
 report_name = fullfile(subject_report_path,[subID,'.html']);
 iter = 2;
-while(isfile(report_name))   
-   report_name = fullfile(subject_report_path,[subID,'_Iter_', num2str(iter),'.html']);
-   iter = iter + 1;
-end 
+while(isfile(report_name))
+    report_name = fullfile(subject_report_path,[subID,'_Iter_', num2str(iter),'.html']);
+    iter = iter + 1;
+end
 
 %%
 %% Start a new report
@@ -200,45 +203,49 @@ bst_report('Info',    '', [], ['Protocol for subject:' , subID])
 %%
 %% Read Transformation
 %%
-bst_progress('start', 'Import HCP MEG/anatomy folder', 'Reading transformations...');
-% Read file
-fid = fopen(MEG_transformation_file, 'rt');
-strFid = fread(fid, [1 Inf], '*char');
-fclose(fid);
-% Evaluate the file (.m file syntax)
-eval(strFid);
-
+if(~isequal(MEG_transformation_file,'none'))
+    bst_progress('start', 'Import HCP MEG/anatomy folder', 'Reading transformations...');
+    % Read file
+    fid = fopen(MEG_transformation_file, 'rt');
+    strFid = fread(fid, [1 Inf], '*char');
+    fclose(fid);
+    % Evaluate the file (.m file syntax)
+    eval(strFid);
+end
 %%
 %% MRI=>MNI Tranformation
 %%
-% Convert transformations from "Brainstorm MRI" to "FieldTrip voxel"
-Tbst2ft = [diag([-1, 1, 1] ./ sMri.Voxsize), [size(sMri.Cube,1); 0; 0]; 0 0 0 1];
-% Set the MNI=>SCS transformation in the MRI
-Tmni = transform.vox07mm2spm * Tbst2ft;
-sMri.NCS.R = Tmni(1:3,1:3);
-sMri.NCS.T = Tmni(1:3,4);
-% Compute default fiducials positions based on MNI coordinates
-sMri = mri_set_default_fid(sMri);
-
+if(~isequal(MEG_transformation_file,'none'))
+    % Convert transformations from "Brainstorm MRI" to "FieldTrip voxel"
+    Tbst2ft = [diag([-1, 1, 1] ./ sMri.Voxsize), [size(sMri.Cube,1); 0; 0]; 0 0 0 1];
+    % Set the MNI=>SCS transformation in the MRI
+    Tmni = transform.vox07mm2spm * Tbst2ft;
+    sMri.NCS.R = Tmni(1:3,1:3);
+    sMri.NCS.T = Tmni(1:3,4);
+    % Compute default fiducials positions based on MNI coordinates
+    sMri = mri_set_default_fid(sMri);
+end
 %%
 %% MRI=>SCS TRANSFORMATION =====
 %%
-% Set the MRI=>SCS transformation in the MRI
-Tscs = transform.vox07mm2bti * Tbst2ft;
-sMri.SCS.R = Tscs(1:3,1:3);
-sMri.SCS.T = Tscs(1:3,4);
-% Standard positions for the SCS fiducials
-NAS = [90,   0, 0] ./ 1000;
-LPA = [ 0,  75, 0] ./ 1000;
-RPA = [ 0, -75, 0] ./ 1000;
-Origin = [0, 0, 0];
-% Convert: SCS (meters) => MRI (millimeters)
-sMri.SCS.NAS    = cs_convert(sMri, 'scs', 'mri', NAS) .* 1000;
-sMri.SCS.LPA    = cs_convert(sMri, 'scs', 'mri', LPA) .* 1000;
-sMri.SCS.RPA    = cs_convert(sMri, 'scs', 'mri', RPA) .* 1000;
-sMri.SCS.Origin = cs_convert(sMri, 'scs', 'mri', Origin) .* 1000;
-% Save MRI structure (with fiducials)
-bst_save(BstMriFile, sMri, 'v7'); 
+if(~isequal(MEG_transformation_file,'none'))
+    % Set the MRI=>SCS transformation in the MRI
+    Tscs = transform.vox07mm2bti * Tbst2ft;
+    sMri.SCS.R = Tscs(1:3,1:3);
+    sMri.SCS.T = Tscs(1:3,4);
+    % Standard positions for the SCS fiducials
+    NAS = [90,   0, 0] ./ 1000;
+    LPA = [ 0,  75, 0] ./ 1000;
+    RPA = [ 0, -75, 0] ./ 1000;
+    Origin = [0, 0, 0];
+    % Convert: SCS (meters) => MRI (millimeters)
+    sMri.SCS.NAS    = cs_convert(sMri, 'scs', 'mri', NAS) .* 1000;
+    sMri.SCS.LPA    = cs_convert(sMri, 'scs', 'mri', LPA) .* 1000;
+    sMri.SCS.RPA    = cs_convert(sMri, 'scs', 'mri', RPA) .* 1000;
+    sMri.SCS.Origin = cs_convert(sMri, 'scs', 'mri', Origin) .* 1000;
+    % Save MRI structure (with fiducials)
+    bst_save(BstMriFile, sMri, 'v7');
+end
 %%
 
 %%
@@ -263,7 +270,7 @@ saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
 close([hFigMri1 hFigMri2 hFigMri3]);
 %%
 %%
-%% Process: Import surfaces 
+%% Process: Import surfaces
 %%
 
 nverthead = selected_data_set.process_import_surfaces.nverthead;
@@ -326,7 +333,7 @@ saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fi
 % Closing figures
 close([hFigMri7 hFigMri8 hFigMri9]);
 
-% 
+%
 hFigSurf10 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
 saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D top view.fig'));
@@ -345,7 +352,7 @@ bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200
 % Closing figure
 close(hFigSurf10);
 
-%% 
+%%
 %% Process: Generate BEM surfaces
 %%
 bst_process('CallProcess', 'process_generate_bem', [], [], ...
@@ -458,7 +465,7 @@ db_surface_default(iSubject, 'Cortex', iCortex);
 %%
 %% Quality control
 %%
-    % View sources on MRI (3D orthogonal slices)
+% View sources on MRI (3D orthogonal slices)
 [sSubject, iSubject] = bst_get('Subject', subID);
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
@@ -528,9 +535,9 @@ LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
 script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 
 %%
-%% Quality control 
+%% Quality control
 %%
-% 
+%
 CortexFile = sSubject.Surface(sSubject.iCortex).FileName;
 hFigSurf24 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
@@ -558,7 +565,7 @@ ProtocolInfo = bst_get('ProtocolInfo');
 [sSubject] = bst_get('Subject', subID);
 
 iStudy = ProtocolInfo.iStudy;
- sStudy = bst_get('Study', iStudy);
+sStudy = bst_get('Study', iStudy);
 headmodel_options = struct();
 headmodel_options.Comment = 'Overlapping spheres'; % for EEG 'OpenMEEG BEM'
 headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name);
@@ -605,19 +612,19 @@ headmodel_options.SaveFile  = true;
 % headmodel_options.BemFiles = {BSTInnerSkullFile};
 % headmodel_options.BemNames = {'Brain'};
 % headmodel_options.BemCond = 1;
-% 
+%
 % iMeg = [];
 % for i = 1: length(headmodel_options.Channel)
 %     chan = headmodel_options.Channel(i);
 %     if(isequal(chan.Type,'MEG'))
-%      iMeg = [iMeg, i];   
-%     end  
+%      iMeg = [iMeg, i];
+%     end
 % end
 % for i = 1: length(headmodel_options.Channel)
 %     chan = headmodel_options.Channel(i);
 %     if(isequal(chan.Type,'MEG REF'))
-%      iMeg = [iMeg, i];   
-%     end  
+%      iMeg = [iMeg, i];
+%     end
 % end
 % headmodel_options.iMeg = iMeg;
 % headmodel_options.iEeg = [];
@@ -635,75 +642,80 @@ headmodel_options.SaveFile  = true;
 %%
 [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
 
-ProtocolInfo = bst_get('ProtocolInfo');
-iStudy = ProtocolInfo.iStudy;
-sStudy = bst_get('Study', iStudy);
-% If a new head model is available
-sHeadModel = db_template('headmodel');
-sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
-sHeadModel.Comment       = headmodel_options.Comment;
-sHeadModel.HeadModelType = headmodel_options.HeadModelType;
-% Update Study structure
-iHeadModel = length(sStudy.HeadModel) + 1;
-sStudy.HeadModel(iHeadModel) = sHeadModel;
-sStudy.iHeadModel = iHeadModel;
-sStudy.iChannel = length(sStudy.Channel);
-% Update DataBase
-bst_set('Study', iStudy, sStudy);
-db_save();
-
-%%
-%% Quality control 
-%%
-ProtocolInfo = bst_get('ProtocolInfo');
-
-BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
-cortex = load(BSTCortexFile);
-
-BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
-head = load(BSTScalpFile);
-
-%%
-%% Uploading Gain matrix
-%%
-BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
-BSTHeadModel = load(BSTHeadModelFile);
-Ke = BSTHeadModel.Gain;
-
-%%
-%% Uploading Channels Loc
-%%
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-BSTChannels = load(BSTChannelsFile);
-
-[BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
-
-channels = [];
-for i = 1: length(BSTChannels.Channel)
-    Loc = BSTChannels.Channel(i).Loc;
-    center = mean(Loc,2);
-    channels = [channels; center(1),center(2),center(3) ];
+if(~isempty(headmodel_options))
+    ProtocolInfo = bst_get('ProtocolInfo');
+    iStudy = ProtocolInfo.iStudy;
+    sStudy = bst_get('Study', iStudy);
+    % If a new head model is available
+    sHeadModel = db_template('headmodel');
+    sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
+    sHeadModel.Comment       = headmodel_options.Comment;
+    sHeadModel.HeadModelType = headmodel_options.HeadModelType;
+    % Update Study structure
+    iHeadModel = length(sStudy.HeadModel) + 1;
+    sStudy.HeadModel(iHeadModel) = sHeadModel;
+    sStudy.iHeadModel = iHeadModel;
+    sStudy.iChannel = length(sStudy.Channel);
+    % Update DataBase
+    bst_set('Study', iStudy, sStudy);
+    db_save();
+    
+    %%
+    %% Quality control
+    %%
+    ProtocolInfo = bst_get('ProtocolInfo');
+    
+    BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
+    cortex = load(BSTCortexFile);
+    
+    BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
+    head = load(BSTScalpFile);
+    
+    %%
+    %% Uploading Gain matrix
+    %%
+    BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
+    BSTHeadModel = load(BSTHeadModelFile);
+    Ke = BSTHeadModel.Gain;
+    
+    %%
+    %% Uploading Channels Loc
+    %%
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+    BSTChannels = load(BSTChannelsFile);
+    
+    [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
+    
+    channels = [];
+    for i = 1: length(BSTChannels.Channel)
+        Loc = BSTChannels.Channel(i).Loc;
+        center = mean(Loc,2);
+        channels = [channels; center(1),center(2),center(3) ];
+    end
+    
+    %%
+    %% Ploting sensors and sources on the scalp and cortex
+    %%
+    [hFig25] = view3D_K(Ke,cortex,head,channels,200);
+    bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
+    view(0,360)
+    saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
+    
+    bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
+    view(1,180)
+    bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
+    view(90,360)
+    bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
+    view(270,360)
+    bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
+    
+    % Closing figure
+    close(hFig25)
+    
+    processed = true;
+else
+    processed = false;
 end
-
-%%
-%% Ploting sensors and sources on the scalp and cortex
-%%
-[hFig25] = view3D_K(Ke,cortex,head,channels,200);
-bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
-view(0,360)
-saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
-
-bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
-view(1,180)
-bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
-view(90,360)
-bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
-view(270,360)
-bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-
-% Closing figure
-close(hFig25)
-
 %%
 %% Save and display report
 %%
@@ -711,6 +723,6 @@ ReportFile = bst_report('Save', sFiles);
 bst_report('Export',  ReportFile,report_name);
 bst_report('Open', ReportFile);
 bst_report('Close');
-processed = true;
+
 disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
 

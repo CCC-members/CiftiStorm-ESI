@@ -34,7 +34,9 @@ if(isnumeric(selected_data_set.id))
                 %%
                 if(processed)
                     disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
-                    export_subject_BCV_structure(selected_data_set,subject_name);
+                    if(selected_data_set.bcv_config.export)
+                        export_subject_BCV_structure(selected_data_set,subject_name);
+                    end
                 end
                 %%
                 Protocol_count = Protocol_count + 1;
@@ -72,7 +74,9 @@ else
                 %% Export Subject to BC-VARETA
                 %%
                 disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);
-                export_subject_BCV_structure(selected_data_set,char(subjectID));
+                if(selected_data_set.bcv_config.export)
+                    export_subject_BCV_structure(selected_data_set,char(subjectID));
+                end
             end
         end
     elseif(isequal(selected_data_set.id,'export_to_BCV'))

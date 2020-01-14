@@ -70,8 +70,8 @@ if(isfield(selected_dataset, 'report_output_path'))
         return;
     end
 end
-if(isfield(selected_dataset, 'bcv_input_path'))
-    if(~isfolder(selected_dataset.bcv_input_path) && selected_dataset.bcv_input_path ~= "local")
+if(isfield(selected_dataset, 'bcv_config'))
+    if(~isfolder(selected_dataset.bcv_config.export_path) && selected_dataset.bcv_config.export_path ~= "local")
         valided = false;
         fprintf(2,'\n-->> Error: The input BC-Vareta folder don''t exist\n');
         return;
