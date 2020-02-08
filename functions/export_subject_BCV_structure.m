@@ -101,7 +101,7 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
                 disp ("-->> Removing Channels  by preprocessed EEG");
                 [Cdata,Ke] = remove_channels_and_leadfield_from_layout(labels,Cdata,Ke);
                 disp ("-->> Sorting Channels and LeadField by preprocessed EEG");
-                [Cdata,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata,Ke);
+                [Cdata,Ke] = sort_channels_and_leadfield_by_labels(labels,Cdata,Ke);
                 
                 subject_info.eeg_dir = fullfile('eeg','eeg.mat');
                 subject_info.eeg_info_dir = fullfile('eeg','eeg_info.mat');
