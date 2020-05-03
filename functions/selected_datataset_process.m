@@ -48,6 +48,8 @@ if(isnumeric(selected_data_set.id))
             end
         end
         disp(strcat('-->> Process finished....'));
+        disp('=================================================================');
+        disp('=================================================================');
         save report.mat subjects_processed subjects_process_error;
     end
 else
