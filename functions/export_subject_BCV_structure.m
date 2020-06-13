@@ -86,20 +86,27 @@ if(isfolder(output_subject_dir))
     for h=1:length(HeadModels)
         HeadModel = HeadModels(h);
         if(isequal(HeadModel.Comment,'Overlapping spheres'))
-            leadfield_dir(h).path = fullfile('leadfield','os_leadfield.mat');
+            dir = replace(fullfile('leadfield','os_leadfield.mat'),'\','/');
+            leadfield_dir(h).path = dir;
         end
         if(isequal(HeadModel.Comment,'Single sphere'))
-            leadfield_dir(h).path = fullfile('leadfield','ss_leadfield.mat');
+            dir = replace(fullfile('leadfield','ss_leadfield.mat'),'\','/');
+            leadfield_dir(h).path = dir;
         end
         if(isequal(HeadModel.Comment,'OpenMEEG BEM'))
-            leadfield_dir(h).path = fullfile('leadfield','om_leadfield.mat');
+            dir = replace(fullfile('leadfield','om_leadfield.mat'),'\','/');
+            leadfield_dir(h).path = dir;
         end
     end
     subject_info.leadfield_dir = leadfield_dir;
-    subject_info.surf_dir = fullfile('surf','surf.mat');
-    subject_info.scalp_dir = fullfile('scalp','scalp.mat');
-    subject_info.innerskull_dir = fullfile('scalp','innerskull.mat');
-    subject_info.outerskull_dir = fullfile('scalp','outerskull.mat');
+    dir = replace(fullfile('surf','surf.mat'),'\','/');
+    subject_info.surf_dir = dir;
+    dir = replace(fullfile('scalp','scalp.mat'),'\','/');
+    subject_info.scalp_dir = dir;
+    dir = replace(fullfile('scalp','innerskull.mat'),'\','/');
+    subject_info.innerskull_dir = dir;
+    dir = replace(fullfile('scalp','outerskull.mat'),'\','/');
+    subject_info.outerskull_dir = dir;
     subject_info.modality = selected_data_set.modality;
     subject_info.name = sSubject.Name;
 end
@@ -114,11 +121,14 @@ if(isfield(selected_data_set, 'preprocessed_eeg'))
         eeg_file = fullfile(base_path,filepath);
         if(isfile(eeg_file))
             disp ("-->> Genering eeg file");
-            [hdr, data] = import_eeg_format(eeg_file,selected_data_set.preprocessed_eeg.format);
-            
+            [hdr, data] = import_eeg_format(eeg_file,selected_data_set.preprocessed_eeg.format); 
+            if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
+                user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
+                disp ("-->> Cleanning EEG bad Channels by user labels");
+                [data,hdr]  = remove_eeg_channels_by_labels(user_labels,data,hdr);
+            end
             labels = hdr.label;
-            labels = strrep(labels,'REF','');
-            
+            labels = strrep(labels,'REF','');            
             for h=1:length(HeadModels)
                 HeadModel = HeadModels(h);
                 disp ("-->> Removing Channels  by preprocessed EEG");
@@ -128,8 +138,10 @@ if(isfield(selected_data_set, 'preprocessed_eeg'))
                 HeadModels(h).Ke = Ke;
             end
             Cdata = Cdata_s;
-            subject_info.eeg_dir = fullfile('eeg','eeg.mat');
-            subject_info.eeg_info_dir = fullfile('eeg','eeg_info.mat');
+            dir = replace(fullfile('eeg','eeg.mat'),'\','/');
+            subject_info.eeg_dir = dir;
+            dir = replace(fullfile('eeg','eeg_info.mat'),'\','/');
+            subject_info.eeg_info_dir = dir;
             disp ("-->> Saving eeg_info file");
             save(fullfile(output_subject_dir,'eeg','eeg_info.mat'),'hdr');
             disp ("-->> Saving eeg file");
@@ -166,9 +178,12 @@ if(isfield(selected_data_set, 'preprocessed_meg'))
             data = [meg.data.trial];
             trials = meg.data.trial;
             
-            subject_info.meg_dir = fullfile('meg','meg.mat');
-            subject_info.meg_info_dir = fullfile('meg','meg_info.mat');
-            subject_info.trials_dir = fullfile('meg','trials.mat');
+            dir = replace(fullfile('meg','meg.mat'),'\','/');
+            subject_info.meg_dir = dir;
+            dir = replace(fullfile('meg','meg_info.mat'),'\','/');
+            subject_info.meg_info_dir = dir;
+            dir = replace(fullfile('meg','trials.mat'),'\','/');
+            subject_info.trials_dir = dir;
             disp ("-->> Saving meg_info file");
             save(fullfile(output_subject_dir,'meg','meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
             disp ("-->> Saving meg file");
