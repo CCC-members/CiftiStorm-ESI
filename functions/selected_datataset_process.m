@@ -2,7 +2,7 @@ function selected_datataset_process(selected_data_set)
 % try
 if(isnumeric(selected_data_set.id))
     if(is_check_dataset_properties(selected_data_set))
-        disp(strcat('--> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
+        disp(strcat('-->> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
         ProtocolName = selected_data_set.protocol_name;
         [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);
         subjects = dir(base_path);

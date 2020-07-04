@@ -28,11 +28,10 @@ function [processed] = protocol_headmodel_hbn(subID,ProtocolName)
 
 
 %%
-%% Preparing current subject
+%% Preparing selected protocol
 %%
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
-app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
-selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
+selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
 %%
 %% Preparing Subject files
@@ -200,6 +199,24 @@ sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, []
     'nverthead',   nverthead, ...
     'nvertcortex', nvertcortex, ...
     'nvertskull',  nvertskull);
+
+%% ===== IMPORT SURFACES 32K =====
+[sSubject, iSubject] = bst_get('Subject', subID);
+% Left pial
+[iLh, BstTessLhFile, nVertOrigL] = import_surfaces(iSubject, L_surface_file, 'GII-MNI', 0);
+BstTessLhFile = BstTessLhFile{1};
+% Right pial
+[iRh, BstTessRhFile, nVertOrigR] = import_surfaces(iSubject, R_surface_file, 'GII-MNI', 0);
+BstTessRhFile = BstTessRhFile{1};
+
+%% ===== MERGE SURFACES =====
+% Merge surfaces
+tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
+% Delete original files
+file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
+% Reload subject
+db_reload_subjects(iSubject);
+db_surface_default(iSubject, 'Cortex', 2);
 
 %%
 %% Quality control
