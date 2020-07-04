@@ -45,9 +45,12 @@ end
 %% Genering surf file
 %%
 disp ("-->> Genering surf file");
-CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
-Sc = load(BSTCortexFile);
+CortexFile32K       = sSubject.Surface(1).FileName;
+BSTCortexFile32K    = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile32K);
+Sc32k               = load(BSTCortexFile32K);
+CortexFile          = sSubject.Surface(sSubject.iCortex).FileName;
+BSTCortexFile       = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
+Sc                  = load(BSTCortexFile);
 
 %%
 %% Genering scalp file
