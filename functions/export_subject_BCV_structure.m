@@ -45,12 +45,24 @@ end
 %% Genering surf file
 %%
 disp ("-->> Genering surf file");
-CortexFile32K       = sSubject.Surface(1).FileName;
-BSTCortexFile32K    = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile32K);
-Sc32k               = load(BSTCortexFile32K);
-CortexFile          = sSubject.Surface(sSubject.iCortex).FileName;
-BSTCortexFile       = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
-Sc                  = load(BSTCortexFile);
+% Loadding FSAve templates
+FSAve_64k               = load('templates/FSAve_cortex_64k.mat');
+fsave_inds_template     = load('templates/FSAve_64k_8k_coregister_inds.mat');
+
+% Loadding subject surfaces
+CortexFile64K           = sSubject.Surface(1).FileName;
+BSTCortexFile64K        = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile64K);
+Sc64k                   = load(BSTCortexFile64K);
+CortexFile8K            = sSubject.Surface(2).FileName;
+BSTCortexFile8K         = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile8K);
+Sc8k                    = load(BSTCortexFile8K);
+% CortexFile              = sSubject.Surface(sSubject.iCortex).FileName;
+% BSTCortexFile           = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
+% Sc                      = load(BSTCortexFile);
+
+% Finding near FSAve vertices on subject surface
+sub_to_FSAve = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
+
 
 %%
 %% Genering scalp file
@@ -214,7 +226,7 @@ for h=1:length(HeadModels)
     end
 end
 disp ("-->> Saving surf file");
-save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc');
+save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc64k','Sc8k','sub_to_FSAve');
 disp ("-->> Saving scalp file");
 save(fullfile(output_subject_dir,'scalp','scalp.mat'),'Cdata','Sh');
 disp ("-->> Saving inner skull file");
