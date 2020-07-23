@@ -52,45 +52,81 @@ if(isnumeric(selected_data_set.id))
         disp('=================================================================');
         save report.mat subjects_processed subjects_process_error;
     end
-else
-    if(isequal(selected_data_set.id,'after_MaQC'))
-        % Load all protools
-        new_bst_DB = selected_data_set.bst_db_path;
-        bst_set('BrainstormDbDir', new_bst_DB);
-        
-        gui_brainstorm('UpdateProtocolsList');
-        db_import(new_bst_DB);
-        
-        protocols = jsondecode(fileread(selected_data_set.MaQC_report_file));
-        for i = 1 : length(protocols)
-            protocol_name = protocols(i).protocol_name;
-            iProtocol = bst_get('Protocol', protocol_name);
-            gui_brainstorm('SetCurrentProtocol', iProtocol);
-            for j = 1 : length(protocols(i).subjects)
-                subjectID = protocols(i).subjects(j);
-                disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
-                str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
-                eval(str_function);
-                
-                %%
-                %% Export Subject to BC-VARETA
-                %%
-                disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);
-                if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,char(subjectID));
-                end
+elseif(isequal(selected_data_set.id,'afterMaQC'))
+    % Load all protools
+    new_bst_DB = selected_data_set.bst_db_path;
+    bst_set('BrainstormDbDir', new_bst_DB);
+    
+    gui_brainstorm('UpdateProtocolsList');
+    db_import(new_bst_DB);
+    
+    protocols = jsondecode(fileread(selected_data_set.MaQC_report_file));
+    for i = 1 : length(protocols)
+        protocol_name = protocols(i).protocol_name;
+        iProtocol = bst_get('Protocol', protocol_name);
+        gui_brainstorm('SetCurrentProtocol', iProtocol);
+        for j = 1 : length(protocols(i).subjects)
+            subjectID = protocols(i).subjects(j);
+            disp(strcat('Recomputing Lead Field for Protocol: ',protocol_name,'. Subject: ',subjectID));
+            str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',char(subjectID),''')');
+            eval(str_function);
+            
+            %%
+            %% Export Subject to BC-VARETA
+            %%
+            disp(['BC-V -->> Export subject:' , char(subjectID), ' to BC-VARETA structure']);
+            if(selected_data_set.bcv_config.export)
+                export_subject_BCV_structure(selected_data_set,char(subjectID));
             end
         end
-    elseif(isequal(selected_data_set.id,'export_to_BCV'))
-        new_bst_DB = selected_data_set.bst_db_path;
-        bst_set('BrainstormDbDir', new_bst_DB);
-        
-        gui_brainstorm('UpdateProtocolsList');
-        db_import(new_bst_DB);
-        
-    else
     end
+elseif(isequal(selected_data_set.id,'export_to_BCV'))
+    new_bst_DB = selected_data_set.bst_db_path;
+    bst_set('BrainstormDbDir', new_bst_DB);
+    
+    gui_brainstorm('UpdateProtocolsList');
+    db_import(new_bst_DB);
+    
+elseif(isequal(selected_data_set.id,'update_protocol'))
+    % ===== LOAD PROTOCOL =====
+%     if ~bst_get('isProtocolLoaded')
+%         db_load_protocol(iProtocol);
+%     end
+    
+    new_bst_DB = selected_data_set.bst_db_path;
+    bst_set('BrainstormDbDir', new_bst_DB);
+    
+     gui_brainstorm('UpdateProtocolsList');
+     nProtocols = db_import(new_bst_DB);
+    
+    %getting existing protocols on DB
+    ProtocolInfo = bst_get('ProtocolInfo');
+    ProtocolFiles = dir(fullfile(new_bst_DB,'**','protocol.mat'));
+   
+    for i=1:length(ProtocolFiles)
+        Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));
+        protocol_name = Protocol.ProtocolInfo.Comment;
+        iProtocol = bst_get('Protocol', protocol_name);
+        gui_brainstorm('SetCurrentProtocol', iProtocol);
+        subjects = bst_get('ProtocolSubjects');
+        for j=1:length(subjects.Subject)
+            current_sub = subjects.Subject(j);
+            processed =  protocol_headmodel_EEG_from_MEG(protocol_name,current_sub.Name);
+            %%
+            %% Export Subject to BC-VARETA
+            %%
+%             if(processed)
+%                 disp(strcat('BC-V -->> Export subject:' , current_sub.Name, ' to BC-VARETA structure'));
+%                 if(selected_data_set.bcv_config.export)
+%                     export_subject_BCV_structure(selected_data_set,current_sub.Name);
+%                 end
+%             end
+        end
+    end
+    
+else
 end
+
 % catch exception
 %     brainstorm stop;
 %     fprintf(2,strcat("\n -->> Protocol stoped \n"));

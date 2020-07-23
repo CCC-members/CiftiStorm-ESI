@@ -40,7 +40,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
     try
         selected_data_set = jsondecode(fileread(fullfile('config_protocols',app_properties.selected_data_set.file_name)));
     catch
-        fprintf(2,"\n ->> Error: The selected_data_set.value in aap\\app_properties.json file have to be a number \n");
+        fprintf(2,"\n ->> Error: The selected_data_set file in config_protocols do not have a correct format \n");
     end
     
     %% Printing data information
@@ -135,6 +135,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         if ~brainstorm('status')
             if(console)
                 brainstorm nogui local
+                bst_set('SpmDir', app_properties.spm_path);
             else
                 brainstorm nogui
                 data_folder = uigetdir('tittle','Select the Data Folder');
