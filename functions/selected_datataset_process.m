@@ -103,7 +103,7 @@ elseif(isequal(selected_data_set.id,'update_protocol'))
     ProtocolInfo = bst_get('ProtocolInfo');
     ProtocolFiles = dir(fullfile(new_bst_DB,'**','protocol.mat'));
    
-    for i=1:length(ProtocolFiles)
+    for i=2:length(ProtocolFiles)
         Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));
         protocol_name = Protocol.ProtocolInfo.Comment;
         iProtocol = bst_get('Protocol', protocol_name);

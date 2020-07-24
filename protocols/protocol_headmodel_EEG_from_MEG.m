@@ -104,8 +104,7 @@ ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
 try
-    hFigMriSurf = view_mri(MriFile, CortexFile);
-    
+    hFigMriSurf = view_mri(MriFile, CortexFile);    
     %
     hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
     bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
@@ -127,20 +126,20 @@ try
     hFigMri7 = view_mri(MriFile, ScalpFile);
     bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
     saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
+    close(hFigMri7);
     %
     hFigMri8 = view_mri(MriFile, OuterSkullFile);
     bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
     saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
+    close(hFigMri8);
     %
     hFigMri9 = view_mri(MriFile, InnerSkullFile);
     bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
     saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
+    close(hFigMri9);
 catch
 end
-% Closing figures
-close([hFigMri7 hFigMri8 hFigMri9]);
 
-% 
 try
     hFigSurf10 = view_surface(CortexFile);
     bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
@@ -179,6 +178,15 @@ try
     hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
     bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
     saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration top view.fig'));
+    
+    view(0,360)    
+    bst_report('Snapshot',hFigSurf11,[],'Field right view', [200,200,750,475]);
+    view(1,180)
+    bst_report('Snapshot',hFigSurf11,[],'Field left view', [200,200,750,475]);
+    view(90,360)
+    bst_report('Snapshot',hFigSurf11,[],'Field front view', [200,200,750,475]);
+    view(270,360)
+    bst_report('Snapshot',hFigSurf11,[],'Field back view', [200,200,750,475]);
 catch
 end
 close(hFigSurf11);
