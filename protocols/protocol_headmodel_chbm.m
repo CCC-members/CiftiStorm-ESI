@@ -227,62 +227,57 @@ OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
-try
-    hFigMriSurf = view_mri(MriFile, CortexFile);
-    
-    %
-    hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
-    bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
-    saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
-    %
-    hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
-    bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
-    saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
-    %
-    hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
-    bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
-    saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
-    % Closing figures
-catch
-end
+
+hFigMriSurf = view_mri(MriFile, CortexFile);
+
+%
+hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
+bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
+saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
+%
+hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
+bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
+saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
+%
+hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
+bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
+saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
+% Closing figures
+
 close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
-try
-    %
-    hFigMri7 = view_mri(MriFile, ScalpFile);
-    bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
-    saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
-    %
-    hFigMri8 = view_mri(MriFile, OuterSkullFile);
-    bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
-    saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
-    %
-    hFigMri9 = view_mri(MriFile, InnerSkullFile);
-    bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
-    saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
-catch
-end
+
+%
+hFigMri7 = view_mri(MriFile, ScalpFile);
+bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
+saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
+%
+hFigMri8 = view_mri(MriFile, OuterSkullFile);
+bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
+saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
+%
+hFigMri9 = view_mri(MriFile, InnerSkullFile);
+bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
+saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
+
 % Closing figures
 close([hFigMri7 hFigMri8 hFigMri9]);
 
 
 %
-try
-    hFigSurf10 = view_surface(CortexFile);
-    bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
-    saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D top view.fig'));
-    %
-    figure_3d('SetStandardView', hFigSurf10, 'left');
-    bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
-    
-    %
-    figure_3d('SetStandardView', hFigSurf10, 'bottom');
-    bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D bottom view', [200,200,750,475]);
-    
-    %
-    figure_3d('SetStandardView', hFigSurf10, 'right');
-    bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200,200,750,475]);
-catch
-end
+
+hFigSurf10 = view_surface(CortexFile);
+bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
+saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
+% Bottom
+view(90,270)
+bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D bottom view', [200,200,750,475]);
+%Left
+view(1,180)
+bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
+% Rigth
+view(0,360)
+bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200,200,750,475]);
+
 % Closing figure
 close(hFigSurf10);
 
@@ -327,43 +322,38 @@ iScalp         = sSubject.iScalp;
 %%
 %% Quality control
 %%
-try
+
     hFigSurf11 = script_view_surface(CortexFile, [], [], [],'top');
     hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
     hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
     hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
     bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
     saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration top view.fig'));
-catch
-end
+
 close(hFigSurf11);
-try
+
     hFigSurf12 = script_view_surface(CortexFile, [], [], [],'left');
     hFigSurf12 = script_view_surface(InnerSkullFile, [], [], hFigSurf12);
     hFigSurf12 = script_view_surface(OuterSkullFile, [], [], hFigSurf12);
     hFigSurf12 = script_view_surface(ScalpFile, [], [], hFigSurf12);
     bst_report('Snapshot',hFigSurf12,[],'BEM surfaces registration left view', [200,200,750,475]);
-catch
-end
+
 close( hFigSurf12);
-try
+
     hFigSurf13 = script_view_surface(CortexFile, [], [], [],'right');
     hFigSurf13 = script_view_surface(InnerSkullFile, [], [], hFigSurf13);
     hFigSurf13 = script_view_surface(OuterSkullFile, [], [], hFigSurf13);
     hFigSurf13 = script_view_surface(ScalpFile, [], [], hFigSurf13);
     bst_report('Snapshot',hFigSurf13,[],'BEM surfaces registration right view', [200,200,750,475]);
-catch
-end
+
 close(hFigSurf13);
 
-try
     hFigSurf14 = script_view_surface(CortexFile, [], [], [],'back');
     hFigSurf14 = script_view_surface(InnerSkullFile, [], [], hFigSurf14);
     hFigSurf14 = script_view_surface(OuterSkullFile, [], [], hFigSurf14);
     hFigSurf14 = script_view_surface(ScalpFile, [], [], hFigSurf14);
     bst_report('Snapshot',hFigSurf14,[],'BEM surfaces registration back view', [200,200,750,475]);
-catch
-end
+
 close(hFigSurf14);
 
 %%

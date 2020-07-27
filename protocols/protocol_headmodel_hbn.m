@@ -266,17 +266,15 @@ close([hFigMri7 hFigMri8 hFigMri9]);
 % 
 hFigSurf10 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
-saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D top view.fig'));
-%
-figure_3d('SetStandardView', hFigSurf10, 'left');
-bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
-
-%
-figure_3d('SetStandardView', hFigSurf10, 'bottom');
+saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
+% Bottom
+view(90,270)
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D bottom view', [200,200,750,475]);
-
-%
-figure_3d('SetStandardView', hFigSurf10, 'right');
+%Left
+view(1,180)
+bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
+% Rigth
+view(0,360)
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200,200,750,475]);
 
 % Closing figure
@@ -297,12 +295,16 @@ bst_process('CallProcess', 'process_generate_bem', [], [], ...
 %%
 sSubject       = bst_get('Subject', subID);
 CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+% InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
 
 %%
 %% Forcing dipoles inside innerskull
 %%
-script_tess_force_envelope(CortexFile, InnerSkullFile);
+% Right pial
+[iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 0);
+BstTessISFile = BstTessISFile{1};
+
+script_tess_force_envelope(CortexFile, BstTessISFile);
 
 %%
 %% Get subject definition and subject files
@@ -327,31 +329,24 @@ hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
-saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration top view.fig'));
-close(hFigSurf11);
+saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration view.fig'));
 
-hFigSurf12 = script_view_surface(CortexFile, [], [], [],'left');
-hFigSurf12 = script_view_surface(InnerSkullFile, [], [], hFigSurf12);
-hFigSurf12 = script_view_surface(OuterSkullFile, [], [], hFigSurf12);
-hFigSurf12 = script_view_surface(ScalpFile, [], [], hFigSurf12);
-bst_report('Snapshot',hFigSurf12,[],'BEM surfaces registration left view', [200,200,750,475]);
+% Left
+view(1,180)
+bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration left view', [200,200,750,475]);
 
-close( hFigSurf12);
-
-hFigSurf13 = script_view_surface(CortexFile, [], [], [],'right');
-hFigSurf13 = script_view_surface(InnerSkullFile, [], [], hFigSurf13);
-hFigSurf13 = script_view_surface(OuterSkullFile, [], [], hFigSurf13);
-hFigSurf13 = script_view_surface(ScalpFile, [], [], hFigSurf13);
-bst_report('Snapshot',hFigSurf13,[],'BEM surfaces registration right view', [200,200,750,475]);
+% Right
+view(0,360)
+bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration right view', [200,200,750,475]);
 close(hFigSurf13);
+% Front
+view(90,360)
+bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration front view', [200,200,750,475]);
+% Back
+view(270,360)
+bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration back view', [200,200,750,475]);
 
-hFigSurf14 = script_view_surface(CortexFile, [], [], [],'back');
-hFigSurf14 = script_view_surface(InnerSkullFile, [], [], hFigSurf14);
-hFigSurf14 = script_view_surface(OuterSkullFile, [], [], hFigSurf14);
-hFigSurf14 = script_view_surface(ScalpFile, [], [], hFigSurf14);
-bst_report('Snapshot',hFigSurf14,[],'BEM surfaces registration back view', [200,200,750,475]);
-
-close(hFigSurf14);
+close(hFigSurf11);
 
 %%
 %% Process: Generate SPM canonical surfaces
