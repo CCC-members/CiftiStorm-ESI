@@ -330,15 +330,12 @@ hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
 saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration view.fig'));
-
 % Left
 view(1,180)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration left view', [200,200,750,475]);
-
 % Right
 view(0,360)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration right view', [200,200,750,475]);
-close(hFigSurf13);
 % Front
 view(90,360)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration front view', [200,200,750,475]);
@@ -450,21 +447,17 @@ hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
 hFigMri16      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
 saveas( hFigMri16,fullfile(subject_report_path,'Sensor-MRI registration front view.fig'));
-
-hFigMri17      = script_view_mri_3d(MriFile, [], [], [], 'left');
-hFigMri17      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri17, 1);
-bst_report('Snapshot',hFigMri17,[],'Sensor-MRI registration left view', [200,200,750,475]);
-
-hFigMri18      = script_view_mri_3d(MriFile, [], [], [], 'right');
-hFigMri18      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri18, 1);
-bst_report('Snapshot',hFigMri18,[],'Sensor-MRI registration right view', [200,200,750,475]);
-
-hFigMri19      = script_view_mri_3d(MriFile, [], [], [], 'back');
-hFigMri19      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri19, 1);
-bst_report('Snapshot',hFigMri19,[],'Sensor-MRI registration back view', [200,200,750,475]);
-
+%Left
+view(1,180)
+bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration left view', [200,200,750,475]);
+% Right
+view(0,360)
+bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration right view', [200,200,750,475]);
+% Back
+view(90,360)
+bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
 % Close figures
-close([hFigMri16 hFigMri17 hFigMri18 hFigMri19]);
+close(hFigMri16);
 
 % View sources on Scalp
 [sSubject, iSubject] = bst_get('Subject', subID);
@@ -475,21 +468,17 @@ hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
 hFigMri20      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
 saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration front view.fig'));
-
-hFigMri21      = script_view_surface(ScalpFile, [], [], [],'left');
-hFigMri21      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri21, 1);
-bst_report('Snapshot',hFigMri21,[],'Sensor-Scalp registration left view', [200,200,750,475]);
-
-hFigMri22      = script_view_surface(ScalpFile, [], [], [],'right');
-hFigMri22      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri22, 1);
-bst_report('Snapshot',hFigMri22,[],'Sensor-Scalp registration right view', [200,200,750,475]);
-
-hFigMri23      = script_view_surface(ScalpFile, [], [], [],'back');
-hFigMri23      = view_channels(sFiles.ChannelFile, 'EEG', 1, 0, hFigMri23, 1);
-bst_report('Snapshot',hFigMri23,[],'Sensor-Scalp registration back view', [200,200,750,475]);
-
+%Left
+view(1,180)
+bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration left view', [200,200,750,475]);
+% Right
+view(0,360)
+bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration right view', [200,200,750,475]);
+% Back
+view(90,360)
+bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration back view', [200,200,750,475]);
 % Close figures
-close([hFigMri20 hFigMri21 hFigMri22 hFigMri23]);
+close(hFigMri20);
 
 %%
 %% Process: Import Atlas
@@ -507,18 +496,15 @@ script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 hFigSurf24 = view_surface(CortexFile);
 bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
 saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
-%
-figure_3d('SetStandardView', hFigSurf24, 'left');
+%Left
+view(1,180)
 bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
-
-%
-figure_3d('SetStandardView', hFigSurf24, 'bottom');
+% Bottom
+view(90,270)
 bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
-
-%
-figure_3d('SetStandardView', hFigSurf24, 'right');
+% Rigth
+view(0,360)
 bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
-
 % Closing figure
 close(hFigSurf24)
 

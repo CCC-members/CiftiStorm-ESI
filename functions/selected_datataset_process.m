@@ -52,6 +52,32 @@ if(isnumeric(selected_data_set.id))
         disp('=================================================================');
         save report.mat subjects_processed subjects_process_error;
     end
+elseif(isequal(selected_data_set.id,''))
+    
+    % Creating permutations
+    
+    
+    for i=1:2 %length(ProtocolFiles)
+        Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));
+        protocol_name = Protocol.ProtocolInfo.Comment;
+        iProtocol = bst_get('Protocol', protocol_name);
+        gui_brainstorm('SetCurrentProtocol', iProtocol);
+        subjects = bst_get('ProtocolSubjects');
+        for j=1:length(subjects.Subject)
+            current_sub = subjects.Subject(j);
+            str_function = strcat(selected_data_set.function,'(''',protocol_name,''',''',current_sub.Name,''')');
+            eval(str_function);
+            %%
+            %% Export Subject to BC-VARETA
+            %%
+            %             if(processed)
+            %                 disp(strcat('BC-V -->> Export subject:' , current_sub.Name, ' to BC-VARETA structure'));
+            %                 if(selected_data_set.bcv_config.export)
+            %                     export_subject_BCV_structure(selected_data_set,current_sub.Name);
+            %                 end
+            %             end
+        end
+    end
 elseif(isequal(selected_data_set.id,'after_MaQC'))
     % Load all protools
     new_bst_DB = selected_data_set.bst_db_path;

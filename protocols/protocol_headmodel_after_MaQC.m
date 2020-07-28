@@ -147,15 +147,12 @@ saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
 % Bottom
 view(90,270)
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D bottom view', [200,200,750,475]);
-
 %Left
 view(1,180)
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
-
 % Right
 view(0,360)
 bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200,200,750,475]);
-
 % Closing figure
 close(hFigSurf10);
 
@@ -177,19 +174,16 @@ hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
 hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
 saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration view.fig'));
-
 %Left
 view(1,180)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration left view', [200,200,750,475]);
-
 % Right
 view(0,360)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration right view', [200,200,750,475]);
-
 % Back
 view(90,360)
 bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration back view', [200,200,750,475]);
-
+% Closing figure
 close(hFigSurf11);
 
 %%
@@ -229,19 +223,15 @@ hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
 hFigMri16      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
 saveas( hFigMri16,fullfile(subject_report_path,'Sensor-MRI registration view.fig'));
-
 %Left
 view(1,180)
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration left view', [200,200,750,475]);
-
 % Right
 view(0,360)
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration right view', [200,200,750,475]);
-
 % Back
 view(90,360)
 bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
-
 % Close figures
 close(hFigMri16);
 
@@ -254,19 +244,15 @@ hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
 hFigMri20      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri20, 1);
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
 saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration view.fig'));
-
 %Left
 view(1,180)
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration left view', [200,200,750,475]);
-
 % Right
 view(0,360)
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration right view', [200,200,750,475]);
-
 % Back
 view(90,360)
 bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration back view', [200,200,750,475]);
-
 % Close figures
 close(hFigMri20);
 
@@ -287,7 +273,6 @@ bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
 % Rigth
 view(0,360)
 bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
-
 % Closing figure
 close(hFigSurf24)
 

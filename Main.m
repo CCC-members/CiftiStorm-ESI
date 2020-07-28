@@ -151,7 +151,9 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         end
         
         %% Process selected dataset and compute the leadfield subjects
-        selected_datataset_process(selected_data_set);
+        %selected_datataset_process(selected_data_set);
+        str_function = strcat(selected_data_set.function,'()');
+        eval(str_function);
         
         %% Stoping BrainStorm
         brainstorm('stop');
