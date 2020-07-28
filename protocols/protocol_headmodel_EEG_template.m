@@ -45,6 +45,7 @@ anatomy_group = selected_data_set.process_anatomy_template.group;
 anatomy_name = selected_data_set.process_anatomy_template.name;
 nameGroup = selected_data_set.process_import_channel.group_layout_name;
 nameLayout = selected_data_set.process_import_channel.channel_layout_name;
+bstDefaults = bst_get('EegDefaults');
   
 ProtocolName = selected_data_set.protocol_name;
 Protocol_count = 0;
@@ -128,59 +129,22 @@ for i=1:length(nverthead_list)
         % [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
         % end
         % Get MRI file and surface files
-        try
-            MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-            hFigMri1 = view_mri_slices(MriFile, 'x', 20);
-            bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
-            saveas( hFigMri1,fullfile(subject_report_path,'MRI Axial view.fig'));
-            
-            hFigMri2 = view_mri_slices(MriFile, 'y', 20);
-            bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,750,475]);
-            saveas( hFigMri2,fullfile(subject_report_path,'MRI Coronal view.fig'));
-            
-            hFigMri3 = view_mri_slices(MriFile, 'z', 20);
-            bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
-            saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
-        catch
-        end
+        
+        MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        hFigMri1 = view_mri_slices(MriFile, 'x', 20);
+        bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
+        saveas( hFigMri1,fullfile(subject_report_path,'MRI Axial view.fig'));
+        
+        hFigMri2 = view_mri_slices(MriFile, 'y', 20);
+        bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,750,475]);
+        saveas( hFigMri2,fullfile(subject_report_path,'MRI Coronal view.fig'));
+        
+        hFigMri3 = view_mri_slices(MriFile, 'z', 20);
+        bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
+        saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
+        
         close([hFigMri1 hFigMri2 hFigMri3]);
-        
-        %%
-        %% Process: Import surfaces
-        %%
-        nverthead = selected_data_set.process_import_surfaces.nverthead;
-        nvertcortex = selected_data_set.process_import_surfaces.nvertcortex;
-        nvertskull = selected_data_set.process_import_surfaces.nvertskull;
-        
-        sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
-            'subjectname', subID, ...
-            'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
-            'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
-            'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
-            'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
-            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
-            'nverthead',   nverthead, ...
-            'nvertcortex', nvertcortex, ...
-            'nvertskull',  nvertskull);
-        
-        
-        %% ===== IMPORT SURFACES 32K =====
-        [sSubject, iSubject] = bst_get('Subject', subID);
-        % Left pial
-        [iLh, BstTessLhFile, nVertOrigL] = import_surfaces(iSubject, L_surface_file, 'GII-MNI', 0);
-        BstTessLhFile = BstTessLhFile{1};
-        % Right pial
-        [iRh, BstTessRhFile, nVertOrigR] = import_surfaces(iSubject, R_surface_file, 'GII-MNI', 0);
-        BstTessRhFile = BstTessRhFile{1};
-        
-        %% ===== MERGE SURFACES =====
-        % Merge surfaces
-        tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
-        % Delete original files
-        file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-        % Reload subject
-        db_reload_subjects(iSubject);
-        db_surface_default(iSubject, 'Cortex', 2);
+
         %%
         %% Quality control
         %%
@@ -246,33 +210,8 @@ for i=1:length(nverthead_list)
         
         % Closing figure
         close(hFigSurf10);
-        
-        
-        %%
-        %% Process: Generate BEM surfaces
-        %%
-        bst_process('CallProcess', 'process_generate_bem', [], [], ...
-            'subjectname', subID, ...
-            'nscalp',      1922, ...
-            'nouter',      1922, ...
-            'ninner',      1922, ...
-            'thickness',   4);
-        
-        %%
-        %% Get subject definition and subject files
-        %%
-        sSubject       = bst_get('Subject', subID);
-        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-        % InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-        
-        %%
-        %% Forcing dipoles inside innerskull
-        %%
-        [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 0);
-        BstTessISFile = BstTessISFile{1};
-        
-        script_tess_force_envelope(CortexFile, BstTessISFile);
-        
+ 
+
         %%
         %% Get subject definition and subject files
         %%
@@ -312,14 +251,7 @@ for i=1:length(nverthead_list)
         bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration back view', [200,200,750,475]);
         % Closing figure
         close(hFigSurf11);
-        
-        %%
-        %% Process: Generate SPM canonical surfaces
-        %%
-        sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
-            'subjectname', subID, ...
-            'resolution',  2);  % 8196
-        
+
         %%
         %% Quality control
         %%
@@ -337,58 +269,20 @@ for i=1:length(nverthead_list)
         close(hFigMri15);
         
         %%
-        %% ===== ACCESS RECORDINGS =====
+        %% DB_SET_CHANNEL: Define a channel file for a given study.
+        %  db_set_channel( iStudy, ChannelMat,  ChannelReplace=2, ChannelAlign=2 )
         %%
-        FileFormat = 'BST';
-        
-        %%
-        %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
-        % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)
-        %%
-        sSubject = bst_get('Subject', subID);
         [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
         if(~isempty(iStudies))
         else
             [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
         end
+        iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
+        iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
+        ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;
         
-        [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
-        
-        
-        %%
-        %% Process: Set BEM Surfaces
-        %%
-        [sSubject, iSubject] = bst_get('Subject', subID);
-        db_surface_default(iSubject, 'Scalp', iScalp);
-        db_surface_default(iSubject, 'OuterSkull', iOuterSkull);
-        db_surface_default(iSubject, 'InnerSkull', iInnerSkull);
-        db_surface_default(iSubject, 'Cortex', iCortex);
-        
-        %%
-        %% Project electrodes on the scalp surface.
-        %%
-        % Get Protocol information
-        ProtocolInfo = bst_get('ProtocolInfo');
-        % Get subject directory
-        [sSubject] = bst_get('Subject', subID);
-        sStudy = bst_get('Study', iStudies);
-        
-        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
-        head = load(BSTScalpFile);
-        
-        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-        BSTChannels = load(BSTChannelsFile);
-        channels = [BSTChannels.Channel.Loc];
-        channels = channels';
-        channels = channel_project_scalp(head.Vertices, channels);
-        
-        % Report projections in original structure
-        for iChan = 1:length(channels)
-            BSTChannels.Channel(iChan).Loc = channels(iChan,:)';
-        end
-        % Save modifications in channel file
-        bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
+        [OutputFile, ChannelMat, ChannelReplace, ChannelAlign, Modality] = db_set_channel( iStudies, ChannelFile, 2,2);
+ 
         
         %%
         %% Quality control
