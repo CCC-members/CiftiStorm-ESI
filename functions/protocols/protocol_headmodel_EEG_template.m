@@ -46,6 +46,7 @@ anatomy_name = selected_data_set.process_anatomy_template.name;
 nameGroup = selected_data_set.process_import_channel.group_layout_name;
 nameLayout = selected_data_set.process_import_channel.channel_layout_name;
 bstDefaults = bst_get('EegDefaults');
+posible_n_verts     = [12 32 42 92 122 162 273 362 482 642 812 1082 1442 1922 2432 2562 3242 4322 5762 7682 7292 9722 10242 12962];
   
 ProtocolName = selected_data_set.protocol_name;
 Protocol_count = 0;
@@ -67,7 +68,7 @@ for i=1:length(nverthead_list)
         nvertskull = nvertskull_list(i);
         nvertcortex = nvertcortex_list(j);
         subID = strcat(anatomy_name,'_',num2str(nverthead/1000),'K_',num2str(nvertcortex/1000),'K');
-        
+               
         %%
         %% Creating subject in Protocol
         %%
@@ -146,6 +147,25 @@ for i=1:length(nverthead_list)
         close([hFigMri1 hFigMri2 hFigMri3]);
 
         %%
+        %% Remesh surfaces
+        %%
+        % Get subject definition and subject files
+        sSubject       = bst_get('Subject', subID);
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+
+        [nverthead,position]=min(abs(posible_n_verts - nverthead));
+        
+        tess_remesh(ScalpFile, nverthead, 1);
+        tess_remesh(OuterSkullFile, nverthead, 1);
+        tess_remesh(InnerSkullFile, nverthead, 1);
+        
+        
+       
+        %%
         %% Quality control
         %%
         % Get subject definition and subject files
@@ -155,9 +175,6 @@ for i=1:length(nverthead_list)
         InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
         OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        
-        %
-        
         hFigMriSurf = view_mri(MriFile, CortexFile);
         
         %
