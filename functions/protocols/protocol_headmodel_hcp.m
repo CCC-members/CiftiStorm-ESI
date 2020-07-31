@@ -61,7 +61,7 @@ if(is_check_dataset_properties(selected_data_set))
                 gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
             end
             if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
-                subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
+                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
             disp(strcat('-->> Processing subject: ', subject_name));
             %%

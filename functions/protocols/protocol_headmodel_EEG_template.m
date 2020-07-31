@@ -38,37 +38,106 @@ selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_pr
 %%
 
 
-nverthead_list = selected_data_set.process_import_surfaces.nverthead;
-nvertcortex_list = selected_data_set.process_import_surfaces.nvertcortex;
-nvertskull_list = selected_data_set.process_import_surfaces.nvertskull;
+nverthead_list = selected_data_set.process_import_surfaces.nverthead.values;
+nvertcortex_list = selected_data_set.process_import_surfaces.nvertcortex.values;
+nvertskull_list = selected_data_set.process_import_surfaces.nvertskull.values;
+
+
 anatomy_group = selected_data_set.process_anatomy_template.group;
 anatomy_name = selected_data_set.process_anatomy_template.name;
 nameGroup = selected_data_set.process_import_channel.group_layout_name;
 nameLayout = selected_data_set.process_import_channel.channel_layout_name;
 bstDefaults = bst_get('EegDefaults');
+
 posible_n_verts     = [12 32 42 92 122 162 273 362 482 642 812 1082 1442 1922 2432 2562 3242 4322 5762 7682 7292 9722 10242 12962];
-  
+
 ProtocolName = selected_data_set.protocol_name;
 Protocol_count = 0;
+subject_count  = 1;
 
-for i=1:length(nverthead_list)
-    for j=1:length(nvertcortex_list)
-        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
-            ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
-            gui_brainstorm('DeleteProtocol',ProtocolName_R);
-            bst_db_path = bst_get('BrainstormDbDir');
-            if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
-                protocol_folder = fullfile(bst_db_path,ProtocolName_R);
-                rmdir(protocol_folder, 's');
-            end
-            gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
-        end
-        
+bst_db_path = bst_get('BrainstormDbDir');
+db_import(bst_db_path);
+
+for i=3:length(nverthead_list)
+    for j=2:length(nvertcortex_list)
+        %
         nverthead = nverthead_list(i);
         nvertskull = nvertskull_list(i);
         nvertcortex = nvertcortex_list(j);
-        subID = strcat(anatomy_name,'_',num2str(nverthead/1000),'K_',num2str(nvertcortex/1000),'K');
-               
+        subID = strcat(anatomy_name,'_',num2str(nverthead),'_',num2str(nvertcortex/1000));
+        
+         %%
+        %% Preparing Subject files
+        %%
+        base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
+        % Cortex Surfaces
+        filepath = strrep(selected_data_set.hcp_data_path.L_surface_location,'SubID',subID);
+        L_surface_file = fullfile(base_path,filepath);
+        
+        filepath = strrep(selected_data_set.hcp_data_path.R_surface_location,'SubID',subID);
+        R_surface_file = fullfile(base_path,filepath);
+        
+        filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',subID);
+        Atlas_seg_location = fullfile(base_path,filepath);
+        
+        if(~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
+            fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
+            disp(string(L_surface_file));
+            disp(string(R_surface_file));
+            disp(string(Atlas_seg_location));
+            fprintf(2,strcat('\n -->> Do not exist. \n'));
+            fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+            processed = false;
+            return;
+        end
+        
+        % Non-Brain surface files
+        base_path =  strrep(selected_data_set.non_brain_data_path.base_path,'SubID',subID);
+        filepath = strrep(selected_data_set.non_brain_data_path.head_file_location,'SubID',subID);
+        head_file = fullfile(base_path,filepath);
+        
+        filepath =  strrep(selected_data_set.non_brain_data_path.outerfile_file_location,'SubID',subID);
+        outerskull_file = fullfile(base_path,filepath);
+        
+        filepath = strrep(selected_data_set.non_brain_data_path.innerfile_file_location,'SubID',subID);
+        innerskull_file = fullfile(base_path,filepath);
+        
+        if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
+            fprintf(2,strcat('\n -->> Error: The Non-brain surfaces: \n'));
+            disp(string(L_surface_file));
+            disp(string(R_surface_file));
+            fprintf(2,strcat('\n -->> Do not exist. \n'));
+            fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+            processed = false;
+            return;
+        end
+        
+        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
+            
+            ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));            
+            
+            if(selected_data_set.protocol_reset)
+                gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
+                    protocol_folder = fullfile(bst_db_path,ProtocolName_R);
+                    rmdir(protocol_folder, 's');
+                end
+                gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
+            else
+%                 gui_brainstorm('UpdateProtocolsList');
+                iProtocol = bst_get('Protocol', ProtocolName_R);
+                gui_brainstorm('SetCurrentProtocol', iProtocol);
+                subjects = bst_get('ProtocolSubjects');
+                subject_count = (i-1)*length(nvertcortex_list)+j;
+                if(subject_count <= length(subjects.Subject))
+                    current_sub = subjects.Subject(subject_count);
+                    db_delete_subjects( subject_count );
+                end
+            end
+        end       
+            
+       
+        
         %%
         %% Creating subject in Protocol
         %%
@@ -145,7 +214,7 @@ for i=1:length(nverthead_list)
         saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
         
         close([hFigMri1 hFigMri2 hFigMri3]);
-
+        
         %%
         %% Remesh surfaces
         %%
@@ -156,15 +225,18 @@ for i=1:length(nverthead_list)
         InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
         OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-
-        [nverthead,position]=min(abs(posible_n_verts - nverthead));
         
-        tess_remesh(ScalpFile, nverthead, 1);
-        tess_remesh(OuterSkullFile, nverthead, 1);
-        tess_remesh(InnerSkullFile, nverthead, 1);
+        %%
+        %% Process: Import surfaces
+        %%
+        sFiles = bst_process('CallProcess', 'script_process_import_surfaces', [], [], ...
+            'subjectname', subID, ...
+            'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
+            'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
+            'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
+            'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
+            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'});
         
-        
-       
         %%
         %% Quality control
         %%
@@ -227,8 +299,29 @@ for i=1:length(nverthead_list)
         
         % Closing figure
         close(hFigSurf10);
- 
-
+        
+        %%
+        %% Process: Generate BEM surfaces
+        %%
+        bst_process('CallProcess', 'process_generate_bem', [], [], ...
+            'subjectname', subID, ...
+            'nscalp',      nverthead, ...
+            'nouter',      nvertskull, ...
+            'ninner',      nvertskull, ...
+            'thickness',   4);
+        
+        %%
+        %% Get subject definition and subject files
+        %%
+        sSubject       = bst_get('Subject', subID);
+        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+        
+        %%
+        %% Forcing dipoles inside innerskull
+        %%
+        script_tess_force_envelope(CortexFile, InnerSkullFile);
+        
         %%
         %% Get subject definition and subject files
         %%
@@ -268,7 +361,7 @@ for i=1:length(nverthead_list)
         bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration back view', [200,200,750,475]);
         % Closing figure
         close(hFigSurf11);
-
+        
         %%
         %% Quality control
         %%
@@ -289,28 +382,34 @@ for i=1:length(nverthead_list)
         %% DB_SET_CHANNEL: Define a channel file for a given study.
         %  db_set_channel( iStudy, ChannelMat,  ChannelReplace=2, ChannelAlign=2 )
         %%
-        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+        [sStudy, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
         if(~isempty(iStudies))
         else
-            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+            [sStudy, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
         end
         iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
         iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
         ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;
         
         [OutputFile, ChannelMat, ChannelReplace, ChannelAlign, Modality] = db_set_channel( iStudies, ChannelFile, 2,2);
- 
         
+        %%
+        %% projecting EEG electrodes on scalp surface
+        %%
+        process_channel_project('Compute',OutputFile,'EEG');
+       
         %%
         %% Quality control
         %%
         % View sources on MRI (3D orthogonal slices)
         [sSubject, iSubject] = bst_get('Subject', subID);
         
-        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-        
-        hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
-        hFigMri16      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
+        ProtocolInfo    = bst_get('ProtocolInfo');
+        sStudy = bst_get('Study', iStudies);
+        MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+        hFigMri16       = script_view_mri_3d(MriFile, [], [], [], 'front');
+        hFigMri16       = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
         saveas( hFigMri16,fullfile(subject_report_path,'Sensor-MRI registration front view.fig'));
         %Left
@@ -333,7 +432,7 @@ for i=1:length(nverthead_list)
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
         hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
-        hFigMri20      = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
+        hFigMri20      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri20, 1);
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
         saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration front view.fig'));
         %Left

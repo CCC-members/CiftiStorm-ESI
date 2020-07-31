@@ -28,8 +28,7 @@ restoredefaultpath;
 addpath(fullfile('app'));
 addpath(fullfile('config_protocols'));
 addpath(fullfile('external'));
-addpath(fullfile('functions'));
-addpath(fullfile('protocols'));
+addpath(genpath(fullfile('functions')));
 addpath(fullfile('templates'));
 addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'guide'));
@@ -41,6 +40,8 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         selected_data_set = jsondecode(fileread(fullfile('config_protocols',app_properties.selected_data_set.file_name)));
     catch
         fprintf(2,"\n ->> Error: The selected_data_set file in config_protocols do not have a correct format \n");
+        disp('-->> Process stoped!!!');
+        return;
     end
     
     %% Printing data information

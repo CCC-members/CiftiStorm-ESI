@@ -1,4 +1,4 @@
-function [processed] = protocol_headmodel_hbn(subID,ProtocolName)
+function [processed] = protocol_headmodel_hbn()
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -55,9 +55,9 @@ if(is_check_dataset_properties(selected_data_set))
                 gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
             end
             if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
-                subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
+                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
-            disp(strcat('-->> Processing subject: ', subject_name));
+            disp(strcat('-->> Processing subject: ', subID));
             
             %%
             %% Preparing Subject files
@@ -321,16 +321,12 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             sSubject       = bst_get('Subject', subID);
             CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-            % InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+            InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
             
             %%
             %% Forcing dipoles inside innerskull
             %%
-            % Right pial
-            [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 0);
-            BstTessISFile = BstTessISFile{1};
-            
-            script_tess_force_envelope(CortexFile, BstTessISFile);
+            script_tess_force_envelope(CortexFile, InnerSkullFile);
             
             %%
             %% Get subject definition and subject files
@@ -679,9 +675,9 @@ if(is_check_dataset_properties(selected_data_set))
             %% Export Subject to BC-VARETA
             %%
             if(processed)
-                disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+                disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
                 if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,subject_name);
+                    export_subject_BCV_structure(selected_data_set,subID);
                 end
             end
             %%
@@ -690,7 +686,7 @@ if(is_check_dataset_properties(selected_data_set))
                 % Genering Manual QC file (need to check)
                 %                     generate_MaQC_file();
             end
-            disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
+            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
         end
     end
     disp(strcat('-->> Process finished....'));

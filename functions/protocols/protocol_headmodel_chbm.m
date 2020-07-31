@@ -56,7 +56,7 @@ if(is_check_dataset_properties(selected_data_set))
                 gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
             end
             if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
-                subject_name = strrep(subject_name,selected_data_set.sub_prefix,'');
+                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
             disp(strcat('-->> Processing subject: ', subject_name));
             %%
@@ -323,15 +323,15 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             sSubject       = bst_get('Subject', subID);
             CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-            % InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+            InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
             
             %%
             %% Forcing dipoles inside innerskull
             %%
-            [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 1);
-            BstTessISFile = BstTessISFile{1};
+%             [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 1);
+%             BstTessISFile = BstTessISFile{1};
             
-            script_tess_force_envelope(CortexFile, BstTessISFile);
+            script_tess_force_envelope(CortexFile, InnerSkullFile);
             
             %%
             %% Get subject definition and subject files
