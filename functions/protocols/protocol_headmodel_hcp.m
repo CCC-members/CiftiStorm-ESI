@@ -38,7 +38,6 @@ function [processed] = protocol_headmodel_hcp(subID,ProtocolName)
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
-
 if(is_check_dataset_properties(selected_data_set))
     disp(strcat('-->> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
     ProtocolName = selected_data_set.protocol_name;
@@ -50,20 +49,7 @@ if(is_check_dataset_properties(selected_data_set))
     for j=1:size(subjects,1)
         subject_name = subjects(j).name;
         if(subject_name ~= '.' & string(subject_name) ~="..")
-            if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
-                ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
-                gui_brainstorm('DeleteProtocol',ProtocolName_R);
-                bst_db_path = bst_get('BrainstormDbDir');
-                if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
-                    protocol_folder = fullfile(bst_db_path,ProtocolName_R);
-                    rmdir(protocol_folder, 's');
-                end
-                gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
-            end
-            if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
-                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
-            end
-            disp(strcat('-->> Processing subject: ', subject_name));
+            
             %%
             %% Preparing Subject files
             %%
@@ -144,8 +130,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                 processed = false;
                 return;
-            end
-            
+            end            
             
             % MEG file
             base_path =  strrep(selected_data_set.meg_data_path.base_path,'SubID',subID);
@@ -174,9 +159,36 @@ if(is_check_dataset_properties(selected_data_set))
             end
             if(isequal(base_path,'none'))
                 MEG_transformation_file = 'none';
+            end            
+            
+            %%
+            %%  Checking protocol
+            %%
+            if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
+                ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
+                if(selected_data_set.protocol_reset)
+                    gui_brainstorm('DeleteProtocol',ProtocolName_R);
+                    bst_db_path = bst_get('BrainstormDbDir');
+                    if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
+                        protocol_folder = fullfile(bst_db_path,ProtocolName_R);
+                        rmdir(protocol_folder, 's');
+                    end
+                    gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
+                else
+                    %                 gui_brainstorm('UpdateProtocolsList');
+                    iProtocol = bst_get('Protocol', ProtocolName_R);
+                    gui_brainstorm('SetCurrentProtocol', iProtocol);
+                    subjects = bst_get('ProtocolSubjects');
+                    if(j <= length(subjects.Subject))
+                        db_delete_subjects( j );
+                    end
+                end
             end
-            
-            
+            if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
+                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
+            end
+            disp(strcat('-->> Processing subject: ', subID));
+                        
             %%
             %% Creating subject in Protocol
             %%
