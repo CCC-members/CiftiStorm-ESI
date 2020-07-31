@@ -33,11 +33,6 @@ function [processed] = protocol_headmodel_EEG_template()
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
-%%
-%% Preparing Subject files
-%%
-
-
 nverthead_list = selected_data_set.process_import_surfaces.nverthead.values;
 nvertcortex_list = selected_data_set.process_import_surfaces.nvertcortex.values;
 nvertskull_list = selected_data_set.process_import_surfaces.nvertskull.values;
@@ -53,20 +48,19 @@ posible_n_verts     = [12 32 42 92 122 162 273 362 482 642 812 1082 1442 1922 24
 
 ProtocolName = selected_data_set.protocol_name;
 Protocol_count = 0;
-subject_count  = 1;
 
 bst_db_path = bst_get('BrainstormDbDir');
 db_import(bst_db_path);
 
-for i=3:length(nverthead_list)
-    for j=2:length(nvertcortex_list)
+for i=1:length(nverthead_list)
+    for j=1:length(nvertcortex_list)
         %
         nverthead = nverthead_list(i);
         nvertskull = nvertskull_list(i);
         nvertcortex = nvertcortex_list(j);
-        subID = strcat(anatomy_name,'_',num2str(nverthead),'_',num2str(nvertcortex/1000));
+        subID = strcat(anatomy_name,'_',num2str(nverthead),'_',num2str(nvertcortex/1000),'K');
         
-         %%
+        %%
         %% Preparing Subject files
         %%
         base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
@@ -111,9 +105,11 @@ for i=3:length(nverthead_list)
             processed = false;
             return;
         end
-        
-        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
-            
+                
+        %%
+        %% Preparing selected protocol
+        %%
+        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )            
             ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));            
             
             if(selected_data_set.protocol_reset)
@@ -130,14 +126,11 @@ for i=3:length(nverthead_list)
                 subjects = bst_get('ProtocolSubjects');
                 subject_count = (i-1)*length(nvertcortex_list)+j;
                 if(subject_count <= length(subjects.Subject))
-                    current_sub = subjects.Subject(subject_count);
                     db_delete_subjects( subject_count );
                 end
             end
         end       
-            
-       
-        
+                   
         %%
         %% Creating subject in Protocol
         %%
@@ -235,7 +228,8 @@ for i=3:length(nverthead_list)
             'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
             'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
             'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
-            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'});
+            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
+            'nvertcortex', nvertcortex);
         
         %%
         %% Quality control
