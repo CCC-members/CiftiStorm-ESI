@@ -78,7 +78,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('\n -->> Do not exist. \n'));
                 fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             
             % Non-Brain surface files
@@ -100,7 +100,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('\n -->> Do not exist. \n'));
                 fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             
             %%
@@ -183,8 +183,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             % Start a new report
             bst_report('Start',['Protocol for subject:' , subID]);
-            bst_report('Info',    '', [], ['Protocol for subject:' , subID])
-            
+            bst_report('Info',    '', [], ['Protocol for subject:' , subID])            
             
             %%
             %% Process: Import MRI
@@ -204,21 +203,20 @@ if(is_check_dataset_properties(selected_data_set))
             % [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
             % end
             % Get MRI file and surface files
-            try
-                MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-                hFigMri1 = view_mri_slices(MriFile, 'x', 20);
-                bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
-                saveas( hFigMri1,fullfile(subject_report_path,'MRI Axial view.fig'));
-                
-                hFigMri2 = view_mri_slices(MriFile, 'y', 20);
-                bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,750,475]);
-                saveas( hFigMri2,fullfile(subject_report_path,'MRI Coronal view.fig'));
-                
-                hFigMri3 = view_mri_slices(MriFile, 'z', 20);
-                bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
-                saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
-            catch
-            end
+            
+            MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+            hFigMri1 = view_mri_slices(MriFile, 'x', 20);
+            bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
+            saveas( hFigMri1,fullfile(subject_report_path,'MRI Axial view.fig'));
+            
+            hFigMri2 = view_mri_slices(MriFile, 'y', 20);
+            bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,750,475]);
+            saveas( hFigMri2,fullfile(subject_report_path,'MRI Coronal view.fig'));
+            
+            hFigMri3 = view_mri_slices(MriFile, 'z', 20);
+            bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
+            saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
+           
             close([hFigMri1 hFigMri2 hFigMri3]);
             
             %%
@@ -238,8 +236,7 @@ if(is_check_dataset_properties(selected_data_set))
                 'nverthead',   nverthead, ...
                 'nvertcortex', nvertcortex, ...
                 'nvertskull',  nvertskull);
-            
-            
+                        
             %% ===== IMPORT SURFACES 32K =====
             [sSubject, iSubject] = bst_get('Subject', subID);
             % Left pial
@@ -270,8 +267,7 @@ if(is_check_dataset_properties(selected_data_set))
             
             %
             
-            hFigMriSurf = view_mri(MriFile, CortexFile);
-            
+            hFigMriSurf = view_mri(MriFile, CortexFile);            
             %
             hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
             bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
@@ -284,8 +280,7 @@ if(is_check_dataset_properties(selected_data_set))
             hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
             bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
             saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
-            % Closing figures
-            
+            % Closing figures            
             close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
             
             %
@@ -302,11 +297,9 @@ if(is_check_dataset_properties(selected_data_set))
             saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
             
             % Closing figures
-            close([hFigMri7 hFigMri8 hFigMri9]);
+            close([hFigMri7 hFigMri8 hFigMri9]);            
             
-            
-            %
-            
+            %            
             hFigSurf10 = view_surface(CortexFile);
             bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
             saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
@@ -322,8 +315,7 @@ if(is_check_dataset_properties(selected_data_set))
             
             % Closing figure
             close(hFigSurf10);
-            
-            
+                        
             %%
             %% Process: Generate BEM surfaces
             %%
@@ -345,8 +337,7 @@ if(is_check_dataset_properties(selected_data_set))
             %% Forcing dipoles inside innerskull
             %%
 %             [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 1);
-%             BstTessISFile = BstTessISFile{1};
-            
+%             BstTessISFile = BstTessISFile{1};            
             script_tess_force_envelope(CortexFile, InnerSkullFile);
             
             %%
@@ -403,13 +394,11 @@ if(is_check_dataset_properties(selected_data_set))
             sSubject       = bst_get('Subject', subID);
             ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
             
-            %
-            
+            %            
             hFigMri15 = view_mri(MriFile, ScalpFile);
             bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
             saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-            % Close figures
-            
+            % Close figures            
             close(hFigMri15);
             
             %%
@@ -429,8 +418,7 @@ if(is_check_dataset_properties(selected_data_set))
             end
             
             [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
-            
-            
+                        
             %%
             %% Process: Set BEM Surfaces
             %%
@@ -488,8 +476,7 @@ if(is_check_dataset_properties(selected_data_set))
             view(90,360)
             bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
             % Close figures
-            close(hFigMri16);
-            
+            close(hFigMri16);            
             
             % View sources on Scalp
             [sSubject, iSubject] = bst_get('Subject', subID);
@@ -524,8 +511,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             %% Quality control
             %%
-            %
-            
+            %            
             hFigSurf24 = view_surface(CortexFile);
             bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
             saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
@@ -540,8 +526,7 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
             % Closing figure
             close(hFigSurf24)
-            
-            
+                        
             %%
             %% Get Protocol information
             %%
@@ -644,25 +629,22 @@ if(is_check_dataset_properties(selected_data_set))
             
             %%
             %% Ploting sensors and sources on the scalp and cortex
-            %%
-            try
-                [hFig25] = view3D_K(Ke,cortex,head,channels,17);
-                bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
-                view(0,360)
-                saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
-                
-                bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
-                view(1,180)
-                bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
-                view(90,360)
-                bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
-                view(270,360)
-                bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-            catch
-            end
-            % Closing figure
-            close(hFig25)
+            %%            
+            [hFig25] = view3D_K(Ke,cortex,head,channels,17);
+            bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
+            view(0,360)
+            saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
             
+            bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
+            view(1,180)
+            bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
+            view(90,360)
+            bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
+            view(270,360)
+            bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
+            
+            % Closing figure
+            close(hFig25);            
             
             %%
             %% Save and display report

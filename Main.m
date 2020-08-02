@@ -119,15 +119,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         uiwait(guiHandle.UIFigure);
         delete(guiHandle);
     end
-    if(isfolder(bst_path) || isfolder(app_properties.spm_path))
-        
-        % Copying the new file channel
-        colin_channel_path = fullfile(bst_path,'defaults','eeg','Colin27');
-        channel_GSN_129 = strcat('templates',filesep,'channel_GSN_129.mat');
-        channel_GSN_HydroCel_129_E001 = strcat('templates',filesep,'channel_GSN_HydroCel_129_E001.mat');
-        copyfile( channel_GSN_129 , colin_channel_path);
-        copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
-        
+    if(isfolder(bst_path) || isfolder(app_properties.spm_path))       
         addpath(genpath(bst_path));
         addpath(app_properties.spm_path);
         

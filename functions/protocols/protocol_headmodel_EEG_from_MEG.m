@@ -89,7 +89,7 @@ for i=2:length(ProtocolFiles)
         sSubject = bst_get('Subject', subID);
         % Get MRI file and surface files
         if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
-            return;
+            continue;
         end
         
         MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
@@ -252,7 +252,7 @@ for i=2:length(ProtocolFiles)
         end
         sStudy = bst_get('Study', iStudies);
         if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
-            return;
+            continue;
         end
         
         %   Process import chennel file
@@ -286,7 +286,7 @@ for i=2:length(ProtocolFiles)
         end
         sStudy = bst_get('Study', iStudies);
         if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
-            return;
+            continue;
         end
         
         %%

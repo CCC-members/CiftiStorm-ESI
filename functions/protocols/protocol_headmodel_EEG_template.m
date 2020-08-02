@@ -82,7 +82,7 @@ for i=1:length(nverthead_list)
             fprintf(2,strcat('\n -->> Do not exist. \n'));
             fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
             processed = false;
-            return;
+            continue;
         end
         
         % Non-Brain surface files
@@ -103,7 +103,7 @@ for i=1:length(nverthead_list)
             fprintf(2,strcat('\n -->> Do not exist. \n'));
             fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
             processed = false;
-            return;
+            continue;
         end
                 
         %%
@@ -134,8 +134,7 @@ for i=1:length(nverthead_list)
         %%
         %% Creating subject in Protocol
         %%
-        [sSubject, iSubject] = db_add_subject(subID);
-        
+        [sSubject, iSubject] = db_add_subject(subID);        
         
         %%
         %% Checking the report output structure
@@ -171,8 +170,7 @@ for i=1:length(nverthead_list)
         % Start a new report
         bst_report('Start',['Protocol for subject:' , subID]);
         bst_report('Info',    '', [], ['Protocol for subject:' , subID])
-        
-        
+                
         %%
         %% Process: Import MRI
         %%
@@ -273,8 +271,7 @@ for i=1:length(nverthead_list)
         saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
         
         % Closing figures
-        close([hFigMri7 hFigMri8 hFigMri9]);
-        
+        close([hFigMri7 hFigMri8 hFigMri9]);       
         
         %
         
@@ -363,13 +360,11 @@ for i=1:length(nverthead_list)
         sSubject       = bst_get('Subject', subID);
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
-        %
-        
+        %        
         hFigMri15 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
         saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-        % Close figures
-        
+        % Close figures        
         close(hFigMri15);
         
         %%
@@ -417,8 +412,7 @@ for i=1:length(nverthead_list)
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
         % Close figures
         close(hFigMri16);
-        
-        
+                
         % View sources on Scalp
         [sSubject, iSubject] = bst_get('Subject', subID);
         
@@ -467,8 +461,7 @@ for i=1:length(nverthead_list)
         view(0,360)
         bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
         % Closing figure
-        close(hFigSurf24)
-        
+        close(hFigSurf24)        
         
         %%
         %% Get Protocol information
@@ -571,26 +564,101 @@ for i=1:length(nverthead_list)
         channels = channels';
         
         %%
+        %% Checking LF correlation 
+        %%
+        [Ne,Nv]=size(Ke);
+        Nv= Nv/3;
+        VoxelCoord=cortex.Vertices';
+        VertNorms=cortex.VertNormals';
+        
+        %computing homogeneous lead field
+        [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+        
+        %%
         %% Ploting sensors and sources on the scalp and cortex
         %%
-        try
-            [hFig25] = view3D_K(Ke,cortex,head,channels,17);
-            bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
-            view(0,360)
-            saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
-            
-            bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
-            view(1,180)
-            bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
-            view(90,360)
-            bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
-            view(270,360)
-            bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-        catch
-        end
-        % Closing figure
-        close(hFig25)
+        [hFig25] = view3D_K(Kn,cortex,head,channels,17);
+        bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
+        view(0,360)
+        saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
         
+        bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
+        view(1,180)
+        bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
+        view(90,360)
+        bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
+        view(270,360)
+        bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
+        % Closing figure
+        close(hFig25);
+        
+        
+        [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+        bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
+        view(0,360)
+        saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
+        
+        bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
+        view(1,180)
+        bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
+        view(90,360)
+        bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
+        view(270,360)
+        bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+        % Closing figure
+        close(hFig26);
+        
+        VertNorms   = reshape(VertNorms,[1,Nv,3]);
+        VertNorms   = repmat(VertNorms,[Ne,1,1]);
+        Kn          = sum(Kn.*VertNorms,3);
+        Khom        = sum(Khom.*VertNorms,3);
+        
+        
+        %Homogenous Lead Field vs. Tester Lead Field Plot
+        hFig27 = figure; 
+        scatter(Khom(:),Kn(:));
+        title('Homogenous Lead Field vs. Tester Lead Field');
+        xlabel('Homogenous Lead Field');
+        ylabel('Tester Lead Field');
+        bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
+        saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+        % Closing figure
+        close(hFig27);
+        
+        
+        distE=sum((Khom-Kn).^2,2).^0.5;
+        distV=sum((Khom-Kn).^2,1).^0.5;
+        
+        %computing channel-wise correlation
+        for j=1:size(Kn,1)
+            corelch(j,1)=corr(Khom(j,:).',Kn(j,:).');
+        end
+        %plotting channel wise correlation
+        hFig28 = figure;
+        plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
+        xlabel('Channels');
+        ylabel('Correlation');
+        title('Correlation between both lead fields channel-wise');
+         bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+        saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+        % Closing figure
+        close(hFig28);
+        
+        zKhom = zscore(Khom')';
+        zK = zscore(Kn')';
+        %computing voxel-wise correlation
+        for j=1:Nv/3
+            corelv(j,1)=corr(zKhom(:,j),zK(:,j));
+        end
+        corelv(isnan(corelv))=0;
+        corr2d = corr2(Khom, Kn);
+        %plotting voxel wise correlation
+        hFig29 = figure; 
+        plot([1:Nv/3],corelv);
+        title('Correlation both lead fields Voxel wise');
+         bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+        saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+        close(hFig29);
         
         %%
         %% Save and display report

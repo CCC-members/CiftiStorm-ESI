@@ -74,7 +74,7 @@ for i = 1:length(iVertOut)
     while ~inpolyhd(vCortex(iVertOut(i),:), vInner, EnvMat.Faces)
         % Find the other cortex points close to the outlier
         dist = sqrt(sum(bst_bsxfun(@minus, vCortex, vCortex(iVertOut(i),:)).^2, 2));
-        maxDist = 0.01;
+        maxDist = 0.03;
         iv = find(dist < maxDist);
         % Decrease the radius for the points in the neighborhood of the outliers
         correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;

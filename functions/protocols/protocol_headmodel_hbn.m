@@ -34,6 +34,13 @@ app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
 if(is_check_dataset_properties(selected_data_set))
+    % Copying the new file channel
+    colin_channel_path              = fullfile(bst_path,'defaults','eeg','Colin27');
+    channel_GSN_129                 = strcat('templates',filesep,'channel_GSN_129.mat');
+    channel_GSN_HydroCel_129_E001   = strcat('templates',filesep,'channel_GSN_HydroCel_129_E001.mat');
+    copyfile( channel_GSN_129 , colin_channel_path);
+    copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
+        
     disp(strcat('-->> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
     ProtocolName = selected_data_set.protocol_name;
     [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);
@@ -76,7 +83,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('-->> Do not exist. \n'));
                 fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             
             % Non-Brain surface files
@@ -98,7 +105,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('-->> Do not exist. \n'));
                 fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             
             % eeg raw data files
@@ -113,7 +120,7 @@ if(is_check_dataset_properties(selected_data_set))
                     fprintf(2,strcat('-->> Do not exist or is not a file. \n'));
                     fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                     processed = false;
-                    return;
+                    continue;
                 end
             else
                 if(~isfolder(raw_eeg))
@@ -123,7 +130,7 @@ if(is_check_dataset_properties(selected_data_set))
                     fprintf(2,strcat('-->> Do not exist or is not a folder. \n'));
                     fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                     processed = false;
-                    return;
+                    continue;
                 end
                 if(isequal(selected_data_set.eeg_raw_data_path.data_format,'mff'))
                     
@@ -446,7 +453,7 @@ if(is_check_dataset_properties(selected_data_set))
                     bst_report('Open', ReportFile);
                     bst_report('Close');
                     processed = false;
-                    return;
+                    continue;
                 end
             end
             

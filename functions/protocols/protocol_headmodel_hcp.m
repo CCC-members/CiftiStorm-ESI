@@ -85,7 +85,7 @@ if(is_check_dataset_properties(selected_data_set))
                             fprintf(2,strcat('\n -->> Do not exist. \n'));
                             fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                             processed = false;
-                            return;
+                            continue;
                         end
                     else
                         fprintf(2,strcat('\n -->> Error: You need to configure the cortex surfaces in at least one of follows field\n'));
@@ -95,7 +95,7 @@ if(is_check_dataset_properties(selected_data_set))
                         disp("brain_external_surface_path");
                         fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                         processed = false;
-                        return;
+                        continue;
                     end
                 else
                     fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
@@ -106,7 +106,7 @@ if(is_check_dataset_properties(selected_data_set))
                     fprintf(2,strcat('\n -->> Do not exist. \n'));
                     fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                     processed = false;
-                    return;
+                    continue;
                 end
             end
             
@@ -129,7 +129,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('\n -->> Do not exist. \n'));
                 fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end            
             
             % MEG file
@@ -142,7 +142,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('\n -->> Do not exist. \n'));
                 fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             
             % Transformation file
@@ -155,7 +155,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('\n -->> Do not exist. \n'));
                 fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
                 processed = false;
-                return;
+                continue;
             end
             if(isequal(base_path,'none'))
                 MEG_transformation_file = 'none';

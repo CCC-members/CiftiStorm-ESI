@@ -1,4 +1,4 @@
-function [fig] = view3D_K(Ke,cortex,head,channels,elecIndex)
+function [fig] = view3D_K(Kq,cortex,head,channels,elecIndex)
 
 %% define electrode to show and Marker size
 %elecIndex = 12; %5 8
@@ -6,8 +6,8 @@ mS = 50;
 
 %% initial computations
 XYZ = cortex.Vertices;
-[Ne, Ng] = size(Ke);
-Kq = reshape(Ke, [Ne 3 Ng/3]);
+[Ne, Ng, ~] = size(Kq);
+Kq = permute(Kq, [1 3 2]);
 Kq = permute(Kq, [3 2 1]);
 Kqm = sqrt(dot(Kq,Kq,2));
 Kqme = Kqm(:,:,elecIndex);
@@ -22,6 +22,7 @@ scatter3(channels(elecIndex,1),channels(elecIndex,2),channels(elecIndex,3),mS,'b
 axis equal off;
 cameratoolbar;
 whitebg('w');
+
 
 
 
