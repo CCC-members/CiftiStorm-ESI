@@ -48,7 +48,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
     disp(strcat("-->> Name:",app_properties.generals.name));
     disp(strcat("-->> Version:",app_properties.generals.version));
     disp(strcat("-->> Version date:",app_properties.generals.version_date));
-    disp("=======================================================");
+    disp("=================================================================");
     
     %% ------------ Checking MatLab compatibility ----------------
     disp('-->> Checking installed matlab version');
@@ -145,11 +145,14 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         
         %% Process selected dataset and compute the leadfield subjects
         %selected_datataset_process(selected_data_set);
-        str_function = strcat(selected_data_set.function,'()');
+        str_function = strcat(selected_data_set.function,'();');
         eval(str_function);
         
         %% Stoping BrainStorm
+        disp("=================================================================");
         brainstorm('stop');
+        close all;
+        clear all;
         
     else
         fprintf(2,'\n ->> Error: The spm path or brainstorm path are wrong.');

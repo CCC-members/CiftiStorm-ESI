@@ -55,10 +55,10 @@ db_import(bst_db_path);
 for i=1:length(nverthead_list)
     for j=1:length(nvertcortex_list)
         %
-        nverthead = nverthead_list(i);
-        nvertskull = nvertskull_list(i);
-        nvertcortex = nvertcortex_list(j);
-        subID = strcat(anatomy_name,'_',num2str(nverthead),'_',num2str(nvertcortex/1000),'K');
+        nverthead       = nverthead_list(i);
+        nvertskull      = nvertskull_list(i);
+        nvertcortex     = nvertcortex_list(j);
+        subID           = strcat(anatomy_name,'_',num2str(nverthead),'_',num2str(nvertcortex/1000),'K');
         
         %%
         %% Preparing Subject files
@@ -222,12 +222,23 @@ for i=1:length(nverthead_list)
         %%
         sFiles = bst_process('CallProcess', 'script_process_import_surfaces', [], [], ...
             'subjectname', subID, ...
-            'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
             'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
             'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
-            'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
-            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
             'nvertcortex', nvertcortex);
+        
+        
+        %%
+        %%  Downsample the template surfaces by subject params
+        %%
+        % ScalpFile
+%         [NewTessFile, iSurface, I, J] = tess_downsize(ScalpFile, nverthead ,'reducepatch');
+        [sph_vert, sph_faces] = tess_remesh(ScalpFile, nverthead, 1);
+        % OuterSkullFile
+%         [NewTessFile, iSurface, I, J] = tess_downsize(OuterSkullFile, nvertskull ,'reducepatch');
+        [sph_vert, sph_faces] = tess_remesh(OuterSkullFile, nvertskull, 1);
+        % InnerSkullFile
+%         [NewTessFile, iSurface, I, J] = tess_downsize(InnerSkullFile, nvertskull ,'reducepatch');
+        [sph_vert, sph_faces] = tess_remesh(InnerSkullFile, nvertskull, 1);
         
         %%
         %% Quality control
