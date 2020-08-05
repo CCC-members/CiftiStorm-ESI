@@ -55,11 +55,11 @@ vInner = bst_bsxfun(@minus, EnvMat.Vertices, bfs_center(:)');
 % Look for points of the cortex inside the innerskull
 iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
 % If no points outside, nothing to do
-% if isempty(iVertOut)
+if isempty(iVertOut)
 %     bst_progress('stop');
 %     java_dialog('msgbox', 'All cortex vertices are already inside the inner skull.', 'Fix cortex surface');
-%     return;
-% end
+    return;
+end
 % Display where the outside points are
 hFig_before = view_surface(TessFile, [], [], 'NewFigure');
 panel_surface('SetSurfaceEdges', hFig_before, 1, 1);
@@ -77,7 +77,7 @@ for i = 1:length(iVertOut)
         maxDist = 0.01;
         iv = find(dist < maxDist);
         % Decrease the radius for the points in the neighborhood of the outliers
-        correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;
+        correction = .10001 .* (maxDist-dist(iv)) ./ maxDist; %correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;
         rCortex(iv) = rCortex(iv) - correction;
         % Recompute cartesian coordinates of the vertices
         [vCortex(iv,1), vCortex(iv,2), vCortex(iv,3)] = sph2cart(thCortex(iv), phiCortex(iv), rCortex(iv));

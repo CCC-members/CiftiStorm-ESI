@@ -25,7 +25,7 @@ if(isfolder(protocol_report_path))
     
     % Copying the template MaQC file to protocol report path
     MaQC_file = fullfile(protocol_report_path,[ProtocolName,'_MaQC3.xlsx']);    
-    MaQC_template_file = strcat('tools',filesep,'Template_MaQC.xlsx');
+    MaQC_template_file = strcat('templates',filesep,'Template_MaQC.xlsx');
     copyfile( MaQC_template_file , MaQC_file);
       
     Subject_ID = subjects;    
