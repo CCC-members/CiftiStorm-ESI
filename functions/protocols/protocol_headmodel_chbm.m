@@ -46,7 +46,7 @@ if(is_check_dataset_properties(selected_data_set))
         subject_name = subjects(j).name;
         if(subject_name ~= '.' & string(subject_name) ~="..")
             
-             if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
+            if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
                 subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
             disp(strcat('-->> Processing subject: ', subID));
@@ -109,7 +109,7 @@ if(is_check_dataset_properties(selected_data_set))
             if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
                 ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
                 
-                if(selected_data_set.protocol_reset)                   
+                if(selected_data_set.protocol_reset)
                     gui_brainstorm('DeleteProtocol',ProtocolName_R);
                     bst_db_path = bst_get('BrainstormDbDir');
                     if(isfolder(fullfile(bst_db_path,ProtocolName_R)))
@@ -127,7 +127,7 @@ if(is_check_dataset_properties(selected_data_set))
                     end
                 end
             end
-                       
+            
             %%
             %% Creating subject in Protocol
             %%
@@ -183,7 +183,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             % Start a new report
             bst_report('Start',['Protocol for subject:' , subID]);
-            bst_report('Info',    '', [], ['Protocol for subject:' , subID])            
+            bst_report('Info',    '', [], ['Protocol for subject:' , subID])
             
             %%
             %% Process: Import MRI
@@ -216,7 +216,7 @@ if(is_check_dataset_properties(selected_data_set))
             hFigMri3 = view_mri_slices(MriFile, 'z', 20);
             bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,750,475]);
             saveas( hFigMri3,fullfile(subject_report_path,'MRI Sagital view.fig'));
-           
+            
             close([hFigMri1 hFigMri2 hFigMri3]);
             
             %%
@@ -236,7 +236,7 @@ if(is_check_dataset_properties(selected_data_set))
                 'nverthead',   nverthead, ...
                 'nvertcortex', nvertcortex, ...
                 'nvertskull',  nvertskull);
-                        
+            
             %% ===== IMPORT SURFACES 32K =====
             [sSubject, iSubject] = bst_get('Subject', subID);
             % Left pial
@@ -267,7 +267,7 @@ if(is_check_dataset_properties(selected_data_set))
             
             %
             
-            hFigMriSurf = view_mri(MriFile, CortexFile);            
+            hFigMriSurf = view_mri(MriFile, CortexFile);
             %
             hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
             bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
@@ -280,7 +280,7 @@ if(is_check_dataset_properties(selected_data_set))
             hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
             bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
             saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
-            % Closing figures            
+            % Closing figures
             close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
             
             %
@@ -297,9 +297,9 @@ if(is_check_dataset_properties(selected_data_set))
             saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
             
             % Closing figures
-            close([hFigMri7 hFigMri8 hFigMri9]);            
+            close([hFigMri7 hFigMri8 hFigMri9]);
             
-            %            
+            %
             hFigSurf10 = view_surface(CortexFile);
             bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
             saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
@@ -315,7 +315,7 @@ if(is_check_dataset_properties(selected_data_set))
             
             % Closing figure
             close(hFigSurf10);
-                        
+            
             %%
             %% Process: Generate BEM surfaces
             %%
@@ -336,8 +336,8 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             %% Forcing dipoles inside innerskull
             %%
-%             [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 1);
-%             BstTessISFile = BstTessISFile{1};            
+            %             [iIS, BstTessISFile, nVertOrigR] = import_surfaces(iSubject, innerskull_file, 'MRI-MASK-MNI', 1);
+            %             BstTessISFile = BstTessISFile{1};
             script_tess_force_envelope(CortexFile, InnerSkullFile);
             
             %%
@@ -394,11 +394,11 @@ if(is_check_dataset_properties(selected_data_set))
             sSubject       = bst_get('Subject', subID);
             ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
             
-            %            
+            %
             hFigMri15 = view_mri(MriFile, ScalpFile);
             bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
             saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-            % Close figures            
+            % Close figures
             close(hFigMri15);
             
             %%
@@ -418,7 +418,7 @@ if(is_check_dataset_properties(selected_data_set))
             end
             
             [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
-                        
+            
             %%
             %% Process: Set BEM Surfaces
             %%
@@ -476,7 +476,7 @@ if(is_check_dataset_properties(selected_data_set))
             view(90,360)
             bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
             % Close figures
-            close(hFigMri16);            
+            close(hFigMri16);
             
             % View sources on Scalp
             [sSubject, iSubject] = bst_get('Subject', subID);
@@ -511,7 +511,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             %% Quality control
             %%
-            %            
+            %
             hFigSurf24 = view_surface(CortexFile);
             bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
             saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
@@ -526,7 +526,7 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
             % Closing figure
             close(hFigSurf24)
-                        
+            
             %%
             %% Get Protocol information
             %%
@@ -608,6 +608,7 @@ if(is_check_dataset_properties(selected_data_set))
             % Update DataBase
             bst_set('Study', iStudies, sStudy);
             db_save();
+            
             %%
             %% Quality control
             %%
@@ -628,9 +629,20 @@ if(is_check_dataset_properties(selected_data_set))
             channels = channels';
             
             %%
+            %% Checking LF correlation
+            %%
+            [Ne,Nv]=size(Ke);
+            Nv= Nv/3;
+            VoxelCoord=cortex.Vertices';
+            VertNorms=cortex.VertNormals';
+            
+            %computing homogeneous lead field
+            [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+            
+            %%
             %% Ploting sensors and sources on the scalp and cortex
-            %%            
-            [hFig25] = view3D_K(Ke,cortex,head,channels,17);
+            %%
+            [hFig25] = view3D_K(Kn,cortex,head,channels,17);
             bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
             view(0,360)
             saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -642,9 +654,76 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
             view(270,360)
             bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-            
             % Closing figure
-            close(hFig25);            
+            close(hFig25);
+            
+            
+            [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+            bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
+            view(0,360)
+            saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
+            
+            bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
+            view(1,180)
+            bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
+            view(90,360)
+            bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
+            view(270,360)
+            bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+            % Closing figure
+            close(hFig26);
+            
+            VertNorms   = reshape(VertNorms,[1,Nv,3]);
+            VertNorms   = repmat(VertNorms,[Ne,1,1]);
+            Kn          = sum(Kn.*VertNorms,3);
+            Khom        = sum(Khom.*VertNorms,3);
+            
+            
+            %Homogenous Lead Field vs. Tester Lead Field Plot
+            hFig27 = figure;
+            scatter(Khom(:),Kn(:));
+            title('Homogenous Lead Field vs. Tester Lead Field');
+            xlabel('Homogenous Lead Field');
+            ylabel('Tester Lead Field');
+            bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
+            saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+            % Closing figure
+            close(hFig27);
+            
+            
+            distE=sum((Khom-Kn).^2,2).^0.5;
+            distV=sum((Khom-Kn).^2,1).^0.5;
+            
+            %computing channel-wise correlation
+            for j=1:size(Kn,1)
+                corelch(j,1)=corr(Khom(j,:).',Kn(j,:).');
+            end
+            %plotting channel wise correlation
+            hFig28 = figure;
+            plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
+            xlabel('Channels');
+            ylabel('Correlation');
+            title('Correlation between both lead fields channel-wise');
+            bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+            saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+            % Closing figure
+            close(hFig28);
+            
+            zKhom = zscore(Khom')';
+            zK = zscore(Kn')';
+            %computing voxel-wise correlation
+            for j=1:Nv/3
+                corelv(j,1)=corr(zKhom(:,j),zK(:,j));
+            end
+            corelv(isnan(corelv))=0;
+            corr2d = corr2(Khom, Kn);
+            %plotting voxel wise correlation
+            hFig29 = figure;
+            plot([1:Nv/3],corelv);
+            title('Correlation both lead fields Voxel wise');
+            bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+            saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+            close(hFig29);
             
             %%
             %% Save and display report
@@ -654,7 +733,9 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Open', ReportFile);
             bst_report('Close');
             processed = true;
-            disp([10 '-->> BrainStorm Protocol: Done.' 10]);
+            disp(strcat("-->> Process finished for subject: ", subID));
+            
+            Protocol_count = Protocol_count+1;
             %%
             %% Export Subject to BC-VARETA
             %%

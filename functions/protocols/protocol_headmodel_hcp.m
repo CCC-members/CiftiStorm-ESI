@@ -130,7 +130,7 @@ if(is_check_dataset_properties(selected_data_set))
                 fprintf(2,strcat('-->> Jumping to an other subject. \n'));
                 processed = false;
                 continue;
-            end            
+            end
             
             % MEG file
             base_path =  strrep(selected_data_set.meg_data_path.base_path,'SubID',subID);
@@ -159,7 +159,7 @@ if(is_check_dataset_properties(selected_data_set))
             end
             if(isequal(base_path,'none'))
                 MEG_transformation_file = 'none';
-            end            
+            end
             
             %%
             %%  Checking protocol
@@ -188,7 +188,7 @@ if(is_check_dataset_properties(selected_data_set))
                 subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
             disp(strcat('-->> Processing subject: ', subID));
-                        
+            
             %%
             %% Creating subject in Protocol
             %%
@@ -707,35 +707,32 @@ if(is_check_dataset_properties(selected_data_set))
                 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
                 cortex = load(BSTCortexFile);
                 
-                BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
                 head = load(BSTScalpFile);
                 
-                %%
-                %% Uploading Gain matrix
-                %%
+                % Uploading Gain matrix
                 BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
                 BSTHeadModel = load(BSTHeadModelFile);
                 Ke = BSTHeadModel.Gain;
                 
-                %%
-                %% Uploading Channels Loc
-                %%
-                BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-                BSTChannels = load(BSTChannelsFile);
+                % Uploading Channels Loc
+                channels = [headmodel_options.Channel.Loc];
+                channels = channels';
                 
-                [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
+                %%
+                %% Checking LF correlation
+                %%
+                [Ne,Nv]=size(Ke);
+                Nv= Nv/3;
+                VoxelCoord=cortex.Vertices';
+                VertNorms=cortex.VertNormals';
                 
-                channels = [];
-                for i = 1: length(BSTChannels.Channel)
-                    Loc = BSTChannels.Channel(i).Loc;
-                    center = mean(Loc,2);
-                    channels = [channels; center(1),center(2),center(3) ];
-                end
+                %computing homogeneous lead field
+                [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
                 
                 %%
                 %% Ploting sensors and sources on the scalp and cortex
                 %%
-                [hFig25] = view3D_K(Ke,cortex,head,channels,200);
+                [hFig25] = view3D_K(Kn,cortex,head,channels,17);
                 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
                 view(0,360)
                 saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -747,45 +744,110 @@ if(is_check_dataset_properties(selected_data_set))
                 bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
                 view(270,360)
                 bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-                
                 % Closing figure
-                close(hFig25)
+                close(hFig25);
                 
-                processed = true;
-            else
-                processed = false;
-            end
-            %%
-            %% Save and display report
-            %%
-            ReportFile = bst_report('Save', sFiles);
-            bst_report('Export',  ReportFile,report_name);
-            bst_report('Open', ReportFile);
-            bst_report('Close');
-            
-            disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
-            
-            %%
-            %% Export Subject to BC-VARETA
-            %%
-            if(processed)
-                disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
-                if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,subject_name);
+                
+                [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+                bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
+                view(0,360)
+                saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
+                
+                bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
+                view(1,180)
+                bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
+                view(90,360)
+                bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
+                view(270,360)
+                bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+                % Closing figure
+                close(hFig26);
+                
+                VertNorms   = reshape(VertNorms,[1,Nv,3]);
+                VertNorms   = repmat(VertNorms,[Ne,1,1]);
+                Kn          = sum(Kn.*VertNorms,3);
+                Khom        = sum(Khom.*VertNorms,3);
+                
+                
+                %Homogenous Lead Field vs. Tester Lead Field Plot
+                hFig27 = figure;
+                scatter(Khom(:),Kn(:));
+                title('Homogenous Lead Field vs. Tester Lead Field');
+                xlabel('Homogenous Lead Field');
+                ylabel('Tester Lead Field');
+                bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
+                saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+                % Closing figure
+                close(hFig27);
+                
+                
+                distE=sum((Khom-Kn).^2,2).^0.5;
+                distV=sum((Khom-Kn).^2,1).^0.5;
+                
+                %computing channel-wise correlation
+                for j=1:size(Kn,1)
+                    corelch(j,1)=corr(Khom(j,:).',Kn(j,:).');
                 end
+                %plotting channel wise correlation
+                hFig28 = figure;
+                plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
+                xlabel('Channels');
+                ylabel('Correlation');
+                title('Correlation between both lead fields channel-wise');
+                bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+                saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+                % Closing figure
+                close(hFig28);
+                
+                zKhom = zscore(Khom')';
+                zK = zscore(Kn')';
+                %computing voxel-wise correlation
+                for j=1:Nv/3
+                    corelv(j,1)=corr(zKhom(:,j),zK(:,j));
+                end
+                corelv(isnan(corelv))=0;
+                corr2d = corr2(Khom, Kn);
+                %plotting voxel wise correlation
+                hFig29 = figure;
+                plot([1:Nv/3],corelv);
+                title('Correlation both lead fields Voxel wise');
+                bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+                saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+                close(hFig29);
+                
+                %%
+                %% Save and display report
+                %%
+                ReportFile = bst_report('Save', sFiles);
+                bst_report('Export',  ReportFile,report_name);
+                bst_report('Open', ReportFile);
+                bst_report('Close');
+                processed = true;
+                disp(strcat("-->> Process finished for subject: ", subID));
+                
+                Protocol_count = Protocol_count+1;
+                %%
+                %% Export Subject to BC-VARETA
+                %%
+                if(processed)
+                    disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+                    if(selected_data_set.bcv_config.export)
+                        export_subject_BCV_structure(selected_data_set,subject_name);
+                    end
+                end
+                %%
+                Protocol_count = Protocol_count + 1;
+                if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
+                    % Genering Manual QC file (need to check)
+                    %                     generate_MaQC_file();
+                end
+                disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
             end
-            %%
-            Protocol_count = Protocol_count + 1;
-            if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
-                % Genering Manual QC file (need to check)
-                %                     generate_MaQC_file();
-            end
-            disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
         end
+        disp(strcat('-->> Process finished....'));
+        disp('=================================================================');
+        disp('=================================================================');
+        save report.mat subjects_processed subjects_process_error;
     end
-    disp(strcat('-->> Process finished....'));
-    disp('=================================================================');
-    disp('=================================================================');
-    save report.mat subjects_processed subjects_process_error;
 end
 end

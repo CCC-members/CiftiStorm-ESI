@@ -105,12 +105,12 @@ for i=1:length(nverthead_list)
             processed = false;
             continue;
         end
-                
+        
         %%
         %% Preparing selected protocol
         %%
-        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )            
-            ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));            
+        if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  )
+            ProtocolName_R = strcat(ProtocolName,'_',char(num2str(Protocol_count)));
             
             if(selected_data_set.protocol_reset)
                 gui_brainstorm('DeleteProtocol',ProtocolName_R);
@@ -120,7 +120,7 @@ for i=1:length(nverthead_list)
                 end
                 gui_brainstorm('CreateProtocol',ProtocolName_R ,selected_data_set.use_default_anatomy, selected_data_set.use_default_channel);
             else
-%                 gui_brainstorm('UpdateProtocolsList');
+                %                 gui_brainstorm('UpdateProtocolsList');
                 iProtocol = bst_get('Protocol', ProtocolName_R);
                 gui_brainstorm('SetCurrentProtocol', iProtocol);
                 subjects = bst_get('ProtocolSubjects');
@@ -129,12 +129,12 @@ for i=1:length(nverthead_list)
                     db_delete_subjects( subject_count );
                 end
             end
-        end       
-                   
+        end
+        
         %%
         %% Creating subject in Protocol
         %%
-        [sSubject, iSubject] = db_add_subject(subID);        
+        [sSubject, iSubject] = db_add_subject(subID);
         
         %%
         %% Checking the report output structure
@@ -170,7 +170,7 @@ for i=1:length(nverthead_list)
         % Start a new report
         bst_report('Start',['Protocol for subject:' , subID]);
         bst_report('Info',    '', [], ['Protocol for subject:' , subID])
-                
+        
         %%
         %% Process: Import MRI
         %%
@@ -231,13 +231,13 @@ for i=1:length(nverthead_list)
         %%  Downsample the template surfaces by subject params
         %%
         % ScalpFile
-%         [NewTessFile, iSurface, I, J] = tess_downsize(ScalpFile, nverthead ,'reducepatch');
+        %         [NewTessFile, iSurface, I, J] = tess_downsize(ScalpFile, nverthead ,'reducepatch');
         [sph_vert, sph_faces] = tess_remesh(ScalpFile, nverthead, 1);
         % OuterSkullFile
-%         [NewTessFile, iSurface, I, J] = tess_downsize(OuterSkullFile, nvertskull ,'reducepatch');
+        %         [NewTessFile, iSurface, I, J] = tess_downsize(OuterSkullFile, nvertskull ,'reducepatch');
         [sph_vert, sph_faces] = tess_remesh(OuterSkullFile, nvertskull, 1);
         % InnerSkullFile
-%         [NewTessFile, iSurface, I, J] = tess_downsize(InnerSkullFile, nvertskull ,'reducepatch');
+        %         [NewTessFile, iSurface, I, J] = tess_downsize(InnerSkullFile, nvertskull ,'reducepatch');
         [sph_vert, sph_faces] = tess_remesh(InnerSkullFile, nvertskull, 1);
         
         %%
@@ -282,7 +282,7 @@ for i=1:length(nverthead_list)
         saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
         
         % Closing figures
-        close([hFigMri7 hFigMri8 hFigMri9]);       
+        close([hFigMri7 hFigMri8 hFigMri9]);
         
         %
         
@@ -371,11 +371,11 @@ for i=1:length(nverthead_list)
         sSubject       = bst_get('Subject', subID);
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
-        %        
+        %
         hFigMri15 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
         saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-        % Close figures        
+        % Close figures
         close(hFigMri15);
         
         %%
@@ -397,7 +397,7 @@ for i=1:length(nverthead_list)
         %% projecting EEG electrodes on scalp surface
         %%
         process_channel_project('Compute',OutputFile,'EEG');
-       
+        
         %%
         %% Quality control
         %%
@@ -423,7 +423,7 @@ for i=1:length(nverthead_list)
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
         % Close figures
         close(hFigMri16);
-                
+        
         % View sources on Scalp
         [sSubject, iSubject] = bst_get('Subject', subID);
         
@@ -472,7 +472,7 @@ for i=1:length(nverthead_list)
         view(0,360)
         bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
         % Closing figure
-        close(hFigSurf24)        
+        close(hFigSurf24)
         
         %%
         %% Get Protocol information
@@ -555,6 +555,7 @@ for i=1:length(nverthead_list)
         % Update DataBase
         bst_set('Study', iStudies, sStudy);
         db_save();
+        
         %%
         %% Quality control
         %%
@@ -575,7 +576,7 @@ for i=1:length(nverthead_list)
         channels = channels';
         
         %%
-        %% Checking LF correlation 
+        %% Checking LF correlation
         %%
         [Ne,Nv]=size(Ke);
         Nv= Nv/3;
@@ -626,7 +627,7 @@ for i=1:length(nverthead_list)
         
         
         %Homogenous Lead Field vs. Tester Lead Field Plot
-        hFig27 = figure; 
+        hFig27 = figure;
         scatter(Khom(:),Kn(:));
         title('Homogenous Lead Field vs. Tester Lead Field');
         xlabel('Homogenous Lead Field');
@@ -650,7 +651,7 @@ for i=1:length(nverthead_list)
         xlabel('Channels');
         ylabel('Correlation');
         title('Correlation between both lead fields channel-wise');
-         bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+        bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
         saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
         % Closing figure
         close(hFig28);
@@ -664,10 +665,10 @@ for i=1:length(nverthead_list)
         corelv(isnan(corelv))=0;
         corr2d = corr2(Khom, Kn);
         %plotting voxel wise correlation
-        hFig29 = figure; 
+        hFig29 = figure;
         plot([1:Nv/3],corelv);
         title('Correlation both lead fields Voxel wise');
-         bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+        bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
         saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
         close(hFig29);
         
@@ -683,5 +684,6 @@ for i=1:length(nverthead_list)
         
         Protocol_count = Protocol_count+1;
     end
+end
 end
 

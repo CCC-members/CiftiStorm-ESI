@@ -40,7 +40,7 @@ if(is_check_dataset_properties(selected_data_set))
     channel_GSN_HydroCel_129_E001   = strcat('templates',filesep,'channel_GSN_HydroCel_129_E001.mat');
     copyfile( channel_GSN_129 , colin_channel_path);
     copyfile( channel_GSN_HydroCel_129_E001, colin_channel_path);
-        
+    
     disp(strcat('-->> Data Source:  ', selected_data_set.hcp_data_path.base_path ));
     ProtocolName = selected_data_set.protocol_name;
     [base_path,name,ext] = fileparts(selected_data_set.hcp_data_path.base_path);
@@ -161,7 +161,7 @@ if(is_check_dataset_properties(selected_data_set))
                     end
                 end
             end
-                        
+            
             %%
             %% Creating subject in Protocol
             %%
@@ -640,6 +640,7 @@ if(is_check_dataset_properties(selected_data_set))
             % Update DataBase
             bst_set('Study', ProtocolInfo.iStudy, sStudy);
             db_save();
+            
             %%
             %% Quality control
             %%
@@ -660,9 +661,20 @@ if(is_check_dataset_properties(selected_data_set))
             channels = channels';
             
             %%
+            %% Checking LF correlation
+            %%
+            [Ne,Nv]=size(Ke);
+            Nv= Nv/3;
+            VoxelCoord=cortex.Vertices';
+            VertNorms=cortex.VertNormals';
+            
+            %computing homogeneous lead field
+            [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+            
+            %%
             %% Ploting sensors and sources on the scalp and cortex
             %%
-            [hFig25] = view3D_K(Ke,cortex,head,channels,17);
+            [hFig25] = view3D_K(Kn,cortex,head,channels,17);
             bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
             view(0,360)
             saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -674,14 +686,76 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
             view(270,360)
             bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-            
             % Closing figure
-            close(hFig25)
+            close(hFig25);
             
-            %%
-            %% Export Subject to BC-VARETA
-            %%
-            % export_subject_BCV(sSubject);
+            
+            [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+            bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
+            view(0,360)
+            saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
+            
+            bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
+            view(1,180)
+            bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
+            view(90,360)
+            bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
+            view(270,360)
+            bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+            % Closing figure
+            close(hFig26);
+            
+            VertNorms   = reshape(VertNorms,[1,Nv,3]);
+            VertNorms   = repmat(VertNorms,[Ne,1,1]);
+            Kn          = sum(Kn.*VertNorms,3);
+            Khom        = sum(Khom.*VertNorms,3);
+            
+            
+            %Homogenous Lead Field vs. Tester Lead Field Plot
+            hFig27 = figure;
+            scatter(Khom(:),Kn(:));
+            title('Homogenous Lead Field vs. Tester Lead Field');
+            xlabel('Homogenous Lead Field');
+            ylabel('Tester Lead Field');
+            bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
+            saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+            % Closing figure
+            close(hFig27);
+            
+            
+            distE=sum((Khom-Kn).^2,2).^0.5;
+            distV=sum((Khom-Kn).^2,1).^0.5;
+            
+            %computing channel-wise correlation
+            for j=1:size(Kn,1)
+                corelch(j,1)=corr(Khom(j,:).',Kn(j,:).');
+            end
+            %plotting channel wise correlation
+            hFig28 = figure;
+            plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
+            xlabel('Channels');
+            ylabel('Correlation');
+            title('Correlation between both lead fields channel-wise');
+            bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+            saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+            % Closing figure
+            close(hFig28);
+            
+            zKhom = zscore(Khom')';
+            zK = zscore(Kn')';
+            %computing voxel-wise correlation
+            for j=1:Nv/3
+                corelv(j,1)=corr(zKhom(:,j),zK(:,j));
+            end
+            corelv(isnan(corelv))=0;
+            corr2d = corr2(Khom, Kn);
+            %plotting voxel wise correlation
+            hFig29 = figure;
+            plot([1:Nv/3],corelv);
+            title('Correlation both lead fields Voxel wise');
+            bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+            saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+            close(hFig29);
             
             %%
             %% Save and display report
@@ -691,15 +765,16 @@ if(is_check_dataset_properties(selected_data_set))
             bst_report('Open', ReportFile);
             bst_report('Close');
             processed = true;
-            disp([10 '-->> BrainStorm Protocol: Done.' 10]);
+            disp(strcat("-->> Process finished for subject: ", subID));
             
+            Protocol_count = Protocol_count+1;
             %%
             %% Export Subject to BC-VARETA
             %%
             if(processed)
-                disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
+                disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
                 if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,subID);
+                    export_subject_BCV_structure(selected_data_set,subject_name);
                 end
             end
             %%
@@ -708,7 +783,7 @@ if(is_check_dataset_properties(selected_data_set))
                 % Genering Manual QC file (need to check)
                 %                     generate_MaQC_file();
             end
-            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+            disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
         end
     end
     disp(strcat('-->> Process finished....'));
