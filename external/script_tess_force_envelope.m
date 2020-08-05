@@ -54,6 +54,9 @@ vInner = bst_bsxfun(@minus, EnvMat.Vertices, bfs_center(:)');
 [thCortex, phiCortex, rCortex] = cart2sph(vCortex(:,1), vCortex(:,2), vCortex(:,3));
 % Look for points of the cortex inside the innerskull
 iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
+% Find points within distance limit
+nearVertOut = get_points_within_limit(EnvMat.Vertices, TessMat.Vertices,0.002);
+iVertOut = unique([iVertOut; nearVertOut]);
 % If no points outside, nothing to do
 if isempty(iVertOut)
 %     bst_progress('stop');

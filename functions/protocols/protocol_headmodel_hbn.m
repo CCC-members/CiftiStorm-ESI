@@ -665,8 +665,8 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             [Ne,Nv]=size(Ke);
             Nv= Nv/3;
-            VoxelCoord=cortex.Vertices';
-            VertNorms=cortex.VertNormals';
+            VoxelCoord=cortex.Vertices;
+            VertNorms=cortex.VertNormals;
             
             %computing homogeneous lead field
             [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);

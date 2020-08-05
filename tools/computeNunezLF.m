@@ -6,7 +6,7 @@ Nv          = Nv/3;
 
 % Compute Distance vector R between Electrodes and Voxels
 channels    = reshape(channels,[Ne,1,3]);
-VoxelCoord  = permute(VoxelCoord,[2 1]);
+% VoxelCoord  = permute(VoxelCoord,[2 1]);
 VoxelCoord  = reshape(VoxelCoord,1,Nv,3);
 Cr          = repmat(channels,1,Nv,1);
 VCr         = repmat(VoxelCoord,Ne,1,1);

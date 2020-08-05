@@ -434,8 +434,8 @@ for i=1:2 %length(ProtocolFiles)
             %%
             [Ne,Nv]=size(Ke);
             Nv= Nv/3;
-            VoxelCoord=cortex.Vertices';
-            VertNorms=cortex.VertNormals';
+            VoxelCoord=cortex.Vertices;
+            VertNorms=cortex.VertNormals;
             
             %computing homogeneous lead field
             [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);

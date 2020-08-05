@@ -454,6 +454,12 @@ for i=1:length(nverthead_list)
         LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
         script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
         
+        
+        %%
+        %%Setting brainstorm properties
+        %%
+        panel_scout('SetScoutsOptions',0, 0, 1, 'all', .7, 0, 0, 0);
+        
         %%
         %% Quality control
         %%
@@ -580,8 +586,8 @@ for i=1:length(nverthead_list)
         %%
         [Ne,Nv]=size(Ke);
         Nv= Nv/3;
-        VoxelCoord=cortex.Vertices';
-        VertNorms=cortex.VertNormals';
+        VoxelCoord=cortex.Vertices;
+        VertNorms=cortex.VertNormals;
         
         %computing homogeneous lead field
         [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
