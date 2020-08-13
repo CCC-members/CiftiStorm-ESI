@@ -145,11 +145,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         
         %% Process selected dataset and compute the leadfield subjects
         %selected_datataset_process(selected_data_set);
-        %%
-        %%Setting brainstorm properties
-        %%
-        SetScoutsOptions(0, 0, 1, 'all', .7, 0, 0, 0);
-        
+       
         %%
         %% Calling dataset function to analysis
         %%

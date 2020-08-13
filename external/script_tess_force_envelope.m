@@ -54,6 +54,10 @@ vInner = bst_bsxfun(@minus, EnvMat.Vertices, bfs_center(:)');
 [thCortex, phiCortex, rCortex] = cart2sph(vCortex(:,1), vCortex(:,2), vCortex(:,3));
 % Look for points of the cortex inside the innerskull
 iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
+% Find points within distance limit and minimal distance with Tess surface
+[nearVertInnSk,distance, mins_dist] = get_points_within_limit(EnvMat.Vertices, TessMat.Vertices,0.003);
+iVertOut = [iVertOut; nearVertInnSk];
+iVertOut = unique(iVertOut);
 % If no points outside, nothing to do
 if isempty(iVertOut)
 %     bst_progress('stop');
@@ -67,28 +71,29 @@ line(TessMat.Vertices(iVertOut,1), TessMat.Vertices(iVertOut,2), TessMat.Vertice
 view_surface(EnvFile, [], [], hFig_before);
 figure_3d('SetStandardView', hFig_before, 'bottom');
 
+
 % Fix point by point
 for i = 1:length(iVertOut)
     bst_progress('start', 'Fix cortex surface', sprintf('Fixing vertex %d/%d...', i, length(iVertOut)));
     % While point is still outside: loop
-    while ~inpolyhd(vCortex(iVertOut(i),:), vInner, EnvMat.Faces)
-        % Find the other cortex points close to the outlier
-        dist = sqrt(sum(bst_bsxfun(@minus, vCortex, vCortex(iVertOut(i),:)).^2, 2));
-        maxDist = 0.01;
-        iv = find(dist < maxDist);
-        % Decrease the radius for the points in the neighborhood of the outliers
-        correction = .10001 .* (maxDist-dist(iv)) ./ maxDist; %correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;
-        rCortex(iv) = rCortex(iv) - correction;
-        % Recompute cartesian coordinates of the vertices
-        [vCortex(iv,1), vCortex(iv,2), vCortex(iv,3)] = sph2cart(thCortex(iv), phiCortex(iv), rCortex(iv));
-    end
+    %     while ~inpolyhd(vCortex(iVertOut(i),:), vInner, EnvMat.Faces)
+    % Find the other cortex points close to the outlier
+    dist = sqrt(sum(bst_bsxfun(@minus, vCortex, vCortex(iVertOut(i),:)).^2, 2));
+    maxDist = 0.01;
+    iv = find(dist < maxDist);
+    % Decrease the radius for the points in the neighborhood of the outliers
+    correction = .001 .* (maxDist-dist(iv)) ./ maxDist; %correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;
+    rCortex(iv) = rCortex(iv) - correction;
+    % Recompute cartesian coordinates of the vertices
+    [vCortex(iv,1), vCortex(iv,2), vCortex(iv,3)] = sph2cart(thCortex(iv), phiCortex(iv), rCortex(iv));
+    %     end
 end
 % Restore surface center
 vCortex = bst_bsxfun(@plus, vCortex, bfs_center(:)');
+
 % Output structure
 NewTessMat = TessMat;
 NewTessMat.Vertices = vCortex;
-
 
 % ===== CREATE NEW SURFACE STRUCTURE =====
 % Build new filename and Comment
