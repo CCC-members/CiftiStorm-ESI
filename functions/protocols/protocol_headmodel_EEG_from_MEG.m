@@ -503,8 +503,8 @@ for i=2:length(ProtocolFiles)
             [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
             
             channels = [];
-            for i = 1: length(BSTChannels.Channel)
-                Loc = BSTChannels.Channel(i).Loc;
+            for k = 1: length(BSTChannels.Channel)
+                Loc = BSTChannels.Channel(k).Loc;
                 center = mean(Loc,2);
                 channels = [channels; center(1),center(2),center(3) ];
             end

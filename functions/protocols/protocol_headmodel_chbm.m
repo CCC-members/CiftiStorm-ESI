@@ -31,6 +31,9 @@ function [processed] = protocol_headmodel_chbm()
 %%
 %% Preparing selected protocol
 %%
+
+load('tools/mycolormap');
+
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
@@ -45,7 +48,7 @@ if(is_check_dataset_properties(selected_data_set))
     for j=1:size(subjects,1)
         subject_name = subjects(j).name;
         if(subject_name ~= '.' & string(subject_name) ~="..")
-            
+            subID = subject_name;
             if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
                 subID = strrep(subject_name,selected_data_set.sub_prefix,'');
             end
@@ -321,9 +324,9 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             bst_process('CallProcess', 'process_generate_bem', [], [], ...
                 'subjectname', subID, ...
-                'nscalp',      1922, ...
-                'nouter',      1922, ...
-                'ninner',      1922, ...
+                'nscalp',      3242, ...
+                'nouter',      3242, ...
+                'ninner',      3242, ...
                 'thickness',   4);
             
             %%
@@ -690,13 +693,9 @@ if(is_check_dataset_properties(selected_data_set))
             % Closing figure
             close(hFig27);
             
-            
-            distE=sum((Khom-Kn).^2,2).^0.5;
-            distV=sum((Khom-Kn).^2,1).^0.5;
-            
             %computing channel-wise correlation
-            for j=1:size(Kn,1)
-                corelch(j,1)=corr(Khom(j,:).',Kn(j,:).');
+            for k=1:size(Kn,1)
+                corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
             end
             %plotting channel wise correlation
             hFig28 = figure;
@@ -712,19 +711,47 @@ if(is_check_dataset_properties(selected_data_set))
             zKhom = zscore(Khom')';
             zK = zscore(Kn')';
             %computing voxel-wise correlation
-            for j=1:Nv/3
-                corelv(j,1)=corr(zKhom(:,j),zK(:,j));
+            for k=1:Nv
+                corelv(k,1)=corr(zKhom(:,k),zK(:,k));
             end
             corelv(isnan(corelv))=0;
             corr2d = corr2(Khom, Kn);
             %plotting voxel wise correlation
             hFig29 = figure;
-            plot([1:Nv/3],corelv);
-            title('Correlation both lead fields Voxel wise');
+            plot([1:Nv],corelv);
+            title('Correlation both lead fields Voxel wise');            
+            % Including to report
             bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
             saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
             close(hFig29);
             
+            %%
+            %% Finding points of low corelation
+            %%     
+            low_cor_inds = find(corelv < .3); 
+            BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);            
+            hFig_low_cor = view_surface(BSTCortexFile, [], [], 'NewFigure');         
+            hFig_low_cor = view_surface(BSTCortexFile, [], [], hFig_low_cor);           
+            % Delete scouts
+            delete(findobj(hFig_low_cor, 'Tag', 'ScoutLabel'));
+            delete(findobj(hFig_low_cor, 'Tag', 'ScoutMarker'));
+            delete(findobj(hFig_low_cor, 'Tag', 'ScoutPatch'));
+            delete(findobj(hFig_low_cor, 'Tag', 'ScoutContour'));           
+            
+            line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
+            figure_3d('SetStandardView', hFig_low_cor, 'bottom');
+            bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
+            saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
+            close(hFig_low_cor);
+            
+            figure_cor = figure;            
+            %colormap(gca,cmap);            
+            patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
+            view(90,270)            
+            bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
+            saveas( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
+            close(figure_cor);
+           
             %%
             %% Save and display report
             %%
