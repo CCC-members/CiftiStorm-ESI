@@ -22,7 +22,7 @@ if(~isfolder(bcv_path))
 end
 
 %% Uploding Subject file into BrainStorm Protocol
-disp('BST-P ->> Uploding Subject file into BrainStorm Protocol.')
+disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
 
 % process_waitbar = waitbar(0,strcat('Importing data subject: ' , subject_name ));
 %%
@@ -63,14 +63,17 @@ Sc8k                    = load(BSTCortexFile8K);
 % Finding near FSAve vertices on subject surface
 sub_to_FSAve = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
 
+%%
+%% Genering Channels file
+%%
+disp ("-->> Genering channels file");
+BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(sStudy.iChannel).FileName);
+Cdata = load(BSTChannelsFile);
 
 %%
 %% Genering scalp file
 %%
 disp ("-->> Genering scalp file");
-BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(sStudy.iChannel).FileName);
-Cdata = load(BSTChannelsFile);
-
 ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
 BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
 Sh = load(BSTScalpFile);

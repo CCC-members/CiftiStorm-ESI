@@ -712,19 +712,31 @@ if(is_check_dataset_properties(selected_data_set))
                 
                 
                 BSTScalpFile    = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.HeadFile);
-                head            = load(BSTScalpFile);
+                head            = load(BSTScalpFile);                
+             
+                %%
+                %% Uploading Gain matrix
+                %%
+                BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
+                BSTHeadModel = load(BSTHeadModelFile);
+                Ke = BSTHeadModel.Gain;
                 
-                % Uploading Gain matrix
-                BSTHeadModelFile    = bst_fullfile(headmodel_options.HeadModelFile);
-                BSTHeadModel        = load(BSTHeadModelFile);
-                Ke                  = BSTHeadModel.Gain;
+                %%
+                %% Uploading Channels Loc
+                %%
+                BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+                BSTChannels = load(BSTChannelsFile);
                 
-                % Uploading Channels Loc
-                channels            = [headmodel_options.Channel.Loc];
-                channels            = channels';
+                [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
                 
+                channels = [];
+                for i = 1: length(BSTChannels.Channel)
+                    Loc = BSTChannels.Channel(i).Loc;
+                    center = mean(Loc,2);
+                    channels = [channels; center(1),center(2),center(3) ];
+                end     
                 
-                %% Change the Homogenius LeadField for MEG 
+                %% Change the Homogenius LeadField for MEG
 %                 %%
 %                 %% Checking LF correlation
 %                 %%
@@ -741,7 +753,7 @@ if(is_check_dataset_properties(selected_data_set))
                 %%
                 %% Ploting sensors and sources on the scalp and cortex
                 %%
-                [hFig25] = view3D_K(Kn,cortex,head,channels,17);
+                [hFig25] = view3D_K(Kn,cortex,head,channels,200);
                 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
                 view(0,360)
                 saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
