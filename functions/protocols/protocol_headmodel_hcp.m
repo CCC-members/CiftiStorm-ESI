@@ -1,4 +1,4 @@
-function [processed] = protocol_headmodel_hcp(subID,ProtocolName)
+function [processed] = protocol_headmodel_hcp()
 % TUTORIAL_HCP: Script that reproduces the results of the online tutorial "Human Connectome Project: Resting-state MEG".
 %
 % CORRESPONDING ONLINE TUTORIALS:
@@ -49,11 +49,14 @@ if(is_check_dataset_properties(selected_data_set))
     for j=1:size(subjects,1)
         subject_name = subjects(j).name;
         if(subject_name ~= '.' & string(subject_name) ~="..")
-            
+            subID = subject_name;
+            if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
+                subID = strrep(subject_name,selected_data_set.sub_prefix,'');
+            end
+            disp(strcat('-->> Processing subject: ', subID));
             %%
             %% Preparing Subject files
-            %%
-            
+            %%            
             % MRI File
             base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
             filepath = strrep(selected_data_set.hcp_data_path.file_location,'SubID',subID);
@@ -519,15 +522,15 @@ if(is_check_dataset_properties(selected_data_set))
             saveas( hFigScalp16,fullfile(subject_report_path,'Sensor-Helmet registration front view.fig'));
             %Left
             view(1,180)
-            bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration left view', [200,200,750,475]);
+            bst_report('Snapshot',hFigScalp16,[],'Sensor-MRI registration left view', [200,200,750,475]);
             % Right
             view(0,360)
-            bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration right view', [200,200,750,475]);
+            bst_report('Snapshot',hFigScalp16,[],'Sensor-MRI registration right view', [200,200,750,475]);
             % Back
             view(90,360)
-            bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
+            bst_report('Snapshot',hFigScalp16,[],'Sensor-MRI registration back view', [200,200,750,475]);
             % Close figures
-            close(hFigMri16);
+            close(hFigScalp16);
             
             % View 4D coils on Scalp
             [hFigScalp20, iDS, iFig] = view_channels_3d(sFiles.ChannelFile,'4D', 'scalp', 0, 0);
@@ -626,12 +629,12 @@ if(is_check_dataset_properties(selected_data_set))
             headmodel_options.SourceSpaceOptions = [];
             
             % Uploading cortex
-            CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-            headmodel_options.CortexFile = CortexFile;
+            CortexFile                      = sSubject.Surface(sSubject.iCortex).FileName;
+            headmodel_options.CortexFile    = CortexFile;
             
             % Uploading head
-            ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-            headmodel_options.HeadFile = ScalpFile;
+            ScalpFile                   = sSubject.Surface(sSubject.iScalp).FileName;
+            headmodel_options.HeadFile  = ScalpFile;
             
             InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
             headmodel_options.InnerSkullFile = InnerSkullFile;
@@ -702,37 +705,55 @@ if(is_check_dataset_properties(selected_data_set))
                 %%
                 %% Quality control
                 %%
-                ProtocolInfo = bst_get('ProtocolInfo');
+                ProtocolInfo    = bst_get('ProtocolInfo');
                 
-                BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
-                cortex = load(BSTCortexFile);
+                BSTCortexFile   = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
+                cortex          = load(BSTCortexFile);
                 
-                head = load(BSTScalpFile);
                 
-                % Uploading Gain matrix
+                BSTScalpFile    = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.HeadFile);
+                head            = load(BSTScalpFile);                
+             
+                %%
+                %% Uploading Gain matrix
+                %%
                 BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
                 BSTHeadModel = load(BSTHeadModelFile);
                 Ke = BSTHeadModel.Gain;
                 
-                % Uploading Channels Loc
-                channels = [headmodel_options.Channel.Loc];
-                channels = channels';
-                
                 %%
-                %% Checking LF correlation
+                %% Uploading Channels Loc
                 %%
-                [Ne,Nv]=size(Ke);
-                Nv= Nv/3;
-                VoxelCoord=cortex.Vertices;
-                VertNorms=cortex.VertNormals;
+                BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+                BSTChannels = load(BSTChannelsFile);
                 
-                %computing homogeneous lead field
-                [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+                [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
                 
+                channels = [];
+                for i = 1: length(BSTChannels.Channel)
+                    Loc = BSTChannels.Channel(i).Loc;
+                    center = mean(Loc,2);
+                    channels = [channels; center(1),center(2),center(3) ];
+                end     
+                
+                %% Change the Homogenius LeadField for MEG
+%                 %%
+%                 %% Checking LF correlation
+%                 %%
+                [Ne,Nv]     = size(Ke);
+                Nv          = Nv/3;
+                Kn          = reshape(Ke,Ne,3,Nv);
+                Kn          = permute(Kn,[1,3,2]);
+%                 VoxelCoord  = cortex.Vertices;
+%                 VertNorms   = cortex.VertNormals;
+%                 
+%                 %computing homogeneous lead field
+%                 [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+%                 
                 %%
                 %% Ploting sensors and sources on the scalp and cortex
                 %%
-                [hFig25] = view3D_K(Kn,cortex,head,channels,17);
+                [hFig25] = view3D_K(Kn,cortex,head,channels,200);
                 bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
                 view(0,360)
                 saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -746,97 +767,97 @@ if(is_check_dataset_properties(selected_data_set))
                 bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
                 % Closing figure
                 close(hFig25);
-                
-                
-                [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
-                bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
-                view(0,360)
-                saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
-                
-                bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
-                view(1,180)
-                bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
-                view(90,360)
-                bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
-                view(270,360)
-                bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
-                % Closing figure
-                close(hFig26);
-                
-                VertNorms   = reshape(VertNorms,[1,Nv,3]);
-                VertNorms   = repmat(VertNorms,[Ne,1,1]);
-                Kn          = sum(Kn.*VertNorms,3);
-                Khom        = sum(Khom.*VertNorms,3);
-                
-                
-                %Homogenous Lead Field vs. Tester Lead Field Plot
-                hFig27 = figure;
-                scatter(Khom(:),Kn(:));
-                title('Homogenous Lead Field vs. Tester Lead Field');
-                xlabel('Homogenous Lead Field');
-                ylabel('Tester Lead Field');
-                bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
-                saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
-                % Closing figure
-                close(hFig27);
-                
-                %computing channel-wise correlation
-                for k=1:size(Kn,1)
-                    corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
-                end
-                %plotting channel wise correlation
-                hFig28 = figure;
-                plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
-                xlabel('Channels');
-                ylabel('Correlation');
-                title('Correlation between both lead fields channel-wise');
-                bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
-                saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
-                % Closing figure
-                close(hFig28);
-                
-                zKhom = zscore(Khom')';
-                zK = zscore(Kn')';
-                %computing voxel-wise correlation
-                for k=1:Nv
-                    corelv(k,1)=corr(zKhom(:,k),zK(:,k));
-                end
-                corelv(isnan(corelv))=0;
-                corr2d = corr2(Khom, Kn);
-                %plotting voxel wise correlation
-                hFig29 = figure;
-                plot([1:Nv],corelv);
-                title('Correlation both lead fields Voxel wise');
-                bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
-                saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
-                close(hFig29);
-                
-                %%
-                %% Finding points of low corelation
-                %%
-                low_cor_inds = find(corelv < .3);
-                BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
-                hFig_low_cor = view_surface(BSTCortexFile, [], [], 'NewFigure');
-                hFig_low_cor = view_surface(BSTCortexFile, [], [], hFig_low_cor);
-                % Delete scouts
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutLabel'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutMarker'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutPatch'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutContour'));
-                
-                line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
-                figure_3d('SetStandardView', hFig_low_cor, 'bottom');
-                bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
-                saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
-                close(hFig_low_cor);
-                
-                figure_cor = figure;
-                %colormap(gca,cmap);
-                patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
-                view(90,270)
-                bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
-                saveas( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
-                close(figure_cor);
+%                 
+%                 
+%                 [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+%                 bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
+%                 view(0,360)
+%                 saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
+%                 
+%                 bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
+%                 view(1,180)
+%                 bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
+%                 view(90,360)
+%                 bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
+%                 view(270,360)
+%                 bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+%                 % Closing figure
+%                 close(hFig26);
+%                 
+%                 VertNorms   = reshape(VertNorms,[1,Nv,3]);
+%                 VertNorms   = repmat(VertNorms,[Ne,1,1]);
+%                 Kn          = sum(Kn.*VertNorms,3);
+%                 Khom        = sum(Khom.*VertNorms,3);
+%                 
+%                 
+%                 %Homogenous Lead Field vs. Tester Lead Field Plot
+%                 hFig27 = figure;
+%                 scatter(Khom(:),Kn(:));
+%                 title('Homogenous Lead Field vs. Tester Lead Field');
+%                 xlabel('Homogenous Lead Field');
+%                 ylabel('Tester Lead Field');
+%                 bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
+%                 saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+%                 % Closing figure
+%                 close(hFig27);
+%                 
+%                 %computing channel-wise correlation
+%                 for k=1:size(Kn,1)
+%                     corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
+%                 end
+%                 %plotting channel wise correlation
+%                 hFig28 = figure;
+%                 plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
+%                 xlabel('Channels');
+%                 ylabel('Correlation');
+%                 title('Correlation between both lead fields channel-wise');
+%                 bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
+%                 saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+%                 % Closing figure
+%                 close(hFig28);
+%                 
+%                 zKhom = zscore(Khom')';
+%                 zK = zscore(Kn')';
+%                 %computing voxel-wise correlation
+%                 for k=1:Nv
+%                     corelv(k,1)=corr(zKhom(:,k),zK(:,k));
+%                 end
+%                 corelv(isnan(corelv))=0;
+%                 corr2d = corr2(Khom, Kn);
+%                 %plotting voxel wise correlation
+%                 hFig29 = figure;
+%                 plot([1:Nv],corelv);
+%                 title('Correlation both lead fields Voxel wise');
+%                 bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
+%                 saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+%                 close(hFig29);
+%                 
+%                 %%
+%                 %% Finding points of low corelation
+%                 %%
+%                 low_cor_inds = find(corelv < .3);
+%                 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
+%                 hFig_low_cor = view_surface(BSTCortexFile, [], [], 'NewFigure');
+%                 hFig_low_cor = view_surface(BSTCortexFile, [], [], hFig_low_cor);
+%                 % Delete scouts
+%                 delete(findobj(hFig_low_cor, 'Tag', 'ScoutLabel'));
+%                 delete(findobj(hFig_low_cor, 'Tag', 'ScoutMarker'));
+%                 delete(findobj(hFig_low_cor, 'Tag', 'ScoutPatch'));
+%                 delete(findobj(hFig_low_cor, 'Tag', 'ScoutContour'));
+%                 
+%                 line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
+%                 figure_3d('SetStandardView', hFig_low_cor, 'bottom');
+%                 bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
+%                 saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
+%                 close(hFig_low_cor);
+%                 
+%                 figure_cor = figure;
+%                 %colormap(gca,cmap);
+%                 patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
+%                 view(90,270)
+%                 bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
+%                 saveas( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
+%                 close(figure_cor);
                 
                 %%
                 %% Save and display report
