@@ -53,16 +53,17 @@ fsave_inds_template     = load('templates/FSAve_64k_8k_coregister_inds.mat');
 CortexFile64K           = sSubject.Surface(1).FileName;
 BSTCortexFile64K        = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile64K);
 Sc64k                   = load(BSTCortexFile64K);
-CortexFile8K            = sSubject.Surface(sSubject.iCortex).FileName;
+CortexFile8K            = sSubject.Surface(2).FileName;
 BSTCortexFile8K         = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile8K);
 Sc8k                    = load(BSTCortexFile8K);
-% CortexFile              = sSubject.Surface(sSubject.iCortex).FileName;
-% BSTCortexFile           = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
-% Sc                      = load(BSTCortexFile);
+
 
 % Finding near FSAve vertices on subject surface
 sub_to_FSAve = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
 
+CortexFile              = sSubject.Surface(sSubject.iCortex).FileName;
+BSTCortexFile           = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);
+Sc8k                      = load(BSTCortexFile);
 %%
 %% Genering Channels file
 %%
