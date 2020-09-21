@@ -154,15 +154,14 @@ end
 %% Genering eeg file
 %%
 if(isfield(selected_data_set, 'preprocessed_data'))
-    if(~isequal(selected_data_set.preprocessed_eeg.base_path,'none'))
-        Name = strrep(subID,'sub-MC00000','sub-CBM000');
-        filepath = strrep(selected_data_set.preprocessed_eeg.file_location,'SubID',Name);
-        base_path =  strrep(selected_data_set.preprocessed_eeg.base_path,'SubID',Name);
+    if(~isequal(selected_data_set.preprocessed_data.base_path,'none'))
+        filepath = strrep(selected_data_set.preprocessed_data.file_location,'SubID',subID);
+        base_path =  strrep(selected_data_set.preprocessed_data.base_path,'SubID',subID);
         data_file = fullfile(base_path,filepath);
         if(isfile(data_file))
             if(isequal(selected_data_format.modality,'EEG'))
                 disp ("-->> Genering eeg file");
-                [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_eeg.format);
+                [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
                 if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
                     user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
                     disp ("-->> Cleanning EEG bad Channels by user labels");

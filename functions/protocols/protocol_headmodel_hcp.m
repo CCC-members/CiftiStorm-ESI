@@ -320,12 +320,12 @@ if(is_check_dataset_properties(selected_data_set))
             'subjectname', subID, ...
             'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
             'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
-            'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
-            'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
-            'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
+            'cortexfile2', {R_surface_file, 'GII-MNI'}, ...            
             'nverthead',   nverthead, ...
             'nvertcortex', nvertcortex, ...
             'nvertskull',  nvertskull);
+%         'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
+%             'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
         
         %% ===== IMPORT SURFACES 32K =====
         [sSubject, iSubject] = bst_get('Subject', subID);
@@ -352,8 +352,8 @@ if(is_check_dataset_properties(selected_data_set))
         sSubject       = bst_get('Subject', subID);
         MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
         CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+%         InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+%         OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
         %
@@ -362,33 +362,39 @@ if(is_check_dataset_properties(selected_data_set))
         hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
         bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
         saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
+        % Closing figures
+        close(hFigMri4);
         %
         hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
         bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
         saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
+        % Closing figures
+        close(hFigMri5);
         %
         hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
         bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
-        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
-        
+        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));        
         % Closing figures
-        close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
+        close([hFigMriSurf hFigMri6]);
         
         %
         hFigMri7 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
         saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
-        %
-        hFigMri8 = view_mri(MriFile, OuterSkullFile);
-        bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
-        saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
-        %
-        hFigMri9 = view_mri(MriFile, InnerSkullFile);
-        bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
-        saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
-        
         % Closing figures
-        close([hFigMri7 hFigMri8 hFigMri9]);
+        close(hFigMri7);
+        %
+%         hFigMri8 = view_mri(MriFile, OuterSkullFile);
+%         bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
+%         saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
+%         % Closing figures
+%         close(hFigMri8);
+%         %
+%         hFigMri9 = view_mri(MriFile, InnerSkullFile);
+%         bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
+%         saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));        
+%         % Closing figures
+%         close(hFigMri9);
         
         %
         hFigSurf10 = view_surface(CortexFile);
