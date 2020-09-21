@@ -187,7 +187,7 @@ if(isfield(selected_data_set, 'preprocessed_data'))
                 save(fullfile(output_subject_dir,'eeg','eeg.mat'),'data');
             else
                 disp ("-->> Genering meg file");
-                meg = load(meg_file);
+                meg = load(data_file);
                 hdr = meg.data.hdr;
                 fsample = meg.data.fsample;
                 trialinfo = meg.data.trialinfo;
