@@ -159,7 +159,7 @@ if(isfield(selected_data_set, 'preprocessed_data'))
         base_path =  strrep(selected_data_set.preprocessed_data.base_path,'SubID',subID);
         data_file = fullfile(base_path,filepath);
         if(isfile(data_file))
-            if(isequal(selected_data_format.modality,'EEG'))
+            if(isequal(selected_data_set.modality,'EEG'))
                 disp ("-->> Genering eeg file");
                 [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
                 if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
