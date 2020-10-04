@@ -1,4 +1,4 @@
-function protocol_headmodel_after_MaQC(ProtocolName,subID)
+function protocol_headmodel_after_MaQC()
 % @=============================================================================
 % This function is part of the Brainstorm software:
 % https://neuroimage.usc.edu/brainstorm
@@ -25,6 +25,9 @@ function protocol_headmodel_after_MaQC(ProtocolName,subID)
 % - Deirel Paz Linares
 
 %%
+%% Preparing selected protocol
+%%
+load('tools/mycolormap');
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
@@ -35,22 +38,18 @@ gui_brainstorm('UpdateProtocolsList');
 nProtocols = db_import(new_bst_DB);
 
 %getting existing protocols on DB
-ProtocolInfo = bst_get('ProtocolInfo');
 ProtocolFiles = dir(fullfile(new_bst_DB,'**','protocol.mat'));
 
-for i=1:2 %length(ProtocolFiles)
-    Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));
-    protocol_name = Protocol.ProtocolInfo.Comment;
-    iProtocol = bst_get('Protocol', protocol_name);
+for i=1:length(ProtocolFiles)
+    Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));   
+    ProtocolName = Protocol.ProtocolInfo.Comment;
+    iProtocol = bst_get('Protocol', ProtocolName);
     gui_brainstorm('SetCurrentProtocol', iProtocol);
+    ProtocolInfo = bst_get('ProtocolInfo');
     subjects = bst_get('ProtocolSubjects');
     for j=1:length(subjects.Subject)
-        subID = subjects.Subject(j);
-        
-        
-        
-        
-        
+        sSubject = subjects.Subject(j);     
+        subID = sSubject.Name;
         %%
         %% Checking the report output structure
         %%
@@ -88,14 +87,13 @@ for i=1:2 %length(ProtocolFiles)
         %%
         %% Quality control
         %%
-        % Get Protocol info
-        ProtocolInfo = bst_get('ProtocolInfo');
-        % Get subject definition
-        sSubject = bst_get('Subject', subID);
         % Get MRI file and surface files
         if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
             return;
         end
+        % Start a new report
+        bst_report('Start',['Protocol for subject:' , subID]);
+        bst_report('Info',    '', [], ['Protocol for subject:' , subID]);
         
         MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
         hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -116,51 +114,47 @@ for i=1:2 %length(ProtocolFiles)
         %% Quality control
         %%
         % Get subject definition and subject files
-        sSubject       = bst_get('Subject', subID);
-        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
         CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
         InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
         OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
-        %
-        
-        hFigMriSurf = view_mri(MriFile, CortexFile);
-        
+        %        
+        hFigMriSurf = view_mri(MriFile, CortexFile);        
         %
         hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
         bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
         saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
+        close(hFigMri4);
         %
         hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
         bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
         saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
+        close(hFigMri5);
         %
         hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
         bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
-        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
-        % Closing figures
-        
-        close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
+        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));        
+        close([hFigMriSurf hFigMri6]);
         
         %
         hFigMri7 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,750,475]);
         saveas( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
+        close(hFigMri7);
         %
         hFigMri8 = view_mri(MriFile, OuterSkullFile);
         bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
         saveas( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
+        close(hFigMri8);
         %
         hFigMri9 = view_mri(MriFile, InnerSkullFile);
         bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
-        saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
-        
+        saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));        
         % Closing figures
-        close([hFigMri7 hFigMri8 hFigMri9]);
+        close(hFigMri9);
         
-        %
-        
+        %        
         % Top
         hFigSurf10 = view_surface(CortexFile);
         bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
@@ -180,15 +174,6 @@ for i=1:2 %length(ProtocolFiles)
         %%
         %% Quality Control
         %%
-        % Get subject definition and subject files
-        sSubject       = bst_get('Subject', subID);
-        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
-        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        
-        
         hFigSurf11 = script_view_surface(CortexFile, [], [], [],'top');
         hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
         hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
@@ -210,36 +195,22 @@ for i=1:2 %length(ProtocolFiles)
         %%
         %% Quality control
         %%
-        % Get subject definition and subject files
-        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        %
-        
         hFigMri15 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
         saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-        % Close figures
-        
+        % Close figures        
         close(hFigMri15);
         
         %%
         %% Quality control
         %%
         % View sources on MRI (3D orthogonal slices)
-        
-        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-        if(~isempty(iStudies))
-        else
-            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-        end
+        iStudies = bst_get('ChannelStudiesWithSubject', i);        
         sStudy = bst_get('Study', iStudies);
-        if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
-            return;
-        end
-        %BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(1).FileName);
-        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@raw5-Restin_c_rfDC','channel_10-20_19.mat');
         
-        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-        
+        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(1).FileName);
+%         BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@raw5-Restin_c_rfDC','channel_10-20_19.mat');
+                
         hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
         hFigMri16      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
@@ -256,11 +227,7 @@ for i=1:2 %length(ProtocolFiles)
         % Close figures
         close(hFigMri16);
         
-        % View sources on Scalp
-        
-        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        
+        % View sources on Scalp     
         hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
         hFigMri20      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri20, 1);
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
@@ -280,8 +247,7 @@ for i=1:2 %length(ProtocolFiles)
         %%
         %% Quality control
         %%
-        %%
-        
+        %%        
         hFigSurf24 = view_surface(CortexFile);
         bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
         saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
@@ -298,41 +264,17 @@ for i=1:2 %length(ProtocolFiles)
         close(hFigSurf24)
         
         % Get subject definition and subject files
-        sSubject       = bst_get('Subject', subID);
         
         %%
         %% Get Protocol information
-        %%
-        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-        if(~isempty(iStudies))
-        else
-            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-        end
-        sStudy = bst_get('Study', iStudies);
-        
+        %%       
         headmodel_options = struct();
         headmodel_options.Comment = 'OpenMEEG BEM';
         headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name);
-        % if(selected_data_set.use_raw_data)
-        %     headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID]);
-        % else
-        %     headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@intra');
-        % end
-        headmodel_options.HeadModelType = 'surface';
-        
-        % Uploading Channels
-        % BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@raw5-Restin_c_rfDC','channel_10-20_19.mat');
+        headmodel_options.HeadModelType = 'surface';        
+        % Uploading Channels        
         BSTChannels = load(BSTChannelsFile);
         headmodel_options.Channel = BSTChannels.Channel;
-        % if(selected_data_set.use_raw_data)
-        %     BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
-        % else
-        %     BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, '@intra','channel.mat');
-        % end
-        % BSTChannels = load(BSTChannelsFile);
-        % headmodel_options.Channel = BSTChannels.Channel;
-        
         headmodel_options.MegRefCoef = [];
         headmodel_options.MEGMethod = '';
         headmodel_options.EEGMethod = 'openmeeg';
@@ -341,20 +283,14 @@ for i=1:2 %length(ProtocolFiles)
         headmodel_options.HeadCenter = [];
         headmodel_options.Radii = [0.88,0.93,1];
         headmodel_options.Conductivity = [0.33,0.0042,0.33];
-        headmodel_options.SourceSpaceOptions = [];
-        
-        % Uploading cortex
-        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-        headmodel_options.CortexFile = CortexFile;
-        
-        % Uploading head
-        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-        headmodel_options.HeadFile = ScalpFile;
-        
-        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-        headmodel_options.InnerSkullFile = InnerSkullFile;
-        
-        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+        headmodel_options.SourceSpaceOptions = [];        
+        % Uploading cortex        
+        headmodel_options.CortexFile = CortexFile;        
+        % Uploading head        
+        headmodel_options.HeadFile = ScalpFile;        
+         % Uploading InnerSkull
+        headmodel_options.InnerSkullFile = InnerSkullFile;        
+       % Uploading OuterSkull
         headmodel_options.OuterSkullFile =  OuterSkullFile;
         headmodel_options.GridOptions = [];
         headmodel_options.GridLoc  = [];
@@ -363,6 +299,7 @@ for i=1:2 %length(ProtocolFiles)
         headmodel_options.Interactive  = true;
         headmodel_options.SaveFile  = true;
         
+        % BEM params
         BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
         BSTOuterSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
         BSTInnerSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
@@ -386,13 +323,7 @@ for i=1:2 %length(ProtocolFiles)
         [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
         
         if(~isempty(headmodel_options))
-            ProtocolInfo = bst_get('ProtocolInfo');
-            
-            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-            if(~isempty(iStudies))
-            else
-                [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-            end
+
             sStudy = bst_get('Study', iStudies);
             %     iStudy = ProtocolInfo.iStudy;
             %     sStudy = bst_get('Study', iStudy);
@@ -412,9 +343,7 @@ for i=1:2 %length(ProtocolFiles)
             
             %%
             %% Quality control
-            %%
-            ProtocolInfo = bst_get('ProtocolInfo');
-            
+            %%            
             BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
             cortex = load(BSTCortexFile);
             
@@ -552,29 +481,23 @@ for i=1:2 %length(ProtocolFiles)
             %%
             %% Save and display report
             %%
-            ReportFile = bst_report('Save', sFiles);
+            ReportFile = bst_report('Save', []);
             bst_report('Export',  ReportFile,report_name);
             bst_report('Open', ReportFile);
             bst_report('Close');
             processed = true;
             disp(strcat("-->> Process finished for subject: ", subID));
-            
-            Protocol_count = Protocol_count+1;
+          
             %%
             %% Export Subject to BC-VARETA
             %%
             if(processed)
-                disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+                disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
                 if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,subject_name);
+                    export_subject_BCV_structure(selected_data_set,subID);
                 end
-            end
-            %%
-            Protocol_count = Protocol_count + 1;
-            if( mod(Protocol_count,selected_data_set.protocol_subjet_count) == 0  || j == size(subjects,1))
-                % Genering Manual QC file (need to check)
-                %                     generate_MaQC_file();
-            end
+            end                  
+            
             disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
         end
     end

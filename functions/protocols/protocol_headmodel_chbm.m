@@ -31,7 +31,6 @@ function [processed] = protocol_headmodel_chbm()
 %%
 %% Preparing selected protocol
 %%
-
 load('tools/mycolormap');
 
 app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
@@ -189,7 +188,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             % Start a new report
             bst_report('Start',['Protocol for subject:' , subID]);
-            bst_report('Info',    '', [], ['Protocol for subject:' , subID])
+            bst_report('Info',    '', [], ['Protocol for subject:' , subID]);
             
             %%
             %% Process: Import MRI

@@ -7,11 +7,8 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 sSubject = bst_get('Subject', subID);
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-if(~isempty(iStudies))
-else
-    [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-end
+[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+
 sStudy = bst_get('Study', iStudies);
 if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
     return;
@@ -31,14 +28,18 @@ disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
 
 disp ("-->> Genering leadfield file");
 HeadModels = struct;
+iHeadModel = sStudy.iHeadModel;
 for h=1: length(sStudy.HeadModel)
     HeadModelFile = fullfile(ProtocolInfo.STUDIES,sStudy.HeadModel(h).FileName);
     HeadModel = load(HeadModelFile);
     
-    HeadModels(h).Comment = sStudy.HeadModel(h).Comment;
-    HeadModels(h).Ke = HeadModel.Gain;
-    HeadModels(h).GridOrient = HeadModel.GridOrient;
-    HeadModels(h).GridAtlas = HeadModel.GridAtlas;
+    HeadModels(h).Comment       = HeadModel.Comment;
+    HeadModels(h).Ke            = HeadModel.Gain;
+    HeadModels(h).HeadModelType = HeadModel.HeadModelType;
+    HeadModels(h).GridOrient    = HeadModel.GridOrient;
+    HeadModels(h).GridAtlas     = HeadModel.GridAtlas;
+    HeadModels(h).History       = HeadModel.History;
+    
     if(~isempty(sStudy.HeadModel(h).EEGMethod))
         HeadModels(h).Method    = sStudy.HeadModel(h).EEGMethod;
     elseif(~isempty(sStudy.HeadModel(h).MEGMethod))
@@ -134,7 +135,7 @@ if(isfolder(output_subject_dir))
     leadfield_dir = struct;
     for h=1:length(HeadModels)
         HeadModel = HeadModels(h);
-        dirref = replace(fullfile('leadfield',strcat(HeadModel.Comment,'.mat')),'\','/');
+        dirref = replace(fullfile('leadfield',strcat(HeadModel.Comment,'_',num2str(posixtime(datetime(HeadModel.History{1}))),'.mat')),'\','/');
         leadfield_dir(h).path = dirref;
     end
     subject_info.leadfield_dir = leadfield_dir;
@@ -162,7 +163,7 @@ if(isfield(selected_data_set, 'preprocessed_data'))
             if(isequal(selected_data_set.modality,'EEG'))
                 disp ("-->> Genering eeg file");
                 [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
-                if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
+                if(isfield(selected_data_set,'process_import_channel') && ~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
                     user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
                     disp ("-->> Cleanning EEG bad Channels by user labels");
                     [data,hdr]  = remove_eeg_channels_by_labels(user_labels,data,hdr);
@@ -204,7 +205,7 @@ if(isfield(selected_data_set, 'preprocessed_data'))
                     [Cdata_s,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata_r,Ke);
                     HeadModels(h).Ke = Ke;
                 end
-                Cdata = Cdata_s;
+                Cdata = Cdata_s;         
                 
                 data = [meg.data.trial];
                 trials = meg.data.trial;
@@ -232,7 +233,8 @@ for h=1:length(HeadModels)
     GridOrient  = HeadModels(h).GridOrient;
     GridAtlas   = HeadModels(h).GridAtlas;
     disp ("-->> Saving leadfield file");
-    save(fullfile(output_subject_dir,'leadfield',strcat(Comment,'.mat')),'Comment','Method','Ke','GridOrient','GridAtlas');
+    save(fullfile(output_subject_dir,'leadfield',strcat(HeadModel.Comment,'_',num2str(posixtime(datetime(HeadModel.History{1}))),'.mat')),...
+        'Comment','Method','Ke','GridOrient','GridAtlas','iHeadModel');
 end
 disp ("-->> Saving surf file");
 save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc','sub_to_FSAve','iCortex');
