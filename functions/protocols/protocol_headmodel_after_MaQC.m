@@ -205,7 +205,7 @@ for i=1:length(ProtocolFiles)
         %% Quality control
         %%
         % View sources on MRI (3D orthogonal slices)
-        iStudies = bst_get('ChannelStudiesWithSubject', i);        
+        iStudies = bst_get('ChannelStudiesWithSubject', j);        
         sStudy = bst_get('Study', iStudies);
         
         BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(1).FileName);
@@ -323,10 +323,7 @@ for i=1:length(ProtocolFiles)
         [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
         
         if(~isempty(headmodel_options))
-
             sStudy = bst_get('Study', iStudies);
-            %     iStudy = ProtocolInfo.iStudy;
-            %     sStudy = bst_get('Study', iStudy);
             % If a new head model is available
             sHeadModel = db_template('headmodel');
             sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
@@ -496,9 +493,9 @@ for i=1:length(ProtocolFiles)
                 if(selected_data_set.bcv_config.export)
                     export_subject_BCV_structure(selected_data_set,subID);
                 end
-            end                  
+            end           
             
-            disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
+            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
         end
     end
 end

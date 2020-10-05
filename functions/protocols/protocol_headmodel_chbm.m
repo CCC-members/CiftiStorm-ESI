@@ -202,13 +202,8 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             % Get subject definition
             sSubject = bst_get('Subject', subID);
-            % [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-            % if(~isempty(iStudies))
-            % else
-            % [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-            % end
-            % Get MRI file and surface files
-            
+           
+            % Get MRI file and surface files            
             MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
             hFigMri1 = view_mri_slices(MriFile, 'x', 20);
             bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,750,475]);
@@ -420,12 +415,8 @@ if(is_check_dataset_properties(selected_data_set))
             %% See Description for -->> import_channel(iStudies, ChannelFile, FileFormat, ChannelReplace,
             % ChannelAlign, isSave, isFixUnits, isApplyVox2ras)
             %%
-            sSubject = bst_get('Subject', subID);
-            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
-            if(~isempty(iStudies))
-            else
-                [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-            end
+            sSubject = bst_get('Subject', subID);            
+            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');            
             
             [Output, ChannelFile, FileFormat] = import_channel(iStudies, ChannelFile, FileFormat, 2, 2, 1, 1, 1);
             

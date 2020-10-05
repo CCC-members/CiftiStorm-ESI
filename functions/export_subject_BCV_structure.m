@@ -8,7 +8,6 @@ ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 sSubject = bst_get('Subject', subID);
 [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-
 sStudy = bst_get('Study', iStudies);
 if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
     return;
@@ -99,6 +98,9 @@ end
 %% Genering Channels file
 %%
 disp ("-->> Genering channels file");
+if(isempty(sStudy.iChannel))
+    sStudy.iChannel = 1;
+end
 BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(sStudy.iChannel).FileName);
 Cdata = load(BSTChannelsFile);
 
@@ -227,14 +229,16 @@ if(isfield(selected_data_set, 'preprocessed_data'))
     end
 end
 for h=1:length(HeadModels)
-    Comment     = HeadModels(h).Comment;
-    Method      = HeadModels(h).Method;
-    Ke          = HeadModels(h).Ke;
-    GridOrient  = HeadModels(h).GridOrient;
-    GridAtlas   = HeadModels(h).GridAtlas;
+    HeadModel   = HeadModels(h);
+    Comment     = HeadModel.Comment;
+    Method      = HeadModel.Method;
+    Ke          = HeadModel.Ke;
+    GridOrient  = HeadModel.GridOrient;
+    GridAtlas   = HeadModel.GridAtlas;
+    History     = HeadModel.History;
     disp ("-->> Saving leadfield file");
-    save(fullfile(output_subject_dir,'leadfield',strcat(HeadModel.Comment,'_',num2str(posixtime(datetime(HeadModel.History{1}))),'.mat')),...
-        'Comment','Method','Ke','GridOrient','GridAtlas','iHeadModel');
+    save(fullfile(output_subject_dir,'leadfield',strcat(HeadModel.Comment,'_',num2str(posixtime(datetime(History{1}))),'.mat')),...
+        'Comment','Method','Ke','GridOrient','GridAtlas','iHeadModel','History');
 end
 disp ("-->> Saving surf file");
 save(fullfile(output_subject_dir,'surf','surf.mat'),'Sc','sub_to_FSAve','iCortex');
