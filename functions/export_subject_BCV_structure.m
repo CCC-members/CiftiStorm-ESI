@@ -26,27 +26,7 @@ disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
 %%
 
 disp ("-->> Genering leadfield file");
-HeadModels = struct;
-iHeadModel = sStudy.iHeadModel;
-for h=1: length(sStudy.HeadModel)
-    HeadModelFile = fullfile(ProtocolInfo.STUDIES,sStudy.HeadModel(h).FileName);
-    HeadModel = load(HeadModelFile);
-    
-    HeadModels(h).Comment       = HeadModel.Comment;
-    HeadModels(h).Ke            = HeadModel.Gain;
-    HeadModels(h).HeadModelType = HeadModel.HeadModelType;
-    HeadModels(h).GridOrient    = HeadModel.GridOrient;
-    HeadModels(h).GridAtlas     = HeadModel.GridAtlas;
-    HeadModels(h).History       = HeadModel.History;
-    
-    if(~isempty(sStudy.HeadModel(h).EEGMethod))
-        HeadModels(h).Method    = sStudy.HeadModel(h).EEGMethod;
-    elseif(~isempty(sStudy.HeadModel(h).MEGMethod))
-        HeadModels(h).Method    = sStudy.HeadModel(h).MEGMethod;
-    else
-        HeadModels(h).Method    = sStudy.HeadModel(h).ECOGMethod;
-    end
-end
+[HeadModels,iHeadModel,modality] = get_headmodels(ProtocolInfo.STUDIES,sStudy);
 
 %%
 %% Genering surf file
@@ -66,33 +46,11 @@ Sc8k                    = load(BSTCortexFile8K);
 
 
 % Finding near FSAve vertices on subject surface
-
 sub_to_FSAve = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
 
 % Loadding subject surfaces
 disp ("-->> Genering surf file");
-Sc      = struct([]);
-count   = 1;
-for h=1:length(sSubject.Surface)
-    surface = sSubject.Surface(h);
-    if(isequal(surface.SurfaceType,'Cortex'))
-        if(isequal(sSubject.iCortex,h))
-            iCortex = count;
-        end
-        CortexFile              = fullfile(ProtocolInfo.SUBJECTS, surface.FileName);
-        Cortex                  = load(CortexFile);
-        Sc(count).Comment       = Cortex.Comment;
-        Sc(count).Vertices      = Cortex.Vertices;
-        Sc(count).Faces         = Cortex.Faces;
-        Sc(count).VertConn      = Cortex.VertConn;
-        Sc(count).VertNormals   = Cortex.VertNormals;
-        Sc(count).Curvature     = Cortex.Curvature;
-        Sc(count).SulciMap      = Cortex.SulciMap;
-        Sc(count).Atlas         = Cortex.Atlas;
-        Sc(count).iAtlas        = Cortex.iAtlas;
-        count                   = count + 1;
-    end
-end
+[Sc,iCortex] = get_surfaces(ProtocolInfo.SUBJECTS,sSubject);
 
 %%
 %% Genering Channels file
@@ -162,69 +120,7 @@ if(isfield(selected_data_set, 'preprocessed_data'))
         base_path =  strrep(selected_data_set.preprocessed_data.base_path,'SubID',subID);
         data_file = fullfile(base_path,filepath);
         if(isfile(data_file))
-            if(isequal(selected_data_set.modality,'EEG'))
-                disp ("-->> Genering eeg file");
-                [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
-                if(isfield(selected_data_set,'process_import_channel') && ~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
-                    user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
-                    disp ("-->> Cleanning EEG bad Channels by user labels");
-                    [data,hdr]  = remove_eeg_channels_by_labels(user_labels,data,hdr);
-                end
-                labels = hdr.label;
-                for h=1:length(HeadModels)
-                    HeadModel = HeadModels(h);
-                    disp ("-->> Removing Channels  by preprocessed EEG");
-                    [Cdata_r,Ke] = remove_channels_and_leadfield_from_layout(labels,Cdata,HeadModel.Ke);
-                    disp ("-->> Sorting Channels and LeadField by preprocessed EEG");
-                    [Cdata_s,Ke] = sort_channels_and_leadfield_by_labels(labels,Cdata_r,Ke);
-                    HeadModels(h).Ke = Ke;
-                end
-                Cdata = Cdata_s;
-                dir = replace(fullfile('eeg','eeg.mat'),'\','/');
-                subject_info.eeg_dir = dir;
-                dir = replace(fullfile('eeg','eeg_info.mat'),'\','/');
-                subject_info.eeg_info_dir = dir;
-                disp ("-->> Saving eeg_info file");
-                save(fullfile(output_subject_dir,'eeg','eeg_info.mat'),'hdr');
-                disp ("-->> Saving eeg file");
-                save(fullfile(output_subject_dir,'eeg','eeg.mat'),'data');
-            else
-                disp ("-->> Genering meg file");
-                meg = load(data_file);
-                hdr = meg.data.hdr;
-                fsample = meg.data.fsample;
-                trialinfo = meg.data.trialinfo;
-                grad = meg.data.grad;
-                time = meg.data.time;
-                label = meg.data.label;
-                cfg = meg.data.cfg;
-                %                 labels = strrep(labels,'REF','');
-                for h=1:length(HeadModels)
-                    HeadModel = HeadModels(h);
-                    disp ("-->> Removing Channels  by preprocessed MEG");
-                    [Cdata_r,Ke] = remove_channels_and_leadfield_from_layout(label,Cdata,HeadModel.Ke);
-                    disp ("-->> Sorting Channels and LeadField by preprocessed MEG");
-                    [Cdata_s,Ke] = sort_channels_and_leadfield_by_labels(label,Cdata_r,Ke);
-                    HeadModels(h).Ke = Ke;
-                end
-                Cdata = Cdata_s;         
-                
-                data = [meg.data.trial];
-                trials = meg.data.trial;
-                
-                dir = replace(fullfile('meg','meg.mat'),'\','/');
-                subject_info.meg_dir = dir;
-                dir = replace(fullfile('meg','meg_info.mat'),'\','/');
-                subject_info.meg_info_dir = dir;
-                dir = replace(fullfile('meg','trials.mat'),'\','/');
-                subject_info.trials_dir = dir;
-                disp ("-->> Saving meg_info file");
-                save(fullfile(output_subject_dir,'meg','meg_info.mat'),'hdr','fsample','trialinfo','grad','time','label','cfg');
-                disp ("-->> Saving meg file");
-                save(fullfile(output_subject_dir,'meg','meg.mat'),'data');
-                disp ("-->> Saving meg trials file");
-                save(fullfile(output_subject_dir,'meg','trials.mat'),'trials');
-            end
+            [subject_info,HeadModels,Cdata] = load_preprocessed_data(subject_info,selected_data_set,output_subject_dir,data_file,HeadModels,Cdata);
         end
     end
 end

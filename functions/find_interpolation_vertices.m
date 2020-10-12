@@ -41,6 +41,7 @@ for i=1:length(fsave_inds_template.ind)
     vertices_interp(i,:) = selected_vertices;
     fprintf(1,'\b\b\b\b%3.0f%%',(i)/(length(fsave_inds_template.ind))*100);
 end
+fprintf(1,'\n');
 %
 % fig = figure;
 % hold on
