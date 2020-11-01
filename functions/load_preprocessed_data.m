@@ -7,6 +7,7 @@ if(isequal(selected_data_set.modality,'EEG'))
            data_type    = selected_data_set.preprocessed_data.format;
            max_freq     = selected_data_set.preprocessed_data.clean_data.max_freq;
            EEG          = eeglab_preproc(subject_info.name, data_file, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq);
+           data         = EEG.data;
        end
     end    
     [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
