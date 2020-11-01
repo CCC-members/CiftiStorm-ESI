@@ -1,6 +1,14 @@
 function [subject_info,HeadModels,Cdata] = load_preprocessed_data(subject_info,selected_data_set,output_subject_dir,data_file,HeadModels,Cdata)
 if(isequal(selected_data_set.modality,'EEG'))
     disp ("-->> Genering eeg file");
+    if(selected_data_set.preprocessed_data.clean_data.run)
+       if(isequal(lower(selected_data_set.preprocessed_data.clean_data.toolbox),'eeglab'))
+           toolbox_path = selected_data_set.preprocessed_data.clean_data.toolbox_path;
+           data_type    = selected_data_set.preprocessed_data.format;
+           max_freq     = selected_data_set.preprocessed_data.clean_data.max_freq;
+           EEG          = eeglab_preproc(subject_info.name, data_file, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq);
+       end
+    end    
     [hdr, data] = import_eeg_format(data_file,selected_data_set.preprocessed_data.format);
     if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
         user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
