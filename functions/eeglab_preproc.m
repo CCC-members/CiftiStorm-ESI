@@ -15,7 +15,7 @@ function EEG  = eeglab_preproc(subID, file_name, data_type, eeglab_path, varargi
 %
 %   verbosity   - Logical value for debbuging (key='debug',value=true OR false) 
 %   max_freq    - Integer maximun frequency to filtering the data (key='max_freq', value=from 1 to 92)
-%   save_path   - full path to save the cleanned EEG (key='save_path', value="fullpath/file_name")
+%   save_path   - full path to save the cleanned EEG (key='save_path', value="fullpath")
 %   
 %
 % Author: Eduardo Gonzalez-Moreira
@@ -58,11 +58,11 @@ switch data_type
     case 'edf'
         EEG = pop_biosig(file_name);
 end
-EEG.setname = subID;
+EEG.subID = subID;
 
 %% Step 3: Visualization.
 if verbosity
-  eegplot(EEG.data);
+    eegplot(EEG.data);
 end
 
 %% Step 4: Downsample the data.
@@ -91,7 +91,7 @@ EEG.data(clear_ind,:) = [];
 EEG.nbchan = length(EEG.chanlocs);
 if verbosity
     figure;
-    [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 30 NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',[1 6 10 18]);
+    [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 52 NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',[1 6 10 18]);
 end
 
 %% Step 7: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
@@ -105,11 +105,24 @@ EEG_interp = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
 if verbosity
     eegplot(EEG_interp.data)
     figure;
-    [spectra,freqs] = spectopo(EEG_interp.data,0,EEG_interp.srate,'limits',[0 30 NaN NaN -10 10],'chanlocs',EEG_interp.chanlocs,'chaninfo',EEG_interp.chaninfo,'freq',[1 6 10 18]);
+    [spectra,freqs] = spectopo(EEG_interp.data,0,EEG_interp.srate,'limits',[0 52 NaN NaN -10 10],'chanlocs',EEG_interp.chanlocs,'chaninfo',EEG_interp.chaninfo,'freq',[1 6 10 18]);
 end
-EEG = EEG_interp;
-
 if(exist('save_path','var'))
-    save(save_path,'EEG','-v7.3');
+    if(~isfolder(save_path))
+        mkdir(save_path);
+    end
+    save(fullfile(save_path,strcat(subID, 'EEG_raw.mat')),'EEG','-v7.3');
+    EEG = EEG_interp;
+    save(fullfile(save_path,strcat(subID, 'EEG_interp.mat')),'EEG','-v7.3');
+    
+    FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+    for iFig = 1:length(FigList)
+        FigHandle = FigList(iFig);
+        FigName   = get(FigHandle, 'Name');
+        savefig(FigHandle, fullfile(save_path, strcat(subID, '_', num2str(iFig), '.fig')));
+    end
+else
+   EEG = EEG_interp;
 end
+close all;
 end
