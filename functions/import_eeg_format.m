@@ -1,11 +1,18 @@
 function EEG = import_eeg_format(subject_info, selected_data_set, base_path)
 data_type    = selected_data_set.preprocessed_data.format;
+if(~isequal(selected_data_set.preprocessed_data.labels_file_path,"none"))
+    user_labels = jsondecode(fileread(selected_data_set.preprocessed_data.labels_file_path));    
+end
 if(selected_data_set.preprocessed_data.clean_data.run)
     if(isequal(lower(selected_data_set.preprocessed_data.clean_data.toolbox),'eeglab'))
-        toolbox_path = selected_data_set.preprocessed_data.clean_data.toolbox_path;        
-        max_freq     = selected_data_set.preprocessed_data.clean_data.max_freq;        
-        save_path    = fullfile(properties.report_output_path,'Reports',properties.protocol_name,subject_info.name,'EEGLab_preproc');
-        EEG          = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq, 'save_path', save_path);        
+        toolbox_path = selected_data_set.preprocessed_data.clean_data.toolbox_path;
+        max_freq     = selected_data_set.preprocessed_data.clean_data.max_freq;
+        %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
+        if(exist('user_labels','var'))
+            EEG          = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', false, 'max_freq', max_freq, 'labels', user_labels);
+        else
+            EEG          = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', false, 'max_freq', max_freq);
+        end
         EEG.labels   = {EEG.chanlocs(:).labels};
     end
 else
@@ -29,10 +36,9 @@ else
     EEG.data = data;
     EEG.labels = strrep(hdr.label,'REF','');
     EEG.srate = hdr.samples(1);    
-end
-if(~isequal(selected_data_set.process_import_channel.channel_label_file,"none"))
-    user_labels = jsondecode(fileread(selected_data_set.process_import_channel.channel_label_file));
-    disp ("-->> Cleanning EEG bad Channels by user labels");
-    EEG  = remove_eeg_channels_by_labels(user_labels,EEG);
+    if(exist('user_labels','var'))
+        disp ("-->> Cleanning EEG bad Channels by user labels");
+        EEG  = remove_eeg_channels_by_labels(user_labels,EEG);
+    end
 end
 end
