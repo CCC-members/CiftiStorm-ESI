@@ -178,10 +178,10 @@ if(is_check_dataset_properties(selected_data_set))
             iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
             iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
             ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;
-            channel_layout= load(ChannelFile);
+%             channel_layout= load(ChannelFile);
             
             %% reduce channel by preprocessed eeg or user labels
-            [ChannelFile] = reduce_channel_BY_prep_eeg_OR_user_labels(selected_data_set,channel_layout,ChannelFile,subID);
+%             [ChannelFile] = reduce_channel_BY_prep_eeg_OR_user_labels(selected_data_set,channel_layout,ChannelFile,subID);
             
             %%
             %% ===== IMPORT ANATOMY =====

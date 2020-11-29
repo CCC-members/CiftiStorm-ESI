@@ -44,7 +44,6 @@ CortexFile8K            = sSubject.Surface(2).FileName;
 BSTCortexFile8K         = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile8K);
 Sc8k                    = load(BSTCortexFile8K);
 
-
 % Finding near FSAve vertices on subject surface
 sub_to_FSAve = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
 
@@ -88,7 +87,7 @@ Sout = load(BSTOuterSkullFile);
 
 %% Creating subject folder structure
 disp(strcat("-->> Saving BC-VARETA structure. Subject: ",sSubject.Name));
-[output_subject_dir] = create_data_structure(bcv_path,sSubject.Name,selected_data_set.modality);
+[output_subject_dir] = create_data_structure(bcv_path,sSubject.Name);
 subject_info = struct;
 
 if(isfolder(output_subject_dir))
@@ -98,6 +97,8 @@ if(isfolder(output_subject_dir))
         dirref = replace(fullfile('leadfield',strcat(HeadModel.Comment,'_',num2str(posixtime(datetime(HeadModel.History{1}))),'.mat')),'\','/');
         leadfield_dir(h).path = dirref;
     end
+    subject_info.modality = modality;
+    subject_info.name = sSubject.Name;
     subject_info.leadfield_dir = leadfield_dir;
     dir = replace(fullfile('surf','surf.mat'),'\','/');
     subject_info.surf_dir = dir;
@@ -107,8 +108,6 @@ if(isfolder(output_subject_dir))
     subject_info.innerskull_dir = dir;
     dir = replace(fullfile('scalp','outerskull.mat'),'\','/');
     subject_info.outerskull_dir = dir;
-    subject_info.modality = selected_data_set.modality;
-    subject_info.name = sSubject.Name;
 end
 
 %%
@@ -120,8 +119,9 @@ if(isfield(selected_data_set, 'preprocessed_data'))
         base_path =  strrep(selected_data_set.preprocessed_data.base_path,'SubID',subID);
         data_file = fullfile(base_path,filepath);
         if(isfile(data_file))
-            [subject_info,HeadModels,Cdata] = load_preprocessed_data(subject_info,selected_data_set,output_subject_dir,data_file,HeadModels,Cdata);
-        end
+            disp ("-->> Genering MEG/EEG file"); 
+            [subject_info, HeadModels, Cdata] = load_preprocessed_data(subject_info, selected_data_set, output_subject_dir, data_file, HeadModels, Cdata);
+        end 
     end
 end
 for h=1:length(HeadModels)
