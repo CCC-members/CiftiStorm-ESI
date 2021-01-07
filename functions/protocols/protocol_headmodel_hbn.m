@@ -42,7 +42,7 @@ if(is_check_dataset_properties(selected_data_set))
         %%
         %% Preparing Subject files
         %%
-        [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,'chbm');        
+        [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,'hbm');        
         if(~files_checked)
             continue;
         end
