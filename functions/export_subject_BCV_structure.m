@@ -7,8 +7,16 @@ function [] = export_subject_BCV_structure(selected_data_set,subID)
 ProtocolInfo = bst_get('ProtocolInfo');
 % Get subject directory
 sSubject = bst_get('Subject', subID);
+
+% Get the current Study
 [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-sStudy = bst_get('Study', iStudies);
+if(length(sStudies)>1)
+    conditions = [sStudies.Condition];
+    sStudy = sStudies(find(strcmp(conditions,strcat('@raw',subID)),1));
+else
+    sStudy = sStudies;
+end
+
 if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
     return;
 end

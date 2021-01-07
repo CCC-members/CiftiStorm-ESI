@@ -12,6 +12,9 @@ for h=1: length(sStudy.HeadModel)
     if(isequal(modality,'MEG') && isempty(HeadModel.MEGMethod))
         continue;
     end
+    if(~isequal(sStudy.Channel.nbChannels,size(HeadModel.Gain,1)))
+        continue;
+    end
     HeadModels(count).Comment       = HeadModel.Comment;
     HeadModels(count).Ke            = HeadModel.Gain;
     HeadModels(count).HeadModelType = HeadModel.HeadModelType;

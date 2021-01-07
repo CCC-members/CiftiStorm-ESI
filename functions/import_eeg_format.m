@@ -1,8 +1,8 @@
 function EEG = import_eeg_format(subject_info, selected_data_set, base_path)
 
 data_type    = selected_data_set.preprocessed_data.format;
-if(~isequal(selected_data_set.preprocessed_data.labels_file_path,"none"))
-    user_labels = jsondecode(fileread(selected_data_set.preprocessed_data.labels_file_path));    
+if(~isequal(selected_data_set.preprocessed_data.channel_label_file,"none"))
+    user_labels = jsondecode(fileread(selected_data_set.preprocessed_data.channel_label_file));    
 end
 if(selected_data_set.preprocessed_data.clean_data.run)
     if(isequal(lower(selected_data_set.preprocessed_data.clean_data.toolbox),'eeglab'))
@@ -11,7 +11,7 @@ if(selected_data_set.preprocessed_data.clean_data.run)
         read_marks   = selected_data_set.preprocessed_data.clean_data.read_marks;
         %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
         if(exist('user_labels','var'))
-            EEG      = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq, 'labels', user_labels, 'read_marks', read_marks);
+            EEG      = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq, 'labels', user_labels, 'read_marks', read_marks, 'save_path', 'E:\Data\Master_Thesis\EEGLab_preprop');
         else
             EEG      = eeglab_preproc(subject_info.name, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq, 'read_marks', read_marks);
         end

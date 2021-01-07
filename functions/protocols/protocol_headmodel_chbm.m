@@ -3,29 +3,10 @@ function [processed] = protocol_headmodel_chbm()
 %
 %
 % @=============================================================================
-% This function is part of the Brainstorm software:
-% https://neuroimage.usc.edu/brainstorm
 %
-% Copyright (c)2000-2019 University of Southern California & McGill University
-% This software is distributed under the terms of the GNU General Public License
-% as published by the Free Software Foundation. Further details on the GPLv3
-% license can be found at http://www.gnu.org/copyleft/gpl.html.
-%
-% FOR RESEARCH PURPOSES ONLY. THE SOFTWARE IS PROVIDED "AS IS," AND THE
-% UNIVERSITY OF SOUTHERN CALIFORNIA AND ITS COLLABORATORS DO NOT MAKE ANY
-% WARRANTY, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
-% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, NOR DO THEY ASSUME ANY
-% LIABILITY OR RESPONSIBILITY FOR THE USE OF THIS SOFTWARE.
-%
-% For more information type "brainstorm license" at command prompt.
-% =============================================================================@
-%
-% Author: Francois Tadel, 2014-2016
-%%
-% Updaters:
+% Authors:
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
-%%
 
 
 %%
@@ -55,58 +36,19 @@ if(is_check_dataset_properties(selected_data_set))
         disp(strcat('-->> Processing subject: ', subID));
         %%
         %% Preparing Subject files
-        %%
-        
-        % MRI File
-        base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
-        filepath = strrep(selected_data_set.hcp_data_path.file_location,'SubID',subID);
-        T1w_file = fullfile(base_path,filepath);
-        
-        % Cortex Surfaces
-        filepath = strrep(selected_data_set.hcp_data_path.L_surface_location,'SubID',subID);
-        L_surface_file = fullfile(base_path,filepath);
-        
-        filepath = strrep(selected_data_set.hcp_data_path.R_surface_location,'SubID',subID);
-        R_surface_file = fullfile(base_path,filepath);
-        
-        filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',subID);
-        Atlas_seg_location = fullfile(base_path,filepath);
-        
-        if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~isfile(Atlas_seg_location))
-            fprintf(2,strcat('\n -->> Error: The Tw1 or Cortex surfaces: \n'));
-            disp(string(T1w_file));
-            disp(string(L_surface_file));
-            disp(string(R_surface_file));
-            disp(string(Atlas_seg_location));
-            fprintf(2,strcat('\n -->> Do not exist. \n'));
-            fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
-            processed = false;
+        %%        
+        [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,'chbm');        
+        if(~files_checked)
             continue;
         end
-        
-        % Non-Brain surface files
-        base_path =  strrep(selected_data_set.non_brain_data_path.base_path,'SubID',subID);
-        filepath = strrep(selected_data_set.non_brain_data_path.head_file_location,'SubID',subID);
-        head_file = fullfile(base_path,filepath);
-        
-        %         filepath =  strrep(selected_data_set.non_brain_data_path.outerfile_file_location,'SubID',subID);
-        %         outerskull_file = fullfile(base_path,filepath);
-        %
-        %         filepath = strrep(selected_data_set.non_brain_data_path.innerfile_file_location,'SubID',subID);
-        %         innerskull_file = fullfile(base_path,filepath);
-        
-        %         if(~isfile(head_file) || ~isfile(outerskull_file) || ~isfile(innerskull_file))
-        if(~isfile(head_file))
-            fprintf(2,strcat('\n -->> Error: The Non-brain surfaces: \n'));
-            disp(string(head_file));
-            %             disp(string(L_surface_file));
-            %             disp(string(R_surface_file));
-            fprintf(2,strcat('\n -->> Do not exist. \n'));
-            fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
-            processed = false;
-            continue;
-        end
-        
+        T1w_file            = subject_environment.T1w_file;
+        L_surface_file      = subject_environment.L_surface_file;
+        R_surface_file      = subject_environment.R_surface_file;
+        Atlas_seg_location  = subject_environment.Atlas_seg_location;
+        head_file           = subject_environment.head_file;
+        subject_report_path = subject_environment.subject_report_path;
+        report_name         = subject_environment.report_name;
+
         %%
         %%  Checking protocol
         %%
@@ -137,34 +79,6 @@ if(is_check_dataset_properties(selected_data_set))
             %% Creating subject in Protocol
             %%
             db_add_subject(subID);
-            
-            %%
-            %% Checking the report output structure
-            %%
-            if(selected_data_set.report_output_path == "local")
-                report_output_path = pwd;
-            else
-                report_output_path = selected_data_set.report_output_path ;
-            end
-            if(~isfolder(report_output_path))
-                mkdir(report_output_path);
-            end
-            if(~isfolder(fullfile(report_output_path,'Reports')))
-                mkdir(fullfile(report_output_path,'Reports'));
-            end
-            if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
-                mkdir(fullfile(report_output_path,'Reports',ProtocolName));
-            end
-            if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName,subID)))
-                mkdir(fullfile(report_output_path,'Reports',ProtocolName,subID));
-            end
-            subject_report_path = fullfile(report_output_path,'Reports',ProtocolName,subID);
-            report_name = fullfile(subject_report_path,[subID,'.html']);
-            iter = 2;
-            while(isfile(report_name))
-                report_name = fullfile(subject_report_path,[subID,'_Iter_', num2str(iter),'.html']);
-                iter = iter + 1;
-            end
             
             %%
             %% Preparing eviroment
@@ -231,15 +145,16 @@ if(is_check_dataset_properties(selected_data_set))
                 'subjectname', subID, ...
                 'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
                 'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
-                'cortexfile2', {R_surface_file, 'GII-MNI'}, ...
+                'cortexfile2', {R_surface_file, 'GII-MNI'}, ...                
+                'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
+                'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
                 'nverthead',   nverthead, ...
                 'nvertcortex', nvertcortex, ...
                 'nvertskull',  nvertskull);
-            %                 'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
-            %                 'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
-            
-            
+                        
+            %%
             %% ===== IMPORT SURFACES 32K =====
+            %%
             [sSubject, iSubject] = bst_get('Subject', subID);
             % Left pial
             [iLh, BstTessLhFile, nVertOrigL] = import_surfaces(iSubject, L_surface_file, 'GII-MNI', 0);
@@ -248,7 +163,9 @@ if(is_check_dataset_properties(selected_data_set))
             [iRh, BstTessRhFile, nVertOrigR] = import_surfaces(iSubject, R_surface_file, 'GII-MNI', 0);
             BstTessRhFile = BstTessRhFile{1};
             
+            %%
             %% ===== MERGE SURFACES =====
+            %%
             % Merge surfaces
             tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
             % Delete original files
@@ -293,16 +210,16 @@ if(is_check_dataset_properties(selected_data_set))
             savefig( hFigMri7,fullfile(subject_report_path,'Scalp registration.fig'));
             close(hFigMri7);
             %
-            %             hFigMri8 = view_mri(MriFile, OuterSkullFile);
-            %             bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
-            %             savefig( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
-            %             close(hFigMri8);
-            %             %
-            %             hFigMri9 = view_mri(MriFile, InnerSkullFile);
-            %             bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
-            %             savefig( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
-            %             % Closing figures
-            %             close(hFigMri9);
+            hFigMri8 = view_mri(MriFile, OuterSkullFile);
+            bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,750,475]);
+            savefig( hFigMri8,fullfile(subject_report_path,'Outer Skull - MRI registration.fig'));
+            close(hFigMri8);
+            %
+            hFigMri9 = view_mri(MriFile, InnerSkullFile);
+            bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
+            savefig( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
+            % Closing figures
+            close(hFigMri9);
             
             %
             hFigSurf10 = view_surface(CortexFile);
@@ -505,6 +422,7 @@ if(is_check_dataset_properties(selected_data_set))
             %% Process: Import Atlas
             %%
             [sSubject, iSubject] = bst_get('Subject', subID);
+            
             %
             LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
             script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
@@ -514,6 +432,11 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             %
             hFigSurf24 = view_surface(CortexFile);
+            % Deleting the Atlas Labels and Countour from Cortex
+            delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
+            delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));            
+            delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
+            
             bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
             savefig( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
             %Left
