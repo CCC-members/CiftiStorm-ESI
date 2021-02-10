@@ -1,4 +1,4 @@
-function [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,dataset_name)
+function [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,dataset_name,ProtocolName)
 %GET_SUBJECT_FILES Summary of this function goes here
 %   Detailed explanation goes here
 

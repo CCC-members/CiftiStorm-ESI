@@ -1,4 +1,4 @@
-function protocol_malaysia(subID,ProtocolName)
+function malaysia(subID,ProtocolName)
 % TUTORIAL_NEUROMAG: Script that reproduces the results of the online tutorials "MEG median nerve (Elekta)"
 %
 % CORRESPONDING ONLINE TUTORIALS:
@@ -28,7 +28,7 @@ function protocol_malaysia(subID,ProtocolName)
 % Author: Francois Tadel, 2010-2016
 %% Modified from above for global/local object presentation
 
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
 selected_data_set = app_properties.data_set(app_properties.selected_data_set.value);
 selected_data_set = selected_data_set{1,1};
 

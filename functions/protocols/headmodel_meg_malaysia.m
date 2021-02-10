@@ -1,4 +1,4 @@
-function protocol_headmodel_meg_hcp(subID,ProtocolName)
+function headmodel_meg_hcp(subID,ProtocolName)
 
 %% @=============================================================================
 % This function is part of the Brainstorm software:
@@ -25,8 +25,8 @@ function protocol_headmodel_meg_hcp(subID,ProtocolName)
 % - Deirel Paz Linares
 %%
 
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
-app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
+app_protocols = jsondecode(fileread(strcat('app',filesep,'protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
 if(isfield(selected_data_set, 'eeg_data_path'))

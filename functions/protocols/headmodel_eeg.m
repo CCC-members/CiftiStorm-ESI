@@ -1,4 +1,4 @@
-function [processed] = protocol_headmodel_eeg(subID,ProtocolName)
+function [processed] = headmodel_eeg(subID,ProtocolName)
 % TUTORIAL: Script that reproduces the results of the online tutorials.
 %
 %
@@ -27,8 +27,8 @@ function [processed] = protocol_headmodel_eeg(subID,ProtocolName)
 % - Deirel Paz Linares
 %%
 
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
-app_protocols = jsondecode(fileread(strcat('app',filesep,'app_protocols.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
+app_protocols = jsondecode(fileread(strcat('app',filesep,'protocols.json')));
 selected_data_set = app_protocols.(strcat('x',app_properties.selected_data_set.value));
 
 %%

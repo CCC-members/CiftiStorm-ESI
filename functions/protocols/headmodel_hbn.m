@@ -1,4 +1,4 @@
-function [processed] = protocol_headmodel_hbn()
+function [processed] = headmodel_hbn()
 % TUTORIAL_PHILIPS_MFF: Script that reproduces the results of the online tutorials "Yokogawa recordings".
 %
 %
@@ -12,8 +12,9 @@ function [processed] = protocol_headmodel_hbn()
 %%
 %% Preparing selected protocol
 %%
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
+modality = selected_data_set.modality;
 
 if(is_check_dataset_properties(selected_data_set))
     % Copying the new file channel
@@ -159,8 +160,13 @@ if(is_check_dataset_properties(selected_data_set))
             tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
             % Delete original files
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
+            % Compute missing fields
+            in_tess_bst( TessFile32K, 1);
             % Reload subject
             db_reload_subjects(iSubject);
+            % Set file type
+            db_surface_type(TessFile32K, 'Cortex');
+            % Set default cortex
             db_surface_default(iSubject, 'Cortex', 2);
             
             %%
@@ -455,69 +461,11 @@ if(is_check_dataset_properties(selected_data_set))
             close(hFigSurf24)
             
             %%
-            %% Get Protocol information
+            %% Getting Headmodeler options
             %%
             ProtocolInfo = bst_get('ProtocolInfo');
-            % Get subject directory
-            sStudy = bst_get('Study', ProtocolInfo.iStudy);
-            [sSubject] = bst_get('Subject', subID);
-            
-            headmodel_options = struct();
-            headmodel_options.Comment = 'OpenMEEG BEM';
-            headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name);
-            headmodel_options.HeadModelType = 'surface';
-            
-            % Uploading Channels
-            BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-            BSTChannels = load(BSTChannelsFile);
-            headmodel_options.Channel = BSTChannels.Channel;
-            
-            headmodel_options.MegRefCoef = [];
-            headmodel_options.MEGMethod = '';
-            headmodel_options.EEGMethod = 'openmeeg';
-            headmodel_options.ECOGMethod = '';
-            headmodel_options.SEEGMethod = '';
-            headmodel_options.HeadCenter = [];
-            headmodel_options.Radii = [0.88,0.93,1];
-            headmodel_options.Conductivity = [0.33,0.0042,0.33];
-            headmodel_options.SourceSpaceOptions = [];
-            
-            % Uploading cortex
-            CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-            headmodel_options.CortexFile = CortexFile;
-            
-            % Uploading head
-            ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
-            headmodel_options.HeadFile = ScalpFile;
-            
-            InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-            headmodel_options.InnerSkullFile = InnerSkullFile;
-            
-            OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
-            headmodel_options.OuterSkullFile =  OuterSkullFile;
-            headmodel_options.GridOptions = [];
-            headmodel_options.GridLoc  = [];
-            headmodel_options.GridOrient  = [];
-            headmodel_options.GridAtlas  = [];
-            headmodel_options.Interactive  = true;
-            headmodel_options.SaveFile  = true;
-            
-            BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
-            BSTOuterSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
-            BSTInnerSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
-            headmodel_options.BemFiles = {BSTScalpFile, BSTOuterSkullFile,BSTInnerSkullFile};
-            headmodel_options.BemNames = {'Scalp','Skull','Brain'};
-            headmodel_options.BemCond = [1,0.0125,1];
-            headmodel_options.iMeg = [];
-            headmodel_options.iEeg = 1:length(BSTChannels.Channel);
-            headmodel_options.iEcog = [];
-            headmodel_options.iSeeg = [];
-            headmodel_options.BemSelect = [true,true,true];
-            headmodel_options.isAdjoint = false;
-            headmodel_options.isAdaptative = true;
-            headmodel_options.isSplit = false;
-            headmodel_options.SplitLength = 4000;
-            
+            [sStudy iStudy] = bst_get('Study');
+            headmodel_options = get_headmodeler_options(modality, subID, iStudy);
             
             %%
             %% Process Head Model
@@ -526,9 +474,7 @@ if(is_check_dataset_properties(selected_data_set))
             
             if(~isempty(headmodel_options))
                 
-                % Get subject directory
-                [sStudy iStudies] = bst_get('Study');
-                ProtocolInfo = bst_get('ProtocolInfo');
+                % Get subject directory                   
                 [sSubject] = bst_get('Subject', subID);
                 
                 % If a new head model is available
@@ -546,142 +492,9 @@ if(is_check_dataset_properties(selected_data_set))
                 db_save();
                 
                 %%
-                %% Quality control
+                %% Quality control of Head model
                 %%
-                ProtocolInfo = bst_get('ProtocolInfo');
-                
-                BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
-                cortex = load(BSTCortexFile);
-                
-                head = load(BSTScalpFile);
-                
-                % Uploading Gain matrix
-                BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
-                BSTHeadModel = load(BSTHeadModelFile);
-                Ke = BSTHeadModel.Gain;
-                
-                % Uploading Channels Loc
-                channels = [headmodel_options.Channel.Loc];
-                channels = channels';
-                
-                %%
-                %% Checking LF correlation
-                %%
-                [Ne,Nv]=size(Ke);
-                Nv= Nv/3;
-                VoxelCoord=cortex.Vertices;
-                VertNorms=cortex.VertNormals;
-                
-                %computing homogeneous lead field
-                [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
-                
-                %%
-                %% Ploting sensors and sources on the scalp and cortex
-                %%
-                [hFig25] = view3D_K(Kn,cortex,head,channels,17);
-                bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
-                view(0,360)
-                saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
-                
-                bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
-                view(1,180)
-                bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
-                view(90,360)
-                bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
-                view(270,360)
-                bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
-                % Closing figure
-                close(hFig25);
-                
-                
-                [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
-                bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
-                view(0,360)
-                saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
-                
-                bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
-                view(1,180)
-                bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
-                view(90,360)
-                bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
-                view(270,360)
-                bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
-                % Closing figure
-                close(hFig26);
-                
-                VertNorms   = reshape(VertNorms,[1,Nv,3]);
-                VertNorms   = repmat(VertNorms,[Ne,1,1]);
-                Kn          = sum(Kn.*VertNorms,3);
-                Khom        = sum(Khom.*VertNorms,3);
-                
-                %Homogenous Lead Field vs. Tester Lead Field Plot
-                hFig27 = figure;
-                scatter(Khom(:),Kn(:));
-                title('Homogenous Lead Field vs. Tester Lead Field');
-                xlabel('Homogenous Lead Field');
-                ylabel('Tester Lead Field');
-                bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
-                saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
-                % Closing figure
-                close(hFig27);
-                
-                %computing channel-wise correlation
-                for k=1:size(Kn,1)
-                    corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
-                end
-                %plotting channel wise correlation
-                hFig28 = figure;
-                plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
-                xlabel('Channels');
-                ylabel('Correlation');
-                title('Correlation between both lead fields channel-wise');
-                bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
-                saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
-                % Closing figure
-                close(hFig28);
-                
-                zKhom = zscore(Khom')';
-                zK = zscore(Kn')';
-                %computing voxel-wise correlation
-                for k=1:Nv
-                    corelv(k,1)=corr(zKhom(:,k),zK(:,k));
-                end
-                corelv(isnan(corelv))=0;
-                corr2d = corr2(Khom, Kn);
-                %plotting voxel wise correlation
-                hFig29 = figure;
-                plot([1:Nv],corelv);
-                title('Correlation both lead fields Voxel wise');
-                bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
-                saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
-                close(hFig29);
-                
-                %%
-                %% Finding points of low corelation
-                %%
-                low_cor_inds = find(corelv < .3);
-                BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
-                hFig_low_cor = view_surface(BSTCortexFile, [], [], 'NewFigure');
-                hFig_low_cor = view_surface(BSTCortexFile, [], [], hFig_low_cor);
-                % Delete scouts
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutLabel'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutMarker'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutPatch'));
-                delete(findobj(hFig_low_cor, 'Tag', 'ScoutContour'));
-                
-                line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
-                figure_3d('SetStandardView', hFig_low_cor, 'bottom');
-                bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
-                saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
-                close(hFig_low_cor);
-                
-                figure_cor = figure;
-                %colormap(gca,cmap);
-                patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
-                view(90,270)
-                bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
-                saveas( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
-                close(figure_cor);
+                qc_headmodel(headmodel_options,modality)
                 
                 %%
                 %% Save and display report

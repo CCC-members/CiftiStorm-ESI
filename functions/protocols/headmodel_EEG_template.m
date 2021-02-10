@@ -1,4 +1,4 @@
-function [processed] = protocol_headmodel_EEG_template()
+function [processed] = headmodel_EEG_template()
 % TUTORIAL: Script that reproduces the results of the online tutorials.
 %
 %
@@ -30,7 +30,7 @@ function [processed] = protocol_headmodel_EEG_template()
 %%
 %% Preparing selected protocol
 %%
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
 nverthead_list = selected_data_set.process_import_surfaces.nverthead.values;

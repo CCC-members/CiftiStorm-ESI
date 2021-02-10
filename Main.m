@@ -26,6 +26,8 @@ restoredefaultpath;
 %------------ Preparing properties --------------------
 % brainstorm('stop');
 addpath(fullfile('app'));
+addpath(fullfile('config_labels'));
+addpath(fullfile('config_MaQC'));
 addpath(fullfile('config_protocols'));
 addpath(fullfile('external'));
 addpath(genpath(fullfile('functions')));
@@ -149,7 +151,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         %%
         %% Calling dataset function to analysis
         %%
-        str_function = strcat(selected_data_set.function,'();');
+        str_function = strcat(selected_data_set.function_name,'();');
         eval(str_function);
         
         %% Stoping BrainStorm

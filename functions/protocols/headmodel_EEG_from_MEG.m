@@ -1,4 +1,4 @@
-function protocol_headmodel_after_MaQC()
+function [processed] = headmodel_EEG_from_MEG(ProtocolName,subID)
 % @=============================================================================
 % This function is part of the Brainstorm software:
 % https://neuroimage.usc.edu/brainstorm
@@ -25,10 +25,7 @@ function protocol_headmodel_after_MaQC()
 % - Deirel Paz Linares
 
 %%
-%% Preparing selected protocol
-%%
-load('tools/mycolormap');
-app_properties = jsondecode(fileread(strcat('app',filesep,'app_properties.json')));
+app_properties = jsondecode(fileread(strcat('app',filesep,'properties.json')));
 selected_data_set = jsondecode(fileread(strcat('config_protocols',filesep,app_properties.selected_data_set.file_name)));
 
 new_bst_DB = selected_data_set.bst_db_path;
@@ -38,18 +35,17 @@ gui_brainstorm('UpdateProtocolsList');
 nProtocols = db_import(new_bst_DB);
 
 %getting existing protocols on DB
+ProtocolInfo = bst_get('ProtocolInfo');
 ProtocolFiles = dir(fullfile(new_bst_DB,'**','protocol.mat'));
 
-for i=1:length(ProtocolFiles)
-    Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));   
-    ProtocolName = Protocol.ProtocolInfo.Comment;
-    iProtocol = bst_get('Protocol', ProtocolName);
+for i=2:length(ProtocolFiles)
+    Protocol = load(fullfile(ProtocolFiles(i).folder,ProtocolFiles(i).name));
+    protocol_name = Protocol.ProtocolInfo.Comment;
+    iProtocol = bst_get('Protocol', protocol_name);
     gui_brainstorm('SetCurrentProtocol', iProtocol);
-    ProtocolInfo = bst_get('ProtocolInfo');
     subjects = bst_get('ProtocolSubjects');
     for j=1:length(subjects.Subject)
-        sSubject = subjects.Subject(j);     
-        subID = sSubject.Name;
+        current_sub = subjects.Subject(j);
         %%
         %% Checking the report output structure
         %%
@@ -87,13 +83,14 @@ for i=1:length(ProtocolFiles)
         %%
         %% Quality control
         %%
+        % Get Protocol info
+        ProtocolInfo = bst_get('ProtocolInfo');
+        % Get subject definition
+        sSubject = bst_get('Subject', subID);
         % Get MRI file and surface files
         if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
-            return;
+            continue;
         end
-        % Start a new report
-        bst_report('Start',['Protocol for subject:' , subID]);
-        bst_report('Info',    '', [], ['Protocol for subject:' , subID]);
         
         MriFile    = sSubject.Anatomy(sSubject.iAnatomy).FileName;
         hFigMri1 = view_mri_slices(MriFile, 'x', 20);
@@ -114,28 +111,31 @@ for i=1:length(ProtocolFiles)
         %% Quality control
         %%
         % Get subject definition and subject files
+        sSubject       = bst_get('Subject', subID);
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
         CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
         InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
         OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
         ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
         
-        %        
-        hFigMriSurf = view_mri(MriFile, CortexFile);        
+        %
+        
+        hFigMriSurf = view_mri(MriFile, CortexFile);
         %
         hFigMri4  = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
         bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,750,475]);
         saveas( hFigMri4,fullfile(subject_report_path,'Cortex - MRI registration Axial view.fig'));
-        close(hFigMri4);
         %
         hFigMri5  = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
         bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,750,475]);
         saveas( hFigMri5,fullfile(subject_report_path,'Cortex - MRI registration Coronal view.fig'));
-        close(hFigMri5);
         %
         hFigMri6  = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
         bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,750,475]);
-        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));        
-        close([hFigMriSurf hFigMri6]);
+        saveas( hFigMri6,fullfile(subject_report_path,'Cortex - MRI registration Sagital view.fig'));
+        % Closing figures
+        
+        close([hFigMriSurf hFigMri4 hFigMri5 hFigMri6]);
         
         %
         hFigMri7 = view_mri(MriFile, ScalpFile);
@@ -150,104 +150,204 @@ for i=1:length(ProtocolFiles)
         %
         hFigMri9 = view_mri(MriFile, InnerSkullFile);
         bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,750,475]);
-        saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));        
-        % Closing figures
+        saveas( hFigMri9,fullfile(subject_report_path,'Inner Skull - MRI registration.fig'));
         close(hFigMri9);
         
-        %        
+        
         % Top
         hFigSurf10 = view_surface(CortexFile);
         bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D top view', [200,200,750,475]);
-        saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D view.fig'));
+        saveas( hFigSurf10,fullfile(subject_report_path,'Cortex mesh 3D top view.fig'));
         % Bottom
         view(90,270)
         bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D bottom view', [200,200,750,475]);
         %Left
         view(1,180)
         bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D left hemisphere view', [200,200,750,475]);
-        % Right
+        % Rigth
         view(0,360)
         bst_report('Snapshot',hFigSurf10,[],'Cortex mesh 3D right hemisphere view', [200,200,750,475]);
+        
         % Closing figure
         close(hFigSurf10);
         
         %%
         %% Quality Control
         %%
+        % Get subject definition and subject files
+        sSubject       = bst_get('Subject', subID);
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        
+        
         hFigSurf11 = script_view_surface(CortexFile, [], [], [],'top');
         hFigSurf11 = script_view_surface(InnerSkullFile, [], [], hFigSurf11);
         hFigSurf11 = script_view_surface(OuterSkullFile, [], [], hFigSurf11);
         hFigSurf11 = script_view_surface(ScalpFile, [], [], hFigSurf11);
         bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration top view', [200,200,750,475]);
         saveas( hFigSurf11,fullfile(subject_report_path,'BEM surfaces registration view.fig'));
-        %Left
-        view(1,180)
-        bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration left view', [200,200,750,475]);
         % Right
         view(0,360)
         bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration right view', [200,200,750,475]);
-        % Back
+        % Left
+        view(1,180)
+        bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration left view', [200,200,750,475]);
+        % Front
         view(90,360)
+        bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration front view', [200,200,750,475]);
+        % Back
+        view(270,360)
         bst_report('Snapshot',hFigSurf11,[],'BEM surfaces registration back view', [200,200,750,475]);
-        % Closing figure
+        
         close(hFigSurf11);
         
         %%
         %% Quality control
         %%
+        % Get subject definition and subject files
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        
+        %
+        
         hFigMri15 = view_mri(MriFile, ScalpFile);
         bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
         saveas( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
-        % Close figures        
+        % Close figures
+        
         close(hFigMri15);
+        
+        
+        %%
+        %% Process: Generate SPM canonical surfaces
+        %%
+        % USAGE:     OutputFiles = process_generate_canonical('Run',     sProcess, sInputs)
+        %         [isOk, errMsg] = process_generate_canonical('Compute', iSubject, iAnatomy=[default], Resolution)
+        %                          process_generate_canonical('ComputeInteractive', iSubject, iAnatomy=[default], Resolution)
+        % process_generate_canonical('Compute', subID, 1, 2,0);
+        
+        % sFiles = bst_process('CallProcess', 'process_generate_canonical',sFiles , [], ...
+        %     'subjectname', subID, ...
+        %     'resolution',  2);  % 8196
+        
+        %%
+        %% Change de Channel file by EEG loyaut
+        %%
+        % Changing surfaces to SPM canonical surfaces
+        sSubject       = bst_get('Subject', subID);
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        [sSubject, iSubject] = bst_get('Subject', subID);
+        db_surface_default(iSubject, 'Scalp', 10);
+        db_surface_default(iSubject, 'OuterSkull', 11);
+        db_surface_default(iSubject, 'InnerSkull', 12);
+        db_surface_default(iSubject, 'Cortex', 13);
+        
+        % note: find a better way to find the corrent Brainstorm sStudy
+        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+        if(~isempty(iStudies))
+        else
+            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+        end
+        sStudy = bst_get('Study', iStudies);
+        if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
+            continue;
+        end
+        
+        %   Process import chennel file
+        bstDefaults = bst_get('EegDefaults');
+        nameGroup = selected_data_set.process_import_channel.group_layout_name;
+        nameLayout = selected_data_set.process_import_channel.channel_layout_name;
+        
+        iGroup = find(strcmpi(nameGroup, {bstDefaults.name}));
+        iLayout = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
+        ChannelFile = bstDefaults(iGroup).contents(iLayout).fullpath;
+        
+        [OutputFile, ChannelMat, ChannelReplace, ChannelAlign, Modality] = db_set_channel( iStudies, ChannelFile, 2,2);
+        
+        % changing surfaces to BEM surfaces
+        [sSubject, iSubject] = bst_get('Subject', subID);
+        db_surface_default(iSubject, 'Scalp', 6);
+        db_surface_default(iSubject, 'OuterSkull', 7);
+        db_surface_default(iSubject, 'InnerSkull', 8);
+        db_surface_default(iSubject, 'Cortex', 9);
+        
+        %%
+        %% projecting EEG electrodes on scalp surface
+        %%
+        process_channel_project('Compute',OutputFile,'EEG');
+        
+        [sSubject, iSubject] = bst_get('Subject', subID);
+        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+        if(~isempty(iStudies))
+        else
+            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+        end
+        sStudy = bst_get('Study', iStudies);
+        if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
+            continue;
+        end
         
         %%
         %% Quality control
         %%
         % View sources on MRI (3D orthogonal slices)
-        iStudies = bst_get('ChannelStudiesWithSubject', j);        
-        sStudy = bst_get('Study', iStudies);
-        
         BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel(1).FileName);
-%         BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@raw5-Restin_c_rfDC','channel_10-20_19.mat');
-                
+        
+        
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        
         hFigMri16      = script_view_mri_3d(MriFile, [], [], [], 'front');
         hFigMri16      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri16, 1);
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration front view', [200,200,750,475]);
         saveas( hFigMri16,fullfile(subject_report_path,'Sensor-MRI registration view.fig'));
+        
         %Left
         view(1,180)
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration left view', [200,200,750,475]);
+        
         % Right
         view(0,360)
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration right view', [200,200,750,475]);
+        
         % Back
         view(90,360)
         bst_report('Snapshot',hFigMri16,[],'Sensor-MRI registration back view', [200,200,750,475]);
+        
         % Close figures
         close(hFigMri16);
         
-        % View sources on Scalp     
+        % View sources on Scalp
+        
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        
         hFigMri20      = script_view_surface(ScalpFile, [], [], [],'front');
         hFigMri20      = view_channels(BSTChannelsFile, 'EEG', 1, 0, hFigMri20, 1);
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration front view', [200,200,750,475]);
         saveas( hFigMri20,fullfile(subject_report_path,'Sensor-Scalp registration view.fig'));
+        
         %Left
         view(1,180)
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration left view', [200,200,750,475]);
+        
         % Right
         view(0,360)
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration right view', [200,200,750,475]);
+        
         % Back
         view(90,360)
         bst_report('Snapshot',hFigMri20,[],'Sensor-Scalp registration back view', [200,200,750,475]);
+        
         % Close figures
         close(hFigMri20);
         
         %%
         %% Quality control
         %%
-        %%        
+        %%
+        
         hFigSurf24 = view_surface(CortexFile);
         bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
         saveas( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
@@ -260,21 +360,45 @@ for i=1:length(ProtocolFiles)
         % Rigth
         view(0,360)
         bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
+        
         % Closing figure
         close(hFigSurf24)
         
         % Get subject definition and subject files
+        sSubject       = bst_get('Subject', subID);
         
         %%
         %% Get Protocol information
-        %%       
+        %%
+        [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+        if(~isempty(iStudies))
+        else
+            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+        end
+        sStudy = bst_get('Study', iStudies);
+        
         headmodel_options = struct();
         headmodel_options.Comment = 'OpenMEEG BEM';
         headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name);
-        headmodel_options.HeadModelType = 'surface';        
-        % Uploading Channels        
+        % if(selected_data_set.use_raw_data)
+        %     headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID]);
+        % else
+        %     headmodel_options.HeadModelFile = bst_fullfile(ProtocolInfo.STUDIES,subID,'@intra');
+        % end
+        headmodel_options.HeadModelType = 'surface';
+        
+        % Uploading Channels
+        BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
         BSTChannels = load(BSTChannelsFile);
         headmodel_options.Channel = BSTChannels.Channel;
+        % if(selected_data_set.use_raw_data)
+        %     BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, ['@raw' subID],'channel.mat');
+        % else
+        %     BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,subID, '@intra','channel.mat');
+        % end
+        % BSTChannels = load(BSTChannelsFile);
+        % headmodel_options.Channel = BSTChannels.Channel;
+        
         headmodel_options.MegRefCoef = [];
         headmodel_options.MEGMethod = '';
         headmodel_options.EEGMethod = 'openmeeg';
@@ -283,15 +407,21 @@ for i=1:length(ProtocolFiles)
         headmodel_options.HeadCenter = [];
         headmodel_options.Radii = [0.88,0.93,1];
         headmodel_options.Conductivity = [0.33,0.0042,0.33];
-        headmodel_options.SourceSpaceOptions = [];        
-        % Uploading cortex        
-        headmodel_options.CortexFile = CortexFile;        
-        % Uploading head        
-        headmodel_options.HeadFile = ScalpFile;        
-         % Uploading InnerSkull
-        headmodel_options.InnerSkullFile = InnerSkullFile;        
-       % Uploading OuterSkull
-        headmodel_options.OuterSkullFile =  OuterSkullFile;
+        headmodel_options.SourceSpaceOptions = [];
+        
+        % Uploading cortex
+        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+        headmodel_options.CortexFile = CortexFile;
+        
+        % Uploading head
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        headmodel_options.HeadFile = ScalpFile;
+        
+        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+        headmodel_options.InnerSkullFile = OuterSkullFile;
+        
+        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+        headmodel_options.OuterSkullFile =  [];
         headmodel_options.GridOptions = [];
         headmodel_options.GridLoc  = [];
         headmodel_options.GridOrient  = [];
@@ -299,7 +429,6 @@ for i=1:length(ProtocolFiles)
         headmodel_options.Interactive  = true;
         headmodel_options.SaveFile  = true;
         
-        % BEM params
         BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
         BSTOuterSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
         BSTInnerSkullFile = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
@@ -323,7 +452,16 @@ for i=1:length(ProtocolFiles)
         [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
         
         if(~isempty(headmodel_options))
+            ProtocolInfo = bst_get('ProtocolInfo');
+            
+            [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName);
+            if(~isempty(iStudies))
+            else
+                [sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+            end
             sStudy = bst_get('Study', iStudies);
+            %     iStudy = ProtocolInfo.iStudy;
+            %     sStudy = bst_get('Study', iStudy);
             % If a new head model is available
             sHeadModel = db_template('headmodel');
             sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
@@ -340,36 +478,41 @@ for i=1:length(ProtocolFiles)
             
             %%
             %% Quality control
-            %%            
+            %%
+            ProtocolInfo = bst_get('ProtocolInfo');
+            
             BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
             cortex = load(BSTCortexFile);
             
+            BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
             head = load(BSTScalpFile);
             
-            % Uploading Gain matrix
+            %%
+            %% Uploading Gain matrix
+            %%
             BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
             BSTHeadModel = load(BSTHeadModelFile);
             Ke = BSTHeadModel.Gain;
             
-            % Uploading Channels Loc
-            channels = [headmodel_options.Channel.Loc];
-            channels = channels';
-            
             %%
-            %% Checking LF correlation
+            %% Uploading Channels Loc
             %%
-            [Ne,Nv]=size(Ke);
-            Nv= Nv/3;
-            VoxelCoord=cortex.Vertices;
-            VertNorms=cortex.VertNormals;
+            BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+            BSTChannels = load(BSTChannelsFile);
             
-            %computing homogeneous lead field
-            [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+            [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
+            
+            channels = [];
+            for k = 1: length(BSTChannels.Channel)
+                Loc = BSTChannels.Channel(k).Loc;
+                center = mean(Loc,2);
+                channels = [channels; center(1),center(2),center(3) ];
+            end
             
             %%
             %% Ploting sensors and sources on the scalp and cortex
             %%
-            [hFig25] = view3D_K(Kn,cortex,head,channels,17);
+            [hFig25] = view3D_K(Ke,cortex,head,channels,1);
             bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
             view(0,360)
             saveas( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -381,121 +524,24 @@ for i=1:length(ProtocolFiles)
             bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
             view(270,360)
             bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
+            
             % Closing figure
-            close(hFig25);
+            close(hFig25)
             
-            
-            [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
-            bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
-            view(0,360)
-            saveas( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
-            
-            bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
-            view(1,180)
-            bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
-            view(90,360)
-            bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
-            view(270,360)
-            bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
-            % Closing figure
-            close(hFig26);
-            
-            VertNorms   = reshape(VertNorms,[1,Nv,3]);
-            VertNorms   = repmat(VertNorms,[Ne,1,1]);
-            Kn          = sum(Kn.*VertNorms,3);
-            Khom        = sum(Khom.*VertNorms,3);
-            
-            
-            %Homogenous Lead Field vs. Tester Lead Field Plot
-            hFig27 = figure;
-            scatter(Khom(:),Kn(:));
-            title('Homogenous Lead Field vs. Tester Lead Field');
-            xlabel('Homogenous Lead Field');
-            ylabel('Tester Lead Field');
-            bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
-            saveas( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
-            % Closing figure
-            close(hFig27);
-            
-            %computing channel-wise correlation
-            for k=1:size(Kn,1)
-                corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
-            end
-            %plotting channel wise correlation
-            hFig28 = figure;
-            plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
-            xlabel('Channels');
-            ylabel('Correlation');
-            title('Correlation between both lead fields channel-wise');
-            bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
-            saveas( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
-            % Closing figure
-            close(hFig28);
-            
-            zKhom = zscore(Khom')';
-            zK = zscore(Kn')';
-            %computing voxel-wise correlation
-            for k=1:Nv
-                corelv(k,1)=corr(zKhom(:,k),zK(:,k));
-            end
-            corelv(isnan(corelv))=0;
-            corr2d = corr2(Khom, Kn);
-            %plotting voxel wise correlation
-            hFig29 = figure;
-            plot([1:Nv],corelv);
-            title('Correlation both lead fields Voxel wise');
-            bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
-            saveas( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
-            close(hFig29);
-            
-                        %%
-            %% Finding points of low corelation
-            %%     
-            low_cor_inds = find(corelv < .3); 
-            BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);            
-            hFig_low_cor = view_surface(BSTCortexFile, [], [], 'NewFigure');         
-            hFig_low_cor = view_surface(BSTCortexFile, [], [], hFig_low_cor);           
-            % Delete scouts
-            delete(findobj(hFig_low_cor, 'Tag', 'ScoutLabel'));
-            delete(findobj(hFig_low_cor, 'Tag', 'ScoutMarker'));
-            delete(findobj(hFig_low_cor, 'Tag', 'ScoutPatch'));
-            delete(findobj(hFig_low_cor, 'Tag', 'ScoutContour'));           
-            
-            line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
-            figure_3d('SetStandardView', hFig_low_cor, 'bottom');
-            bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
-            saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
-            close(hFig_low_cor);
-            
-            figure_cor = figure;            
-            %colormap(gca,cmap);            
-            patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
-            view(90,270)            
-            bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
-            saveas( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
-            close(figure_cor);
-           
-            %%
-            %% Save and display report
-            %%
-            ReportFile = bst_report('Save', []);
-            bst_report('Export',  ReportFile,report_name);
-            bst_report('Open', ReportFile);
-            bst_report('Close');
             processed = true;
-            disp(strcat("-->> Process finished for subject: ", subID));
-          
-            %%
-            %% Export Subject to BC-VARETA
-            %%
-            if(processed)
-                disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
-                if(selected_data_set.bcv_config.export)
-                    export_subject_BCV_structure(selected_data_set,subID);
-                end
-            end           
-            
-            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+        else
+            processed = false;
         end
+        %%
+        %% Save and display report
+        %%
+        ReportFile = bst_report('Save');
+        bst_report('Export',  ReportFile,report_name);
+        bst_report('Open', ReportFile);
+        bst_report('Close');
+        disp([10 '-->> BrainStorm Protocol PhilipsMFF: Done.' 10]);
+        
     end
 end
+end
+
