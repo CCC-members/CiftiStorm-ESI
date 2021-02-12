@@ -1,4 +1,4 @@
-function result = app_check_version()
+function result = check_version()
 result = '';
 %  App check version
 %

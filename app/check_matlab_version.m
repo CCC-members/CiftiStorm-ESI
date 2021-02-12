@@ -1,4 +1,4 @@
-function result = app_check_matlab_version()
+function result = check_matlab_version()
 %  BC-VARETA check matlab version
 %
 %

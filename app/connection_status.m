@@ -1,4 +1,4 @@
-function connected =app_connection_status()
+function connected = connection_status()
 connected = false;
 try    
   options = weboptions('ContentType','json','Timeout',Inf,'RequestMethod','auto');  

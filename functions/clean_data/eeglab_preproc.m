@@ -88,18 +88,24 @@ switch lower(data_type)
     case 'dat'
         EEG         = pop_loadBCI2000(file_name);
     case 'plg'
-        EEG         = readplot_plg(fullfile(file_name));
+        EEG         = readplot_plg(fullfile(base_path));
         template    = load('templates/EEG_template.mat');
-        chanlocs    = template.EEG.chanlocs;        
         load('templates/labels_nomenclature.mat');
-        orig_labels = labels_match(:,1);  
-        if(size(EEG.data,1)<length(template.EEG.chanlocs))
-          chanlocs(size(EEG.data,1)+1:end,:) = [];  
-        end
+        orig_labels = labels_match(:,1);
         for i=1:length(orig_labels)
-            chanlocs(i).labels = labels_match{find(strcmp({EEG.chanlocs.labels},num2str(orig_labels{i})),1),2};
-        end 
-        EEG.chanlocs = chanlocs;
+            label = orig_labels{i};
+            pos = find(strcmp({EEG.chanlocs.labels},num2str(label)),1);
+            if(~isempty(pos))
+                EEG.chanlocs(pos).labels = labels_match{i,2};
+            end
+        end
+        chan_row    = template.EEG.chanlocs(1);
+        labels      = EEG.chanlocs;
+        for i=1:length(labels)
+            chan_row.labels = labels(i).labels;
+            new_chanlocs(i) = chan_row;
+        end
+        EEG.chanlocs = new_chanlocs;
         EEG.chaninfo = template.EEG.chaninfo;
     case 'edf'
         EEG                     = pop_biosig(file_name);

@@ -21,10 +21,7 @@ if(selected_data_set.preprocessed_data.clean_data.run)
             EEGs(i).labels   = {EEGs(i).chanlocs(:).labels};
         end
     end
-else
-    EEG         = struct;
-    EEG.subID   = subID;
-    EEG.setname = subID;
+else    
     switch data_type
         case 'edf'
             [hdr, data]     = edfread(base_path);
@@ -32,19 +29,25 @@ else
              EEG.labels  = strrep(hdr.label,'REF','');
              EEG.srate   = hdr.samples(1);
         case 'plg'
-            [pat_info, inf_info, plg_info, mrk_info, win_info, cdc_info, states_name] = plg2matlab(base_path);
-            % creating output structure
-            data            = plg_info.data;            
-            hdr.pat_info    = pat_info;
-            hdr.inf_info    = inf_info;
-            hdr.mrk_info    = mrk_info;
-            hdr.win_info    = win_info;
-            hdr.cdc_info    = cdc_info;
-            hdr.states_name = states_name;
-            hdr.label       = inf_info.PLGMontage;
-            EEG.data    = data;
-            EEG.labels  = strrep(hdr.label,'REF','');
-            EEG.srate   = hdr.samples(1);
+            EEG         = readplot_plg(fullfile(base_path));              
+            template    = load('templates/EEG_template.mat');            
+            load('templates/labels_nomenclature.mat');
+            orig_labels = labels_match(:,1);
+            for i=1:length(orig_labels)
+                label = orig_labels{i};
+                pos = find(strcmp({EEG.chanlocs.labels},num2str(label)),1);
+                if(~isempty(pos))
+                    EEG.chanlocs(pos).labels = labels_match{i,2};
+                end
+            end
+            chan_row    = template.EEG.chanlocs(1);
+            labels = EEG.chanlocs;
+            for i=1:length(labels)
+               chan_row.labels = labels(i).labels;
+               new_chanlocs(i) = chan_row;
+            end
+            EEG.chanlocs = new_chanlocs;
+            EEG.chaninfo = template.EEG.chaninfo;
         case 'txt'
             load('templates/EEG_template_58Ch.mat');
             [filepath,filename,~]   = fileparts(base_path);
@@ -68,6 +71,8 @@ else
         EEG         = remove_eeg_channels_by_labels(user_labels,EEG);
         EEG.labels  = {EEG.chanlocs(:).labels};
     end
-    EEGs = EEG;
+    EEG.subID   = subID;
+    EEG.setname = subID;
+    EEGs        = EEG;
 end
 end

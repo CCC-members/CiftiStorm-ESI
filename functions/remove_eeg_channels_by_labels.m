@@ -13,9 +13,10 @@ while(from <= limit)
         from = from + 1;
     end
 end
-EEG.data        = data;
-EEG.chanlocs(length(labels)+1:end,:) = [];
-[EEG.chanlocs.labels]    = labels{:};
-EEG.nbchan      = size(data,1);
+EEG.data                    = data;
+rej_indms                   = length(labels)+1:length(EEG.chanlocs);
+EEG.chanlocs(rej_indms)     = [];
+[EEG.chanlocs.labels]       = labels{:};
+EEG.nbchan                  = size(data,1);
 end
 

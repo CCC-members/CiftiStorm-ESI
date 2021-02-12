@@ -31,11 +31,12 @@ addpath(fullfile('config_MaQC'));
 addpath(fullfile('config_protocols'));
 addpath(fullfile('external'));
 addpath(genpath(fullfile('functions')));
+addpath(genpath('plugins'));
 addpath(fullfile('templates'));
 addpath(fullfile('tools'));
 % addpath(strcat('bst_lf_ppl',filesep,'guide'));
 %app_properties = jsondecode(fileread(strcat('properties',filesep,'app_properties.json')));
-app_properties = jsondecode(fileread(fullfile('app','app_properties.json')));
+app_properties = jsondecode(fileread(fullfile('app','properties.json')));
 
 if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name)))    
     try
@@ -54,13 +55,13 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
     
     %% ------------ Checking MatLab compatibility ----------------
     disp('-->> Checking installed matlab version');
-    if(~app_check_matlab_version())
+    if(~check_matlab_version())
         return;
     end
     
     %% ------------  Checking updates --------------------------
     disp('-->> Checking project laster version');
-    if(isequal(app_check_version,'updated'))
+    if(isequal(check_version,'updated'))
         return;
     end
     
@@ -109,7 +110,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
                     [folderpath,foldername] = unpackage_file(filename,pwd);
                     
                     app_properties.bs_path = fullfile(folderpath,foldername);
-                    saveJSON(app_properties,strcat('app_properties.json'));
+                    saveJSON(app_properties,strcat('properties.json'));
                     
                 case 'Cancel'
                     result = false;
@@ -166,6 +167,6 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
 else
     fprintf(2,strcat("\n ->> Error: The file ",app_properties.selected_data_set.file_name," do not exit \n"));
     disp("______________________________________________________________________________________________");
-    disp("Please configure app_properties.selected_data_set.file_name element in app\\app_properties file. ")
+    disp("Please configure app_properties.selected_data_set.file_name element in app/properties file. ")
 end
 
