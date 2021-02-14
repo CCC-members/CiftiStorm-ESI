@@ -3,9 +3,9 @@ function [vertices_interp] = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_
 subject_inds            = get_inds_co_registration(Sc64k,Sc8k);
 vertices_interp  = zeros(length(subject_inds),3);
 fprintf(1,'-->> Finding vertices interpolation: %3d%%\n',0);
-for i=1:length(fsave_inds_template.ind)
+for i=1:length(fsave_inds_template.indms)
     % Checking
-    pivot_ind       = fsave_inds_template.ind(i);
+    pivot_ind       = fsave_inds_template.indms(i);
     selected_vertices = [];
     % find neigh vertices in 64k subject surface
     while isempty(selected_vertices)
@@ -15,7 +15,7 @@ for i=1:length(fsave_inds_template.ind)
             pivot_ind = neigh_indexes;
             continue;
         end
-        P_64k = Sc64k.Vertices(fsave_inds_template.ind(i),:);
+        P_64k = Sc64k.Vertices(fsave_inds_template.indms(i),:);
         distances =  zeros(length(neigh_inter),1);
         for j=1:length(neigh_inter)
             P_8k = Sc64k.Vertices(neigh_inter(j),:);
@@ -39,7 +39,7 @@ for i=1:length(fsave_inds_template.ind)
         selected_vertices = [ind_vert1 ind_vert2 ind_vert3];
     end
     vertices_interp(i,:) = selected_vertices;
-    fprintf(1,'\b\b\b\b%3.0f%%',(i)/(length(fsave_inds_template.ind))*100);
+    fprintf(1,'\b\b\b\b%3.0f%%',(i)/(length(fsave_inds_template.indms))*100);
 end
 fprintf(1,'\n');
 %
