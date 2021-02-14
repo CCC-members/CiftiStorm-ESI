@@ -17,8 +17,8 @@ if(isequal(nargin,1))
     time_end            = length(EEG.times) ;    
     rej_regions         = [rej_regions; time_start time_end];
     
-    EEG                 = eeg_eegrej(EEG, rej_regions);
-    EEG.RejTime         = rej_regions;
+    newEEG                 = eeg_eegrej(EEG, rej_regions);
+    newEEG.RejTime         = rej_regions;
 else
     for i=1:2:length(varargin)
         eval([varargin{i} '=  varargin{(i+1)};'])

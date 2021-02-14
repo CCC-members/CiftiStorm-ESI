@@ -16,10 +16,11 @@ if(isempty(events))
         if( isfield(EEG,'TW') && ~isempty(EEG.TW))
             EEGs    = rejtime_by_segments(EEG);
         else
-            EEGs    = EEG;
+            EEGs    = [];
         end
+    else
+        EEGs        = EEG;
     end
-    EEGs            = EEG;    
 else
     countEEG = 1;
     for j=1:length(events)
@@ -28,10 +29,6 @@ else
         if(isequal(select_by,'segments'))
             if(~isempty(newEEG.TW))
                 newEEG          = rejtime_by_segments(newEEG,'event',event);
-                EEGs(countEEG)  = newEEG;
-                countEEG        = countEEG + 1;
-            else
-                newEEG          = rejtime_by_marks(newEEG,'event',event);
                 EEGs(countEEG)  = newEEG;
                 countEEG        = countEEG + 1;
             end
