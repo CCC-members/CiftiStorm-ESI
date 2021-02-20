@@ -20,7 +20,7 @@ if(isempty(events))
         end
     else
         EEGs        = EEG;
-    end
+    end   
 else
     countEEG = 1;
     for j=1:length(events)
@@ -29,14 +29,21 @@ else
         if(isequal(select_by,'segments'))
             if(~isempty(newEEG.TW))
                 newEEG          = rejtime_by_segments(newEEG,'event',event);
-                EEGs(countEEG)  = newEEG;
-                countEEG        = countEEG + 1;
+                if(~isempty(newEEG))
+                    EEGs(countEEG)  = newEEG;
+                    countEEG        = countEEG + 1;
+                end
             end
         else
             newEEG              = rejtime_by_marks(newEEG,'event',event);
-            EEGs(countEEG)      = newEEG;
-            countEEG            = countEEG + 1;
+            if(~isempty(newEEG))
+                EEGs(countEEG)      = newEEG;
+                countEEG            = countEEG + 1;
+            end
         end        
+    end
+    if(~exist('EEGs','var'))
+        EEGs = [];
     end
 end
 end

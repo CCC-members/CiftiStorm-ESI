@@ -47,15 +47,18 @@ disp ("-->> Genering leadfield file");
 %% Genering surf file
 %%
 % Loadding subject surfaces
+if(~exist('non_interp','var'))
+    non_interp = false;
+end
 CortexFile8K            = sSubject.Surface(sSubject.iCortex).FileName;
 BSTCortexFile8K         = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile8K);
 Sc8k                    = load(BSTCortexFile8K);
-if(~exist('non_interp','var') && ~non_interp)
+if(~non_interp)
     disp ("-->> Getting FSAve surface corregistration");
     % Loadding FSAve templates
     FSAve_64k               = load('templates/FSAve_cortex_64K.mat');
-    % fsave_inds_template     = load('templates/FSAve_64K_8K_coregister_indms.mat');
-    fsave_inds_template     = load('templates/FSAve_64k_coregister_indms.mat');
+    fsave_inds_template     = load('templates/FSAve_64K_8K_coregister_indms.mat');
+%     fsave_inds_template     = load('templates/FSAve_64k_coregister_indms.mat');
        
     CortexFile64K           = sSubject.Surface(1).FileName;
     BSTCortexFile64K        = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile64K);

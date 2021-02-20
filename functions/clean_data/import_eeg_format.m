@@ -29,7 +29,12 @@ else
              EEG.labels  = strrep(hdr.label,'REF','');
              EEG.srate   = hdr.samples(1);
         case 'plg'
-            EEG         = readplot_plg(fullfile(base_path));              
+            try
+                EEG         = readplot_plg(fullfile(base_path));
+            catch
+                EEGs = [];
+                return;
+            end
             template    = load('templates/EEG_template.mat');            
             load('templates/labels_nomenclature.mat');
             orig_labels = labels_match(:,1);

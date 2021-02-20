@@ -60,9 +60,6 @@ if(~exist('freq_list','var'))
     freq_list = [1 6 10 18];
 end
 
-addpath(eeglab_path);
-eeglab nogui;
-
 %% Step2: Import data.
 switch lower(data_type)
     case 'set'
@@ -88,7 +85,12 @@ switch lower(data_type)
     case 'dat'
         EEG         = pop_loadBCI2000(file_name);
     case 'plg'
-        EEG         = readplot_plg(fullfile(base_path));
+        try
+            EEG         = readplot_plg(fullfile(file_name));
+        catch
+            EEGs = [];
+            return;
+        end
         template    = load('templates/EEG_template.mat');
         load('templates/labels_nomenclature.mat');
         orig_labels = labels_match(:,1);
@@ -100,9 +102,9 @@ switch lower(data_type)
             end
         end
         chan_row    = template.EEG.chanlocs(1);
-        labels      = EEG.chanlocs;
-        for i=1:length(labels)
-            chan_row.labels = labels(i).labels;
+        data_labels      = EEG.chanlocs;
+        for i=1:length(data_labels)
+            chan_row.labels = data_labels(i).labels;
             new_chanlocs(i) = chan_row;
         end
         EEG.chanlocs = new_chanlocs;
