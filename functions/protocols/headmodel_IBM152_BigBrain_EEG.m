@@ -375,7 +375,7 @@ close(hFigSurf11);
 %%
 %% Process: Generate SPM canonical surfaces
 %%
-bst_process('CallProcess', 'process_generate_canonical', [], [], ...
+sFiles = bst_process('CallProcess', 'process_generate_canonical', sFiles, [], ...
     'subjectname', subID, ...
     'resolution',  2);  % 8196
 
@@ -566,15 +566,26 @@ else
     subjects_process_error = [subjects_process_error; subID];    
 end
 
-
-% [base_path,~,~]    = fileparts(selected_data_set.preprocessed_data.base_path);
-subjects           =  dir(selected_data_set.preprocessed_data.base_path);
+if(contains(selected_data_set.preprocessed_data.base_path,'SubID'))
+    [base_path,~,~]    = fileparts(selected_data_set.preprocessed_data.base_path);
+    subjects           =  dir(base_path);
+else
+    subjects           =  dir(selected_data_set.preprocessed_data.base_path);
+end
 subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
 if(isempty(subjects))
     fprintf(2,strcat('\n -->> Error: We can not find any subject data: \n'));
     fprintf(2,strcat('-->> Do not exist the Raw data Or the Preprocessed data. \n'));
     fprintf(2,strcat('-->> Please configure the properties file correctly. \n'));
     return;
+end
+
+if(selected_data_set.preprocessed_data.clean_data.run)
+    if(isequal(lower(selected_data_set.preprocessed_data.clean_data.toolbox),'eeglab'))
+        toolbox_path    = selected_data_set.preprocessed_data.clean_data.toolbox_path;
+        addpath(toolbox_path);
+        eeglab nogui;
+    end
 end
 
 for i=1:length(subjects)

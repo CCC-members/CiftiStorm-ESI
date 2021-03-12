@@ -1,7 +1,7 @@
 function newEEG = rejtime_by_segments(EEG,varargin)
 
 if(isequal(nargin,1))
-    regions = [EEG.TW];
+     regions = [EEG.TW];
     rej_regions = [];
     for i=1:length(regions)
         if(isempty(rej_regions))

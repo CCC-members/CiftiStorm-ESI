@@ -3,7 +3,7 @@
             %% Voxel corelation vs Cortex and InnerSkull Minimal Distance
             %%
             iSkull = load(BSTInnerSkullFile);
-            [vert_inds,distances,min_distances] = get_points_within_limit(iSkull.Vertices,cortex.Vertices,0.003);
+            [vert_inds,distances,min_distances] = get_points_within_limit(head.Vertices,outer.Vertices,0.003);
             save(fullfile(subject_report_path,'cortex_vs_inner_dist.fig'),'min_distances','vert_inds');
             
             hFig30 = figure;
