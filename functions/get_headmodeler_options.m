@@ -31,7 +31,8 @@ ScalpFile                   = sSubject.Surface(sSubject.iScalp).FileName;
 options.HeadFile            = ScalpFile;
 % Uploading OuterSkull
 OuterSkullFile              = sSubject.Surface(sSubject.iOuterSkull).FileName;
-options.OuterSkullFile      =  [];
+% options.OuterSkullFile      = OuterSkullFile;
+options.OuterSkullFile      = [];
 % Uploading InnerSkull
 InnerSkullFile              = sSubject.Surface(sSubject.iInnerSkull).FileName;
 options.InnerSkullFile      = InnerSkullFile;
