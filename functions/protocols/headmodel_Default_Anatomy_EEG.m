@@ -474,8 +474,7 @@ if(selected_data_set.preprocessed_data.clean_data.run)
     end
 end
 
-for i=1:length(subjects)
-      
+for i=1:length(subjects)      
     %%
     %% Export Subject to BC-VARETA
     %%  
@@ -489,13 +488,11 @@ for i=1:length(subjects)
     if(selected_data_set.bcv_config.export)
         export_subject_BCV_structure(selected_data_set,subID,'iTemplate',iSubject,'iter',i,'non_interp',true);
     end
-       
-    disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
-    
-    disp(strcat('-->> Process finished....'));
-    disp('=================================================================');
-    disp('=================================================================');
-    save report.mat subjects_processed subjects_process_error;
+    disp(strcat('-->> Subject:' , subID, '. Processing finished.')); 
 end
+disp(strcat('-->> Process finished....'));
+disp('=================================================================');
+disp('=================================================================');
+save report.mat subjects_processed subjects_process_error;
 end
 

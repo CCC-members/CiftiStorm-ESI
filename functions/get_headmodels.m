@@ -1,6 +1,10 @@
 function [HeadModels,iHeadModel,modality] = get_headmodels(protocol_data_path,sStudy)
 iHeadModel = sStudy.iHeadModel;
-modality = char(sStudy.Channel.DisplayableSensorTypes);
+if(iscell(sStudy.Channel.DisplayableSensorTypes))
+    modality = char(sStudy.Channel.DisplayableSensorTypes{1});
+else
+    modality = char(sStudy.Channel.DisplayableSensorTypes);
+end
 HeadModels = struct;
 count = 1;
 for h=1: length(sStudy.HeadModel)
