@@ -140,6 +140,7 @@ if(exist('labels','var'))
     disp ("-->> Cleanning EEG bad Channels by user labels");
     EEG  = remove_eeg_channels_by_labels(labels,EEG);
 end
+
 %% Step 3: Visualization.
 if verbosity
     eegplot(EEG.data);
@@ -164,19 +165,24 @@ end
 EEG.chanlocs(clear_ind) = [];
 EEG.data(clear_ind,:) = [];
 EEG.nbchan = length(EEG.chanlocs);
-
+if verbosity
+    figure;
+    [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
+end
 %%
 %% Getting marks and segments
 %%
 EEGs = get_marks_and_segments(EEG, 'select_events', select_events);
+
 try
     for i=1:length(EEGs)
         EEG = EEGs(i);
         if verbosity
             figure;
             [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
+            eegplot(EEGs(i).data);
         end
-        
+              
         %% Step 7: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
         EEG_cleaned = clean_artifacts(EEG);
         if verbosity
@@ -207,7 +213,7 @@ try
         else
             EEG = EEG_interp;
         end
-%         EEGs(i) = EEG;
+        EEGs(i) = EEG;
         close all;
     end    
 catch
