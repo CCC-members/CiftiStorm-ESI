@@ -62,32 +62,35 @@ end
 
 if(isequal(dataset_name,'hbn'))
     % eeg raw data files
-    base_path =  strrep(selected_data_set.eeg_raw_data_path.base_path,'SubID',subID);
-    filepath = strrep(selected_data_set.eeg_raw_data_path.file_location,'SubID',subID);
-    raw_eeg = fullfile(base_path,filepath);
-    subject_environment.raw_eeg = raw_eeg;
+    if(~isempty(selected_data_set.sub_prefix) && ~isequal(selected_data_set.sub_prefix,'none') )
+        subID = strrep(subID,selected_data_set.sub_prefix,'');
+    end
+    base_path =  strrep(selected_data_set.raw_data_path.base_path,'SubID',subID);
+    filepath = strrep(selected_data_set.raw_data_path.file_location,'SubID',subID);
+    raw_data = fullfile(base_path,filepath);
+    subject_environment.raw_data = raw_data;
     
-    if(selected_data_set.eeg_raw_data_path.isfile)
-        if(~isfile(raw_eeg))
+    if(selected_data_set.raw_data_path.isfile)
+        if(~isfile(raw_data))
             fprintf(2,strcat('\n -->> Error: The EEG Raw data: \n'));
-            disp(string(raw_eeg));
+            disp(string(raw_data));
             fprintf(2,strcat('-->> Do not exist or is not a file. \n'));
             fprintf(2,strcat('-->> Jumping to an other subject. \n'));
             files_checked = false;
             return;
         end
     else
-        if(~isfolder(raw_eeg))
+        if(~isfolder(raw_data))
             %         if(~isequal(selected_data_set.eeg_raw_data_path.))
             fprintf(2,strcat('\n -->> Error: The EEG Raw data: \n'));
-            disp(string(raw_eeg));
+            disp(string(raw_data));
             fprintf(2,strcat('-->> Do not exist or is not a folder. \n'));
             fprintf(2,strcat('-->> Jumping to an other subject. \n'));
             files_checked = false;
             return;
         end
-        if(isequal(selected_data_set.eeg_raw_data_path.data_format,'mff'))
-            
+        if(isequal(selected_data_set.raw_data_path.data_format,'mff'))
+           
         end
     end
 end

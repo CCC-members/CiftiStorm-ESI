@@ -31,8 +31,8 @@ ScalpFile                   = sSubject.Surface(sSubject.iScalp).FileName;
 options.HeadFile            = ScalpFile;
 % Uploading OuterSkull
 OuterSkullFile              = sSubject.Surface(sSubject.iOuterSkull).FileName;
-% options.OuterSkullFile      = OuterSkullFile;
-options.OuterSkullFile      = [];
+options.OuterSkullFile      = OuterSkullFile;
+% options.OuterSkullFile      = [];
 % Uploading InnerSkull
 InnerSkullFile              = sSubject.Surface(sSubject.iInnerSkull).FileName;
 options.InnerSkullFile      = InnerSkullFile;
@@ -55,18 +55,18 @@ if(isequal(modality,'EEG'))
     BSTScalpFile            = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
     BSTOuterSkullFile       = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
     BSTInnerSkullFile       = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
-    %     options.BemFiles        = {BSTScalpFile, BSTOuterSkullFile,BSTInnerSkullFile};
-    options.BemFiles = {BSTScalpFile,BSTInnerSkullFile};
-    %     options.BemNames        = {'Scalp','Skull','Brain'};
-    options.BemNames = {'Scalp','Brain'};
-    %     options.BemCond         = [1,0.0125,1];
-    options.BemCond = [1,1];
+    options.BemFiles        = {BSTScalpFile, BSTOuterSkullFile,BSTInnerSkullFile};
+    %     options.BemFiles = {BSTScalpFile,BSTInnerSkullFile};
+    options.BemNames        = {'Scalp','Skull','Brain'};
+    %     options.BemNames = {'Scalp','Brain'};
+    options.BemCond         = [1,0.0125,1];
+    %     options.BemCond = [1,1];
     options.iMeg            = [];
     options.iEeg            = 1:length(BSTChannels.Channel);
     options.iEcog           = [];
     options.iSeeg           = [];
-    %     options.BemSelect       = [true,true,true];
-    options.BemSelect = [true,true];
+    options.BemSelect       = [true,true,true];
+    %     options.BemSelect = [true,true];
     options.isAdjoint       = false;
     options.isAdaptative    = true;
     options.isSplit         = false;

@@ -440,6 +440,10 @@ if(is_check_dataset_properties(selected_data_set))
             %% Quality control
             %%
             %
+            %             panel_scout('SetScoutsOptions',0, 0, 1, 'all', 0.7, 0, 0, 0);
+            %             panel_scout('SetScoutContourVisible',0, 1);
+            %             panel_scout('SetScoutTextVisible',0, 1);
+            %             panel_scout('SetDefaultOptions',1);
             hFigSurf24 = view_surface(CortexFile);
             % Deleting the Atlas Labels and Countour from Cortex
             delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
@@ -517,9 +521,9 @@ if(is_check_dataset_properties(selected_data_set))
         %% Export Subject to BC-VARETA
         %%
         if(processed)
-            disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+            disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
             if(selected_data_set.bcv_config.export)
-                export_subject_BCV_structure(selected_data_set,subject_name);
+                export_subject_BCV_structure(selected_data_set,subID);
             end
         end
         %%
@@ -527,7 +531,7 @@ if(is_check_dataset_properties(selected_data_set))
             % Genering Manual QC file (need to check)
             %                     generate_MaQC_file();
         end
-        disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
+        disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
         
     end
     disp(strcat('-->> Process finished....'));

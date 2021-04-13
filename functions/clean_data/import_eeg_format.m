@@ -1,7 +1,7 @@
 function EEGs = import_eeg_format(subID, selected_data_set, base_path)
 
 data_type    = selected_data_set.preprocessed_data.format;
-if(~isequal(selected_data_set.preprocessed_data.channel_label_file,"none"))
+if(~isequal(selected_data_set.preprocessed_data.channel_label_file,"none") && ~isempty(selected_data_set.preprocessed_data.channel_label_file))
     user_labels = jsondecode(fileread(selected_data_set.preprocessed_data.channel_label_file));    
 end
 if(selected_data_set.preprocessed_data.clean_data.run)    
@@ -12,10 +12,10 @@ if(selected_data_set.preprocessed_data.clean_data.run)
         %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
         if(exist('user_labels','var'))
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                'labels', user_labels, 'select_events', select_events);
+                'labels', user_labels, 'select_events', select_events, 'use_raw_data',selected_data_set.preprocessed_data.use_raw_data);
         else
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                'read_segments', 'select_events', select_events);
+                 'select_events', select_events, 'use_raw_data',selected_data_set.preprocessed_data.use_raw_data);
         end
         for i=1:length(EEGs)
             EEGs(i).labels   = {EEGs(i).chanlocs(:).labels};

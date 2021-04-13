@@ -28,6 +28,7 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %                   [min1 max1; min2 max2; ...] to exclude several time ranges. For epoched
 %                   data, the latency range must include an epoch boundary, as latency
 %                   ranges in the middle of epochs cannot be removed from epoched data.
+%   use_raw_data    - Import data from raw data (key='use_raw_data',value=true OR false)
 %
 % Author: Eduardo Gonzalez-Moreira
 % Date: Oct-2020
@@ -54,7 +55,7 @@ if(~exist('verbosity','var'))
     verbosity = true;
 end
 if(~exist('max_freq','var'))
-    max_freq = 92;
+    max_freq = 90;
 end
 if(~exist('freq_list','var'))
     freq_list = [1 6 10 18];
@@ -66,21 +67,25 @@ switch lower(data_type)
         EEG         = pop_loadset(file_name);
     case 'mat'
         load(file_name);
-        srate       = SAMPLING_FREQ;
-        % For Pedrito's data selection
-        load('templates/EEG_template.mat');
-        EEG.srate   = srate;
-        EEG.age     = age;
-        EEG.data    = data;
-        EEG.nbchan  = size(data,1);
-        EEG.pnts    = size(data,2);
-        EEG.xmin    = 0;
-        EEG.xmax    = EEG.xmin+(EEG.pnts-1)*(1/EEG.srate);
-        EEG.times   = (0:EEG.pnts-1)/EEG.srate.*1000;
-        if(exist('labels','var'))
-            EEG.chanlocs(length(labels)+1:end,:)    = [];
-            new_labels                              = labels;
-            [EEG.chanlocs.labels]                   = new_labels{:};
+        if(use_raw_data)
+           EEG = F.header.EEG; 
+        else
+            srate       = SAMPLING_FREQ;
+            % For Pedrito's data selection
+            load('templates/EEG_template.mat');
+            EEG.srate   = srate;
+            EEG.age     = age;
+            EEG.data    = data;
+            EEG.nbchan  = size(data,1);
+            EEG.pnts    = size(data,2);
+            EEG.xmin    = 0;
+            EEG.xmax    = EEG.xmin+(EEG.pnts-1)*(1/EEG.srate);
+            EEG.times   = (0:EEG.pnts-1)/EEG.srate.*1000;
+            if(exist('labels','var'))
+                EEG.chanlocs(length(labels)+1:end,:)    = [];
+                new_labels                              = labels;
+                [EEG.chanlocs.labels]                   = new_labels{:};
+            end
         end
     case 'dat'
         EEG         = pop_loadBCI2000(file_name);
@@ -135,26 +140,31 @@ end
 EEG.setname     = subID;
 EEG.subID       = subID;
 
-%% Filtering by user labels
+%% 3 Filtering by user labels
 if(exist('labels','var'))
     disp ("-->> Cleanning EEG bad Channels by user labels");
     EEG  = remove_eeg_channels_by_labels(labels,EEG);
 end
 
-%% Step 3: Visualization.
+%% Step 4: Visualization.
 if verbosity
     eegplot(EEG.data);
 end
 
-%% Step 4: Downsample the data.
+%% Step 5: Appling notch filter to 6Hz.
+% EEG = pop_cleanline(EEG,'arg_direct',0,'linefreqs',60,'scanforlines',1,'p',0.01,...
+%     'bandwidth',2,'sigtype','Channels','chanlist',1:EEG.nbchan,'taperbandwidth',2,...
+%     'winsize',4,'winstep',1,'tau',100,'pad',2,'computepower',1,'normSpectrum',1,'verb',1,'plotfigures',0);
+
+%% Step 6: Downsample the data.
 if EEG.srate > 300
     EEG = pop_resample(EEG, 200);
 end
 
-%% Step 5: Filtering the data at 0Hz and Max frequency Hz.
+%% Step 7: Filtering the data at 0Hz and Max frequency Hz.
 EEG = pop_eegfiltnew(EEG, 'locutoff', 0, 'hicutoff',max_freq, 'filtorder', 3300);
 
-%% Step 6: Import channel info.
+%% Step 8: Import channel info.
 EEG = pop_chanedit(EEG, 'lookup',fullfile(eeglab_path,'plugins/dipfit/standard_BEM/elec/standard_1005.elc'),'eval','chans = pop_chancenter( chans, [],[]);');
 clear_ind = [];
 for i=1:length(EEG.chanlocs)
@@ -169,33 +179,35 @@ if verbosity
     figure;
     [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
 end
+
 %%
-%% Getting marks and segments
+%%  Step 9: Getting marks and segments
 %%
 EEGs = get_marks_and_segments(EEG, 'select_events', select_events);
-
 try
     for i=1:length(EEGs)
         EEG = EEGs(i);
         if verbosity
             figure;
             [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
-            eegplot(EEGs(i).data);
+            eegplot(EEG.data);
         end
               
-        %% Step 7: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
+        %% Step 10: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
         EEG_cleaned = clean_artifacts(EEG);
         if verbosity
             vis_artifacts(EEG_cleaned,EEG);
         end
         
-        %% Step 8: Interpolate all the removed channels.
+        %% Step 11: Interpolate all the removed channels.
         EEG_interp = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
         if verbosity
             eegplot(EEG_interp.data)
             figure;
             [spectra,freqs] = spectopo(EEG_interp.data,0,EEG_interp.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG_interp.chanlocs,'chaninfo',EEG_interp.chaninfo,'freq',freq_list);
         end
+        
+        %% Step 12: Saving figures
         if(exist('save_path','var'))
             if(~isfolder(save_path))
                 mkdir(save_path);

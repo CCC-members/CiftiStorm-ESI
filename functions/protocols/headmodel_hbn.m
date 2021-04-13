@@ -32,7 +32,7 @@ if(is_check_dataset_properties(selected_data_set))
     subjects_process_error = [];
     subjects_processed =[];
     Protocol_count = 0;
-    for j=1:size(subjects,1)
+    for j=1:length(subjects)
         subject_name = subjects(j).name;
         subID = subject_name;
         if(~isequal(selected_data_set.sub_prefix,'none') && ~isempty(selected_data_set.sub_prefix))
@@ -43,7 +43,7 @@ if(is_check_dataset_properties(selected_data_set))
         %%
         %% Preparing Subject files
         %%
-        [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,'hbm');        
+        [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,'hbn',ProtocolName);        
         if(~files_checked)
             continue;
         end
@@ -54,7 +54,7 @@ if(is_check_dataset_properties(selected_data_set))
         head_file           = subject_environment.head_file;
         outerskull_file     = subject_environment.outerskull_file;
         innerskull_file     = subject_environment.innerskull_file;
-        raw_eeg             = subject_environment.raw_eeg;
+        raw_data            = subject_environment.raw_data;
         subject_report_path = subject_environment.subject_report_path;
         report_name         = subject_environment.report_name;
                 
@@ -152,12 +152,13 @@ if(is_check_dataset_properties(selected_data_set))
             % Right pial
             [iRh, BstTessRhFile, nVertOrigR] = import_surfaces(iSubject, R_surface_file, 'GII-MNI', 0);
             BstTessRhFile = BstTessRhFile{1};
-            
+                        
             %%
             %% ===== MERGE SURFACES =====
             %%
             % Merge surfaces
-            tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
+            % Merge surfaces
+            [TessFile32K, iSurface] = tess_concatenate({BstTessLhFile, BstTessRhFile}, sprintf('cortex_%dV', nVertOrigL + nVertOrigR), 'Cortex');
             % Delete original files
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
             % Compute missing fields
@@ -319,7 +320,7 @@ if(is_check_dataset_properties(selected_data_set))
             % Process: Create link to raw file
             sFiles = bst_process('CallProcess', 'process_import_data_raw', sFiles, [], ...
                 'subjectname',    subID, ...
-                'datafile',       {raw_eeg, 'EEG-EGI-MFF'}, ...
+                'datafile',       {raw_data, 'EEG-EGI-MFF'}, ...
                 'channelreplace', 0, ...
                 'channelalign',   1);
             
@@ -472,8 +473,7 @@ if(is_check_dataset_properties(selected_data_set))
             %%
             [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
             
-            if(~isempty(headmodel_options))
-                
+            if(~isempty(headmodel_options))                
                 % Get subject directory                   
                 [sSubject] = bst_get('Subject', subID);
                 
@@ -494,7 +494,7 @@ if(is_check_dataset_properties(selected_data_set))
                 %%
                 %% Quality control of Head model
                 %%
-                qc_headmodel(headmodel_options,modality)
+                qc_headmodel(headmodel_options,modality,subject_report_path);
                 
                 %%
                 %% Save and display report
@@ -522,9 +522,9 @@ if(is_check_dataset_properties(selected_data_set))
         %% Export Subject to BC-VARETA
         %%
         if(processed)
-            disp(strcat('BC-V -->> Export subject:' , subject_name, ' to BC-VARETA structure'));
+            disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
             if(selected_data_set.bcv_config.export)
-                export_subject_BCV_structure(selected_data_set,subject_name);
+                export_subject_BCV_structure(selected_data_set,subID);
             end
         end
         %%
@@ -533,7 +533,7 @@ if(is_check_dataset_properties(selected_data_set))
             % Genering Manual QC file (need to check)
             %                     generate_MaQC_file();
         end
-        disp(strcat('-->> Subject:' , subject_name, '. Processing finished.'));
+        disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
         
     end
     disp(strcat('-->> Process finished....'));

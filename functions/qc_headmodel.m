@@ -138,7 +138,10 @@ if(isequal(modality,'EEG'))
     figure_cor = figure;
     %colormap(gca,cmap);
     patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
-    view(90,270)
+    view(90,270);    
+    axis off;
+    colorbar;
+    title('Distance correlation map');
     bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
     savefig( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
     close(figure_cor);

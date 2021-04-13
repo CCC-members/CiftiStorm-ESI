@@ -26,6 +26,7 @@ restoredefaultpath;
 %------------ Preparing properties --------------------
 % brainstorm('stop');
 addpath(fullfile('app'));
+addpath('bst_templates');
 addpath(fullfile('config_labels'));
 addpath(fullfile('config_MaQC'));
 addpath(fullfile('config_protocols'));
@@ -122,7 +123,7 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
         uiwait(guiHandle.UIFigure);
         delete(guiHandle);
     end
-    if(isfolder(bst_path) || isfolder(app_properties.spm_path))       
+    if(isfolder(bst_path) && isfolder(app_properties.spm_path))       
         addpath(genpath(bst_path));
         addpath(app_properties.spm_path);
         
@@ -146,9 +147,22 @@ if(isfile(fullfile("config_protocols",app_properties.selected_data_set.file_name
             bst_set('BrainstormDbDir', app_properties.bst_db_path);
         end
         
+        if(selected_data_set.preprocessed_data.clean_data.run)
+            toolbox = selected_data_set.preprocessed_data.clean_data.toolbox;
+            switch toolbox
+                case 'eeglab'
+                    if(isfile(fullfile(selected_data_set.preprocessed_data.clean_data.toolbox_path,'eeglab.m')))
+                        toolbox_path    = selected_data_set.preprocessed_data.clean_data.toolbox_path;
+                        addpath(toolbox_path);
+                        eeglab nogui;
+                    else
+                        fprintf(2,'\n ->> Error: The eeglab path is wrong.');
+                    end            
+            end
+        else
+        end
+        
         %% Process selected dataset and compute the leadfield subjects
-        %selected_datataset_process(selected_data_set);
-       
         %%
         %% Calling dataset function to analysis
         %%
