@@ -6,7 +6,7 @@ for m=1:length(MEEGs)
     MEEG = MEEGs(m);
     % Creating subject folder structure
     disp(strcat("-->> Creating subject output structure"));
-    [output_subject_dir] = create_data_structure(selected_data_set.BCV_work_dir,MEEG.subID);
+    [output_subject_dir] = create_data_structure(selected_data_set.bcv_config.export_path,MEEG.subID);
     
     subject_info = struct;
     if(isfolder(output_subject_dir))
