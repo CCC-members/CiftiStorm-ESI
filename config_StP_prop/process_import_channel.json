@@ -1,0 +1,10 @@
+{
+    "description":"",
+    "params":{
+        "process_import_channel":{
+            "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
+            "group_layout_name":"Colin27",
+            "channel_layout_name":"ASA 10-05 343"
+        }
+    }
+}

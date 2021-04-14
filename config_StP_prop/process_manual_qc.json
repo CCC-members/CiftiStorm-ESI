@@ -1,0 +1,17 @@
+{
+    "description":"",
+    "params":{
+        "elements":[
+            "MRI Segmentation",
+            "Scalp registration",
+            "Cortex registration",
+            "OuterSkull registration",
+            "InnerSkull registration",
+            "Cortex",
+            "BEM surfaces registration",
+            "SPM Scalp Envelope",
+            "Sensor Projection",
+            "Field views"
+        ]
+    }
+}

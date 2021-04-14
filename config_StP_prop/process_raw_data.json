@@ -1,0 +1,12 @@
+{
+    "description":"",
+    "params":{
+        "raw_data":{
+            "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI-HBN_data/whole_eeg/SubID",
+            "file_location":"EEG/raw/mff_format/SubID",
+            "tamplate_data_path":"E:/Data/CMI/whole_eeg/sub-Template/Sub_Template",
+            "data_format":"mff",
+            "isfile":false
+        }
+    }
+}
