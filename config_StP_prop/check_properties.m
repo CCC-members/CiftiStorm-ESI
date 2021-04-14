@@ -279,9 +279,7 @@ if(mri_transform.use_transformation)
     for i=1:length(structures)
         structure = structures(i);
         transf_file = fullfile(base_path,structure.name,strrep(mri_transform.file_location,'SubID',structure.name));
-        if(~isfile(transf_file))
-            count_transf = count_transf + 1;
-        end
+        if(~isfile(transf_file)); count_transf = count_transf + 1; end
     end
     if(~isequal(count_transf,0))
         if(isequal(count_transf,length(structures)))
@@ -302,7 +300,26 @@ if(mri_transform.use_transformation)
 end
 % Check non brain surfaces configuration
 non_brain = anat_params.non_brain_surfaces;
-
+base_path = strrep(non_brain.base_path,'SubID','');
+if(~isfolder(fullfile(base_path)))
+    fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
+    disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
+    status = false;
+    disp('-->> Process stoped!!!');
+    return;
+end
+structures = dir(base_path);
+structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
+count_skin = 0;
+count_outer = 0;
+count_inner = 0;
+for i=1:length(structures)
+    structure = structures(i);
+    skin_file = fullfile(base_path,structure.name,strrep(non_brain.file_location,'SubID',structure.name));
+    if(~isfile(skin_file))
+        count_skin = count_skin + 1;
+    end
+end
 %%
 %% Checking channel params
 %%
