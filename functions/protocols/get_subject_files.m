@@ -1,25 +1,25 @@
-function [subject_environment, files_checked] = get_subject_files(selected_data_set,subID,dataset_name,ProtocolName)
+function [subject_environment, files_checked] = get_subject_files(properties,subID,dataset_name,ProtocolName)
 %GET_SUBJECT_FILES Summary of this function goes here
 %   Detailed explanation goes here
 
 subject_environment = struct;
 files_checked = true;
 % MRI File
-base_path =  strrep(selected_data_set.hcp_data_path.base_path,'SubID',subID);
-filepath = strrep(selected_data_set.hcp_data_path.file_location,'SubID',subID);
+base_path =  strrep(properties.hcp_data_path.base_path,'SubID',subID);
+filepath = strrep(properties.hcp_data_path.file_location,'SubID',subID);
 T1w_file = fullfile(base_path,filepath);
 subject_environment.T1w_file = T1w_file;
 
 % Cortex Surfaces
-filepath = strrep(selected_data_set.hcp_data_path.L_surface_location,'SubID',subID);
+filepath = strrep(properties.hcp_data_path.L_surface_location,'SubID',subID);
 L_surface_file = fullfile(base_path,filepath);
 subject_environment.L_surface_file = L_surface_file;
 
-filepath = strrep(selected_data_set.hcp_data_path.R_surface_location,'SubID',subID);
+filepath = strrep(properties.hcp_data_path.R_surface_location,'SubID',subID);
 R_surface_file = fullfile(base_path,filepath);
 subject_environment.R_surface_file = R_surface_file;
 
-filepath = strrep(selected_data_set.hcp_data_path.Atlas_seg_location,'SubID',subID);
+filepath = strrep(properties.hcp_data_path.Atlas_seg_location,'SubID',subID);
 Atlas_seg_location = fullfile(base_path,filepath);
 subject_environment.Atlas_seg_location = Atlas_seg_location;
 
@@ -35,16 +35,16 @@ if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file) || ~i
 end
 
 % Non-Brain surface files
-base_path =  strrep(selected_data_set.non_brain_data_path.base_path,'SubID',subID);
-filepath = strrep(selected_data_set.non_brain_data_path.head_file_location,'SubID',subID);
+base_path =  strrep(properties.non_brain_data_path.base_path,'SubID',subID);
+filepath = strrep(properties.non_brain_data_path.head_file_location,'SubID',subID);
 head_file = fullfile(base_path,filepath);
 subject_environment.head_file = head_file;
 
-filepath =  strrep(selected_data_set.non_brain_data_path.outerfile_file_location,'SubID',subID);
+filepath =  strrep(properties.non_brain_data_path.outerfile_file_location,'SubID',subID);
 outerskull_file = fullfile(base_path,filepath);
 subject_environment.outerskull_file = outerskull_file;
 
-filepath = strrep(selected_data_set.non_brain_data_path.innerfile_file_location,'SubID',subID);
+filepath = strrep(properties.non_brain_data_path.innerfile_file_location,'SubID',subID);
 innerskull_file = fullfile(base_path,filepath);
 subject_environment.innerskull_file = innerskull_file;
 
@@ -62,15 +62,15 @@ end
 
 if(isequal(dataset_name,'hbn'))
     % eeg raw data files
-    if(~isempty(selected_data_set.sub_prefix) && ~isequal(selected_data_set.sub_prefix,'none') )
-        subID = strrep(subID,selected_data_set.sub_prefix,'');
+    if(~isempty(properties.sub_prefix) && ~isequal(properties.sub_prefix,'none') )
+        subID = strrep(subID,properties.sub_prefix,'');
     end
-    base_path =  strrep(selected_data_set.raw_data_path.base_path,'SubID',subID);
-    filepath = strrep(selected_data_set.raw_data_path.file_location,'SubID',subID);
+    base_path =  strrep(properties.raw_data_path.base_path,'SubID',subID);
+    filepath = strrep(properties.raw_data_path.file_location,'SubID',subID);
     raw_data = fullfile(base_path,filepath);
     subject_environment.raw_data = raw_data;
     
-    if(selected_data_set.raw_data_path.isfile)
+    if(properties.raw_data_path.isfile)
         if(~isfile(raw_data))
             fprintf(2,strcat('\n -->> Error: The EEG Raw data: \n'));
             disp(string(raw_data));
@@ -89,7 +89,7 @@ if(isequal(dataset_name,'hbn'))
             files_checked = false;
             return;
         end
-        if(isequal(selected_data_set.raw_data_path.data_format,'mff'))
+        if(isequal(properties.raw_data_path.data_format,'mff'))
            
         end
     end
@@ -98,10 +98,10 @@ end
 %%
 %% Checking the report output structure
 %%
-if(selected_data_set.report_output_path == "local")
+if(properties.report_output_path == "local")
     report_output_path = pwd;
 else
-    report_output_path = selected_data_set.report_output_path ;
+    report_output_path = properties.report_output_path ;
 end
 if(~isfolder(report_output_path))
     mkdir(report_output_path);

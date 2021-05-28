@@ -206,7 +206,7 @@ nverthead = selected_data_set.process_import_surfaces.nverthead;
 nvertcortex = selected_data_set.process_import_surfaces.nvertcortex;
 nvertskull = selected_data_set.process_import_surfaces.nvertskull;
 
-sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
+sFiles = bst_process('CallProcess', 'process_import_surfaces', sFiles, [], ...
     'subjectname', subID, ...
     'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
     'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
@@ -494,8 +494,9 @@ close(hFigMri20);
 [sSubject, iSubject] = bst_get('Subject', subID);
 
 %
-LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
-script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
+% LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
+% script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
+import_label(sSubject.Surface(sSubject.iCortex).FileName,Atlas_seg_location,0);
 
 %%
 %% Quality control
@@ -503,7 +504,7 @@ script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
 %
 hFigSurf24 = view_surface(CortexFile);
 % Deleting the Atlas Labels and Countour from Cortex
-delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
+% delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
 delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));
 delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
 
@@ -550,7 +551,7 @@ if(~isempty(headmodel_options))
     %%
     %% Quality control of Head model
     %%
-    qc_headmodel(headmodel_options,modality,subject_report_path)
+    qc_headmodel(headmodel_options,modality,subject_report_path);
     
     %%
     %% Save and display report

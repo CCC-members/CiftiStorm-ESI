@@ -1,35 +1,44 @@
 {
     "description":"",
     "params":{
-        "preprocessed_data":{
-            "description":"Preprocessed data params. You can not remove the <<SubID>> generic part",
-            "base_path":"E:/Data/CHBM/PLG/SubID",
-            "file_location":"SubID.plg",
-            "format":"plg",
-            "use_raw_data":false,
-            "clean_data":{            
-                "description":"Clean EEG channels with external Toolbox (Removing and interpolating channels)",
-                "run":true,
-                "toolbox":"eeglab",
-                "toolbox_path":"D:/Tools/EEG Lab/eeglab2020_0",
-                "max_freq":90,
-                "select_events":{                  
-                    "by_description":"Selection of the data by <<marks>> way or <<segments>> way",
-                    "by":"segments",
-                    "events_description":"Type the events that you want to select from the data. If you want to extract all data leave the events list empty. For select a specific event fill the list like the events_example tab",
-                    "events":[
-                        
-                    ],
-                    "events_example":[
-                        "open_eyes",
-                        "closed_eyes",
-                        "hyperventilation_1",
-                        "recuperation",
-                        "another_event"
-                    ]
-                }
-            },
-            "channel_label_file":"labels_chbm.json"
-        }
+        "process_type":{
+            "description":"Select the type of preprocessed data to use.<<0>> do not import preprocessed data. <<1>> use raw data. <<2>> Import preprocessed data",
+            "type":2,
+            "type_list":[
+                {
+                    "name":"raw_data",            
+                    "description":""
+                },
+                {
+                    "name":"preprocessed_data",
+                    "description":"Preprocessed data params. You can not remove the <<SubID>> generic part",
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/HCP-GUSHI-2019/Selected_data/SubID",
+                    "file_location":"MEG/Restin/rmegpreproc/SubID_MEG_5-Restin_rmegpreproc.mat",
+                    "format":"mat"
+                } 
+            ]
+        },        
+        "clean_data":{            
+            "description":"Clean EEG channels with external Toolbox (Removing and interpolating channels)",
+            "run":true,
+            "toolbox":"eeglab",
+            "toolbox_path":"D:/Tools/EEG Lab/eeglab2020_0",
+            "max_freq":90,
+            "select_events":{                  
+                "by_description":"Default:<<empty>>. Selection of the data by <<marks>> way or <<segments>> way",
+                "by":"segments",
+                "events_description":"Type the events that you want to select from the data. If you want to extract all data leave the events list empty. For select a specific event fill the list like the events_example tab",
+                "events":[
+
+                ],
+                "events_example":[
+                    "open_eyes",
+                    "closed_eyes",
+                    "hyperventilation_1",
+                    "recuperation",
+                    "another_event"
+                ]
+            }
+        }       
     }
 }

@@ -5,7 +5,10 @@ function qc_headmodel(headmodel_options,modality,subject_report_path)
 %% Quality control
 %%
 ProtocolInfo = bst_get('ProtocolInfo');
-
+[sStudy iStudy] = bst_get('Study');
+if(isempty(iStudy))
+    [sStudy, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
 cortex = load(BSTCortexFile);
 
@@ -16,27 +19,27 @@ head = load(BSTScalpFile);
 BSTHeadModelFile = bst_fullfile(headmodel_options.HeadModelFile);
 BSTHeadModel = load(BSTHeadModelFile);
 Ke = BSTHeadModel.Gain;
-
-% Uploading Channels Loc
-channels = [headmodel_options.Channel.Loc];
-channels = channels';
-
-%%
-%% Checking LF correlation
-%%
-[Ne,Nv]=size(Ke);
-Nv= Nv/3;
-VoxelCoord=cortex.Vertices;
-VertNorms=cortex.VertNormals;
-
 if(isequal(modality,'EEG'))
+    % Uploading Channels Loc
+    Channels = [headmodel_options.Channel.Loc];
+    Channels = Channels';
+    ChannOri = [headmodel_options.Channel.Orient];
+    
+    %%
+    %% Checking LF correlation
+    %%
+    [Ne,Nv]=size(Ke);
+    Nv= Nv/3;
+    VoxelCoord=cortex.Vertices;
+    VertNorms=cortex.VertNormals;    
+    
     %computing homogeneous lead field
-    [Kn,Khom]   = computeNunezLF(Ke,VoxelCoord, channels);
+    [Kn, Khom, KhomN]   = computeNunezLF(Ke, VoxelCoord, VertNorms, Channels, ChannOri, modality);
     
     %%
     %% Ploting sensors and sources on the scalp and cortex
     %%
-    [hFig25] = view3D_K(Kn,cortex,head,channels,17);
+    [hFig25] = view3D_K(Kn,cortex,head,Channels,17);
     bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
     view(0,360)
     savefig( hFig25,fullfile(subject_report_path,'Field view.fig'));
@@ -52,7 +55,7 @@ if(isequal(modality,'EEG'))
     close(hFig25);
     
     
-    [hFig26]    = view3D_K(Khom,cortex,head,channels,17);
+    [hFig26]    = view3D_K(Khom,cortex,head,Channels,17);
     bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
     view(0,360)
     savefig( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
@@ -71,7 +74,7 @@ if(isequal(modality,'EEG'))
     VertNorms   = repmat(VertNorms,[Ne,1,1]);
     Kn          = sum(Kn.*VertNorms,3);
     Khom        = sum(Khom.*VertNorms,3);
-    
+    KhomN        = sum(KhomN.*VertNorms,3);
     
     %Homogenous Lead Field vs. Tester Lead Field Plot
     hFig27 = figure;
@@ -138,7 +141,7 @@ if(isequal(modality,'EEG'))
     figure_cor = figure;
     %colormap(gca,cmap);
     patch('Faces',cortex.Faces,'Vertices',cortex.Vertices,'FaceVertexCData',corelv,'FaceColor','interp','EdgeColor','none','FaceAlpha',.99);
-    view(90,270);    
+    view(90,270);
     axis off;
     colorbar;
     title('Distance correlation map');
@@ -146,7 +149,34 @@ if(isequal(modality,'EEG'))
     savefig( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
     close(figure_cor);
 else
+    %%
+    %% Uploading Channels Loc
+    %%
+    BSTChannelsFile = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
+    BSTChannels = load(BSTChannelsFile);
     
+    [BSTChannels,Ke] = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
+    
+    Channels = [];
+    ChannelsOrient = [];
+    for i = 1: length(BSTChannels.Channel)
+        Loc = BSTChannels.Channel(i).Loc;
+        center = mean(Loc,2);
+        Channels = [Channels; center(1),center(2),center(3) ];
+        Orient = BSTChannels.Channel(i).Orient;
+        center = mean(Orient,2);
+        ChannelsOrient = [ChannelsOrient; center(1),center(2),center(3) ];
+    end
+    %%
+    %% Checking LF correlation
+    %%
+    [Ne,Nv]=size(Ke);
+    Nv= Nv/3;
+    VoxelCoord=cortex.Vertices;
+    VertNorms=cortex.VertNormals;
+    
+    %computing homogeneous lead field
+    [Kn, Khom, KhomN]   = computeNunezLF(Ke, VoxelCoord, VertNorms, Channels, ChannelsOrient, modality);
 end
 
 

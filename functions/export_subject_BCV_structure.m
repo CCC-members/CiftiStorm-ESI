@@ -1,4 +1,4 @@
-function [] = export_subject_BCV_structure(selected_data_set,subID,varargin)
+function [] = export_subject_BCV_structure(properties,subID,varargin)
 
 %%
 %% Get Protocol information
@@ -10,7 +10,7 @@ end
 
 % Get subject directory
 ProtocolInfo        = bst_get('ProtocolInfo');
-bcv_path = selected_data_set.bcv_config.export_path;
+bcv_path = properties.general_params.bcv_config.export_path;
 if(~isfolder(bcv_path))
     mkdir(bcv_path);
 end
@@ -57,34 +57,39 @@ Cdata           = load(BSTChannelsFile);
 if(~exist('FSAve_interp','var'))
     FSAve_interp = true;
 end
-[scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp);
+if(~exist('iter','var'))
+    iter = 1;
+end
+[scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter);
 
 %%
 %% Genering MEG/EEG file
 %%
-if(isfield(selected_data_set, 'preprocessed_data'))
-    if(selected_data_set.preprocessed_data.use_raw_data)
-        data_file = fullfile(ProtocolInfo.STUDIES,sStudy.Data.FileName);
-        selected_data_set.preprocessed_data.format = 'mat';
-    else
-        if(~isequal(selected_data_set.preprocessed_data.base_path,'none'))
-            filepath = strrep(selected_data_set.preprocessed_data.file_location,'SubID',subID);
-            base_path =  strrep(selected_data_set.preprocessed_data.base_path,'SubID',subID);
-            data_file = fullfile(base_path,filepath);
-        end
-    end
-    if(exist('data_file','var') && isfile(data_file))
-        disp ("-->> Genering MEG/EEG file");
-        [HeadModels,Cdata, MEEGs] = load_preprocessed_data(modality,subID,selected_data_set,data_file,HeadModels,Cdata);
+if(isequal(properties.prep_data_params.process_type.type,1))
+    data_file = fullfile(ProtocolInfo.STUDIES,sStudy.Data.FileName);
+    preprocessed_data.format = 'mat';
+elseif(isequal(properties.prep_data_params.process_type.type,2))
+    preprocessed_data = properties.prep_data_params.process_type.type_list{2};
+    if(~isequal(preprocessed_data.base_path,'none'))
+        filepath = strrep(preprocessed_data.file_location,'SubID',subID);
+        base_path =  strrep(preprocessed_data.base_path,'SubID',subID);
+        data_file = fullfile(base_path,filepath);
     end
 end
+if(exist('data_file','var') && isfile(data_file))
+    disp ("-->> Genering MEG/EEG file");
+    preprocessed_data.clean_data = properties.prep_data_params.clean_data;
+    preprocessed_data.channel_label_file = properties.channel_params.channel_label_file;
+    [HeadModels,Cdata, MEEGs] = load_preprocessed_data(modality,subID,preprocessed_data,data_file,HeadModels,Cdata);
+end
+
 scalp.Cdata     = Cdata;
 
 %%
 %% Creating structure for the subject and save the output files
 %%
 if(exist('MEEGs','var') && ~isempty(MEEGs))
-    save_output_files(selected_data_set,modality,MEEGs,HeadModels,iHeadModel,scalp,outerS,innerS,surf);
+    save_output_files(properties,modality,MEEGs,HeadModels,iHeadModel,scalp,outerS,innerS,surf);
 end
 end
 
