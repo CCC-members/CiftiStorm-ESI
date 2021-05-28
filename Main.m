@@ -75,47 +75,68 @@ if(~status)
     disp('Please check the configuration files.');
     return;
 end
-if(~check_app_properties(app_properties))
-    return;
-end
 
+properties.general_params       = properties.general_params.params;
+properties.anatomy_params       = properties.anatomy_params.params;
+properties.channel_params       = properties.channel_params.params;
+properties.prep_data_params     = properties.prep_data_params.params;
+properties.qc_params            = properties.qc_params.params;
 
-
-try
-    selected_dataset = jsondecode(fileread(fullfile('config_protocols',app_properties.selected_data_set.file_name)));
-catch EM
-    fprintf(2,"\n ->> Error: The selected_data_set file in config_protocols do not have a correct format \n");
-    disp("-->> Message error");
-    disp(EM.message);
-    disp('-->> Process stoped!!!');
-    return;
-end
-if(~check_dataset_properties(selected_dataset))
-    return;
+if(isfile(properties.general_params.colormap))
+    load(properties.general_params.colormap);
+else
+    load('tools/mycolormap.mat');
 end
 %%
 disp('-->> Preparing BrainStorm properties.');
-bst_path =  app_properties.bst_path;
-spm_path = app_properties.spm_path;
+bst_path        =  properties.general_params.bst_config.bst_path;
+bst_db_path     = properties.general_params.bst_database.db_path;
+spm_path        = properties.general_params.spm_config.spm_path;
 addpath(genpath(bst_path));
 addpath(spm_path);
 
 %---------------- Starting BrainStorm-----------------------
+
 brainstorm reset
-if ~brainstorm('status')
-    brainstorm nogui local
-    bst_set('SpmDir', app_properties.spm_path);
+brainstorm nogui local
+
+disp("-->> Installing external plugins.");
+bst_plugin('SetCustomPath','spm', spm_path);
+if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
+    [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'openmeeg', 0, []);
+    if(isOk)
+        [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'openmeeg');
+    else
+        fprintf(2,"\n ->> Error: We can not install tha openmeeg plugin. Please see the fallow error and restart the process. \n");
+        disp("-->> Message error");
+        disp(errMsg);
+        disp('-->> Process stoped!!!');
+        return;
+    end
 end
-if(~isequal( app_properties.bst_db_path,'local'))
+if(isempty(bst_plugin('GetInstalled', 'mff')))
+    [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'mff', 0, []);
+    if(isOk)
+        [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'mff');
+    else
+        fprintf(2,"\n ->> Error: We can not install tha mff plugin. Please see the fallow error and restart the process. \n");
+        disp("-->> Message error");
+        disp(errMsg);
+        disp('-->> Process stoped!!!');
+        return;
+    end
+end
+
+if(~isequal(bst_db_path,'local'))
     bst_set('BrainstormDbDir', app_properties.bst_db_path);
 end
 
-if(selected_dataset.preprocessed_data.clean_data.run)
-    toolbox = selected_dataset.preprocessed_data.clean_data.toolbox;
+if(properties.prep_data_params.clean_data.run)
+    toolbox = properties.prep_data_params.clean_data.toolbox;
     switch toolbox
         case 'eeglab'
-            if(isfile(fullfile(selected_dataset.preprocessed_data.clean_data.toolbox_path,'eeglab.m')))
-                toolbox_path    = selected_dataset.preprocessed_data.clean_data.toolbox_path;
+            if(isfile(fullfile(properties.prep_data_params.clean_data.toolbox_path,'eeglab.m')))
+                toolbox_path    = properties.prep_data_params.clean_data.toolbox_path;
                 addpath(toolbox_path);
                 eeglab nogui;
             else
@@ -129,8 +150,7 @@ end
 %%
 %% Calling dataset function to analysis
 %%
-str_function = strcat(selected_dataset.function_name,'();');
-eval(str_function);
+process_error = headmodel_process_interface(properties);
 
 %% Stoping BrainStorm
 disp("=================================================================");

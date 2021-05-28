@@ -26,6 +26,8 @@ if(nargin == 1)
             mkdir(leadfield_path);
             scalp_path = fullfile(subject_path,'scalp');
             mkdir(scalp_path);
+            channel_path = fullfile(subject_path,'channel');
+            mkdir(channel_path);
             surf_path = fullfile(subject_path,'surf');
             mkdir(surf_path);
         end
@@ -42,6 +44,8 @@ elseif(nargin == 2)
         mkdir(leadfield_path);
         scalp_path = fullfile(subject_path,'scalp');
         mkdir(scalp_path);
+        channel_path = fullfile(subject_path,'channel');
+        mkdir(channel_path);
         surf_path = fullfile(subject_path,'surf');
         mkdir(surf_path);
     end
@@ -56,6 +60,8 @@ else
         mkdir(leadfield_path);
         scalp_path = fullfile(subject_path,'scalp');
         mkdir(scalp_path);
+        channel_path = fullfile(subject_path,'channel');
+        mkdir(channel_path);
         surf_path = fullfile(subject_path,'surf');
         mkdir(surf_path);
     end

@@ -1,21 +1,21 @@
-function EEGs = import_eeg_format(subID, selected_data_set, base_path)
+function EEGs = import_eeg_format(subID, properties, base_path)
 
-data_type    = selected_data_set.preprocessed_data.format;
-if(~isequal(selected_data_set.preprocessed_data.channel_label_file,"none") && ~isempty(selected_data_set.preprocessed_data.channel_label_file))
-    user_labels = jsondecode(fileread(selected_data_set.preprocessed_data.channel_label_file));    
+data_type    = properties.format;
+if(~isequal(properties.channel_label_file,"none") && ~isempty(properties.channel_label_file))
+    user_labels = jsondecode(fileread(properties.channel_label_file));    
 end
-if(selected_data_set.preprocessed_data.clean_data.run)    
-    if(isequal(lower(selected_data_set.preprocessed_data.clean_data.toolbox),'eeglab'))
-        toolbox_path    = selected_data_set.preprocessed_data.clean_data.toolbox_path;
-        max_freq        = selected_data_set.preprocessed_data.clean_data.max_freq;            
-        select_events   = selected_data_set.preprocessed_data.clean_data.select_events;
+if(properties.clean_data.run)    
+    if(isequal(lower(properties.clean_data.toolbox),'eeglab'))
+        toolbox_path    = properties.clean_data.toolbox_path;
+        max_freq        = properties.clean_data.max_freq;            
+        select_events   = properties.clean_data.select_events;
         %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
         if(exist('user_labels','var'))
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                'labels', user_labels, 'select_events', select_events, 'use_raw_data',selected_data_set.preprocessed_data.use_raw_data);
+                'labels', user_labels, 'select_events', select_events);
         else
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                 'select_events', select_events, 'use_raw_data',selected_data_set.preprocessed_data.use_raw_data);
+                 'select_events', select_events);
         end
         for i=1:length(EEGs)
             EEGs(i).labels   = {EEGs(i).chanlocs(:).labels};

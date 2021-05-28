@@ -354,8 +354,7 @@ close(hFigMri20);
 [sSubject, iSubject] = bst_get('Subject', subID);
 %
 if(exist('Atlas_seg_location','var'))
-    LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
-    script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
+    import_label(sSubject.Surface(sSubject.iCortex).FileName,Atlas_seg_location,0);
 else
     CortexFile = sSubject.Surface(sSubject.iCortex).FileName;
     BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, CortexFile);

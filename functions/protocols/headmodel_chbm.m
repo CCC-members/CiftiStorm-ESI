@@ -144,7 +144,7 @@ for j=1:size(subjects,1)
     nvertcortex = selected_dataset.process_import_surfaces.nvertcortex;
     nvertskull = selected_dataset.process_import_surfaces.nvertskull;
     
-    sFiles = bst_process('CallProcess', 'script_process_import_surfaces', sFiles, [], ...
+    sFiles = bst_process('CallProcess', 'process_import_surfaces', sFiles, [], ...
         'subjectname', subID, ...
         'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
         'cortexfile1', {L_surface_file, 'GII-MNI'}, ...
@@ -432,8 +432,8 @@ for j=1:size(subjects,1)
     [sSubject, iSubject] = bst_get('Subject', subID);
     
     %
-    LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
-    script_import_label(sSubject.Surface(sSubject.iCortex).FileName,LabelFile,0);
+%     LabelFile = {Atlas_seg_location,'MRI-MASK-MNI'};
+    import_label(sSubject.Surface(sSubject.iCortex).FileName,Atlas_seg_location,0);
     
     %%
     %% Quality control

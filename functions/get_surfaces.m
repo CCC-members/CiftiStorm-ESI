@@ -1,4 +1,4 @@
-function [scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp)
+function [scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter)
 
 anat_path = ProtocolInfo.SUBJECTS;
 %%
