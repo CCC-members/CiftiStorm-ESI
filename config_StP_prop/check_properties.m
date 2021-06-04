@@ -407,22 +407,22 @@ end
 
 % Check surface resolution
 surf_resol = anat_params.surfaces_resolution;
-if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 5000 || surf_resol.nverthead > 15000)
-    fprintf(2,'The Head resolution have be between 5000 and 15000 vertices.\n');
+if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 2000 || surf_resol.nverthead > 15000)
+    fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
     disp('Please check the nverthead configuration in the process_import_anat.json file.');
     status = false;
     disp('-->> Process stoped!!!');
     return;
 end
-if(isempty(surf_resol.nvertskull) || surf_resol.nvertskull < 5000 || surf_resol.nvertskull > 15000)
-    fprintf(2,'The Skull resolution have be between 5000 and 15000 vertices.\n');
+if(isempty(surf_resol.nvertskull) || surf_resol.nvertskull < 2000 || surf_resol.nvertskull > 15000)
+    fprintf(2,'The Skull resolution have be between 2000 and 15000 vertices.\n');
     disp('Please check the nvertskull configuration in the process_import_anat.json file.');
     status = false;
     disp('-->> Process stoped!!!');
     return;
 end
-if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 5000 || surf_resol.nvertcortex > 15000)
-    fprintf(2,'The Cortex resolution have be between 5000 and 15000 vertices.\n');
+if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
+    fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
     disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
     status = false;
     disp('-->> Process stoped!!!');
@@ -537,7 +537,7 @@ elseif(isequal(prep_params.process_type.type,2))
         return;
     end
     [path,name,ext] = fileparts(prep_config.file_location);
-    if(~isequal(strcat('.',prep_config.format),ext))
+    if(~isequal(strcat('.',prep_config.format),ext) &&  ~isequal(lower(prep_config.format),'matrix'))
          fprintf(2,'The preprocessed data format and the file location extension do not match.\n');
         disp('Please check the process_prep_data.json configuration file.');
         status = false;

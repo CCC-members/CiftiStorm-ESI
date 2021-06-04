@@ -87,6 +87,21 @@ switch lower(data_type)
                 [EEG.chanlocs.labels]                   = new_labels{:};
             end
         end
+    case 'matrix'
+        load(file_name);
+        load('templates/EEG_template.mat');
+        EEG.srate   = 128;
+        EEG.data    = eeg;
+        EEG.nbchan  = size(EEG.data,1);
+        EEG.pnts    = size(EEG.data,2);
+        EEG.xmin    = 0;
+        EEG.xmax    = EEG.xmin+(EEG.pnts-1)*(1/EEG.srate);
+        EEG.times   = (0:EEG.pnts-1)/EEG.srate.*1000;
+        if(exist('labels','var'))
+            EEG.chanlocs(length(labels)+1:end,:)    = [];
+            new_labels                              = labels;
+            [EEG.chanlocs.labels]                   = new_labels{:};
+        end        
     case 'dat'
         EEG         = pop_loadBCI2000(file_name);
     case 'plg'

@@ -3,7 +3,7 @@
     "params":{
         "anatomy_type":{
             "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-            "type":2,
+            "type":1,
             "type_list":[
                 {
                     "name":"default_anatomy",            
@@ -14,8 +14,8 @@
                 {
                     "name":"hcp_anat_template",
                     "description":"Use this configuration as anatomy template",
-                    "template_name":"ICBM152nonbrain_BigBrain",
-                    "base_path":"E:/Data/BigBrain/ciftify",
+                    "template_name":"ICBM152_2019",
+                    "base_path":"E:/Data/Joan/Ciftify",
                     "file_location":"T1w/T1w.nii.gz",
                     "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
                     "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
@@ -38,7 +38,7 @@
             "file_location":"MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"E:/Data/BigBrain/non_brain/SubID",
+            "base_path":"E:/Data/Joan/Non_brain/SubID",
             "head_file_location":"SubID_outskin_mesh.nii.gz",
             "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
             "innerfile_file_location":"SubID_inskull_mesh.nii.gz"

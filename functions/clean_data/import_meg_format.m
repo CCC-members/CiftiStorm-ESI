@@ -14,15 +14,15 @@ switch data_type
             MEG.labels      = MEG_file.data.label;
             MEG.cfg         = MEG_file.data.cfg;
         catch
-            lab     = load('/home/Ian/Documents/meg-tool/BC-V_data_converter-master/app/meg_label.mat');
-            channel = lab.Channel1;
-            lim     = length(channel);
+            lab         = load('/home/Ian/Documents/meg-tool/BC-V_data_converter-master/app/meg_label.mat');
+            channel     = lab.Channel1;
+            lim         = length(channel);
             for i=1:lim
                 ni = string(channel(i).Name);
                 name(i) = ni ;
             end
-            name = name';
-            MEG.labels =name;
+            name        = name';
+            MEG.labels  = name;
         end
 end
 try

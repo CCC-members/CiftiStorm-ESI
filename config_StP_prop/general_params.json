@@ -1,11 +1,11 @@
 {
     "description":"",
     "params":{
-        "modality":"MEG",
-        "name":"HeadModel_HCP_BigBrain",
+        "modality":"EEG",
+        "name":"HeadModel_EEG",
         "description":"",
         "colormap":"tools/mycolormap.mat",
-        "protocol_name":"HeadModel_HCP_BigBrain",
+        "protocol_name":"HeadModel_EEG_Test",
         "protocol_subjet_count":10,
         "protocol_reset":true,
         "use_default_anatomy":false,
@@ -26,7 +26,7 @@
         },
         "bcv_config":{
             "export":true,
-            "export_path":"Z:/data3_260T/data/CCLAB_DATASETS/BigBrain/Processes/BC-V_Structure/HCP"
+            "export_path":"Z:/data3_260T/data/CCLAB_DATASETS/Covid/Corrected/BC-V_Structure/Corrected_June/Pathol_manual_&_auto"
         },
         "tmp_path":{
             "description":"",
@@ -34,7 +34,7 @@
         },
         "reports":{
             "description":"",
-            "output_path":"E:/Data/BigBrain"
+            "output_path":"E:/Data/Covid/BST_Output"
         }                
     }
 }
