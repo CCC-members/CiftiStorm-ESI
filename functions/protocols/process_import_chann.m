@@ -17,7 +17,8 @@ switch type
             iLayout                 = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
             ChannelFile             = bstDefaults(iGroup).contents(iLayout).fullpath;
             FileFormat              = 'BST';
-            [~, ChannelFile, ~]     = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);        
+            [ChannelFile,  ChannelMat, ChannelReplace, ChannelAlign, Modality] = db_set_channel( iStudy, ChannelFile, 1, 0 );
+%             [~, ChannelFile, ~]     = import_channel(iStudy, ChannelFile, FileFormat, 2, 2, 1, 1, 1);        
     case 'individual'
         % Process: Create link to raw file
         format = channel_params.data_format;

@@ -16,7 +16,7 @@ if(isempty(events))
         if( isfield(EEG,'TW') && ~isempty(EEG.TW))
             EEGs    = rejtime_by_segments(EEG);
         else
-            EEGs    = [];
+            EEGs    = EEG;
         end
     else
         EEGs        = EEG;
