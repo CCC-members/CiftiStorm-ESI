@@ -16,10 +16,5 @@ switch anat_modality
         subj_error = headmodel_indiv_anat(properties);
 end
 
-channel_error = process_import_channel(properties);
-prep_data = process_import_prep_data(properties);
-qc_error = process_qc(properties);
-
-
 end
 

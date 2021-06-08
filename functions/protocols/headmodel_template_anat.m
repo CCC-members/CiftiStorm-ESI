@@ -426,7 +426,7 @@ else
 end
 subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
 if(isempty(subjects))
-    fprintf(2,strcat('\n -->> Error: We can not find any subject data: \n'));
+    fprintf(2,strcat('-->> Error: We can not find any subject data: \n'));
     fprintf(2,strcat('-->> Do not exist the Raw data Or the Preprocessed data. \n'));
     fprintf(2,strcat('-->> Please configure the properties file correctly. \n'));
     return;

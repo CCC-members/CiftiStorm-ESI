@@ -3,7 +3,7 @@
     "params":{
         "anatomy_type":{
             "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-            "type":1,
+            "type":2,
             "type_list":[
                 {
                     "name":"default_anatomy",            
@@ -46,9 +46,9 @@
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample each surface: default <<8000>>",
             "gener_BEM_surf":true,
-            "nverthead":8000,
-            "nvertcortex":8000,
-            "nvertskull":8000
+            "nverthead":4000,
+            "nvertcortex":4000,
+            "nvertskull":4000
         }
     }
 }
