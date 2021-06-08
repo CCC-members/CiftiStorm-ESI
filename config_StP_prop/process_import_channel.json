@@ -17,7 +17,7 @@
                     "name":"import_channel",
                     "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
                     "group_layout_name":"ICBM152",
-                    "channel_layout_name":"10-20 19"                    
+                    "channel_layout_name":"BioSemi 32"                    
                 },
                 {
                     "name":"template_data",
@@ -31,6 +31,6 @@
 
             ]
         },
-        "channel_label_file":"labels_chbm_10_20_19Ch.json"
+        "channel_label_file":"Biosemi_32.json"
     }
 }
