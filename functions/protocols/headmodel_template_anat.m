@@ -247,10 +247,12 @@ close(hFigMri15);
 %% ===== IMPORT CHANNEL =====
 %%
 iSurfaces = {iScalp, iOuterSkull, iInnerSkull, iCortex};
-if(isequal(properties.channel_params.channel_type.type,2))
-    channel_type = 'default';
-else
+if(isequal(properties.channel_params.channel_type.type,3))
     channel_type = 'template';
+elseif(isequal(properties.channel_params.channel_type.type,1))
+    channel_type = 'individual';    
+else
+    channel_type = 'default';
 end
 [ChannelFile, channel_error] = process_import_chann(properties, channel_type, subID,iSurfaces);
 

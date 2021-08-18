@@ -9,13 +9,18 @@ if(properties.clean_data.run)
         toolbox_path    = properties.clean_data.toolbox_path;
         max_freq        = properties.clean_data.max_freq;            
         select_events   = properties.clean_data.select_events;
+        if(isequal(properties.name,'raw_data'))
+           use_raw_data = true; 
+        else
+            use_raw_data = false;
+        end
         %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
         if(exist('user_labels','var'))
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                'labels', user_labels, 'select_events', select_events);
+                'labels', user_labels, 'select_events', select_events, 'use_raw_data', use_raw_data);
         else
             EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                 'select_events', select_events);
+                 'select_events', select_events, 'use_raw_data', use_raw_data);
         end
         for i=1:length(EEGs)
             EEGs(i).labels   = {EEGs(i).chanlocs(:).labels};

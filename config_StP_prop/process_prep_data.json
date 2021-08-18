@@ -3,18 +3,23 @@
     "params":{
         "process_type":{
             "description":"Select the type of preprocessed data to use.<<0>> do not import preprocessed data. <<1>> use raw data. <<2>> Import preprocessed data",
-            "type":2,
+            "type":1,
             "type_list":[
                 {
                     "name":"raw_data",            
-                    "description":""
+                    "description":"",
+                    "subID_prefix":"",
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI-HBN_data/whole_eeg/SubID",
+                    "file_location":"EEG/raw/mff_format/SubID",
+                    "format":"mff",
+                    "isfile":false
                 },
                 {
                     "name":"preprocessed_data",
                     "description":"Preprocessed data params. You can not remove the <<SubID>> generic part",
-                    "base_path":"E:/Data/Joan/Data/SubID",
-                    "file_location":"eeg.mat",
-                    "format":"matrix"
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/Covid/Corrected_June_All/Data/Controls/SubID",
+                    "file_location":"SubID.plg",
+                    "format":"plg"
                 } 
             ]
         },        

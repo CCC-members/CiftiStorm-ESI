@@ -33,6 +33,10 @@ switch type
         base_path           =  strrep(anatomy_type.base_path,'SubID',subID);
         filepath            = strrep(anatomy_type.Atlas_seg_location,'SubID',subID);
         Atlas_seg_location  = fullfile(base_path,filepath);
+        % Add this sentence in import_label function in line 80
+        %  case '.gz',     FileFormat = 'MRI-MASK-MNI';
+        % modify import_label function in line 341 
+        %  sMriMask = in_mri(LabelFiles{iFile}, 'ALL-MNI', 0, 0);         
         import_label(sSubject.Surface(sSubject.iCortex).FileName,Atlas_seg_location,0);
 end
 

@@ -91,7 +91,7 @@ switch lower(data_type)
         load(file_name);
         load('templates/EEG_template.mat');
         EEG.srate   = 128;
-        EEG.data    = eeg;
+        EEG.data    = data;
         EEG.nbchan  = size(EEG.data,1);
         EEG.pnts    = size(EEG.data,2);
         EEG.xmin    = 0;
@@ -151,6 +151,8 @@ switch lower(data_type)
         EEG.min                 = 0;
         EEG.max                 = EEG.xmin+(EEG.pnts-1)*(1/EEG.srate);
         EEG.times               = (0:EEG.pnts-1)/EEG.srate.*1000;
+    case 'mff'
+        [EEG, com] = pop_mffimport(file_name, 'code');
 end
 EEG.setname     = subID;
 EEG.subID       = subID;

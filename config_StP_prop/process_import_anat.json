@@ -3,7 +3,7 @@
     "params":{
         "anatomy_type":{
             "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-            "type":2,
+            "type":3,
             "type_list":[
                 {
                     "name":"default_anatomy",            
@@ -24,10 +24,11 @@
                 {
                     "name":"hcp_anat_individual",
                     "description":"",
-                    "base_path":"E:/Data/Conectome/HCP_data/SubID",
-                    "file_location":"T1w/T1w_acpc_dc.nii.gz",
-                    "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
-                    "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
+                    "subID_prefix":"P-",
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_P/155_CMI/ciftify/P-SubID",
+                    "file_location":"T1w/T1w.nii.gz",
+                    "L_surface_location":"T1w/fsaverage_LR32k/P-SubID.L.midthickness.32k_fs_LR.surf.gii",
+                    "R_surface_location":"T1w/fsaverage_LR32k/P-SubID.R.midthickness.32k_fs_LR.surf.gii",
                     "Atlas_seg_location":"T1w/aparc.a2009s+aseg.nii.gz"
                 }
             ]
@@ -38,17 +39,17 @@
             "file_location":"MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"E:/Data/Joan/Non_brain/SubID",
-            "head_file_location":"SubID_outskin_mesh.nii.gz",
-            "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
-            "innerfile_file_location":"SubID_inskull_mesh.nii.gz"
+            "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_P/155_CMI/non-brain/P-SubID",
+            "head_file_location":"P-SubID_outskin_mesh.nii.gz",
+            "outerfile_file_location":"P-SubID_outskull_mesh.nii.gz",
+            "innerfile_file_location":"P-SubID_inskull_mesh.nii.gz"
         },
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample each surface: default <<8000>>",
             "gener_BEM_surf":true,
-            "nverthead":4000,
-            "nvertcortex":4000,
-            "nvertskull":4000
+            "nverthead":8000,
+            "nvertcortex":8000,
+            "nvertskull":8000
         }
     }
 }
