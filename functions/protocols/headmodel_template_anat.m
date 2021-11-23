@@ -15,38 +15,17 @@ subj_error = [];
 modality                = properties.general_params.modality;
 anatomy_type            = properties.anatomy_params.anatomy_type.type_list{2};
 subID                   = anatomy_type.template_name;
-ProtocolName            = properties.general_params.protocol_name;
+ProtocolName            = properties.general_params.bst_config.protocol_name;
 ProtocolName_R          = strcat(ProtocolName,'_Template');
 subjects_process_error  = [];
 subjects_processed      = [];
 report_output_path      = properties.general_params.reports.output_path;
-protocol_reset          = properties.general_params.protocol_reset;
+protocol_reset          = properties.general_params.bst_config.protocol_reset;
 
 %%
-%% Checking the report output structure
+%% Getting report path
 %%
-if(report_output_path == "local")
-    report_output_path = pwd;
-end
-if(~isfolder(report_output_path))
-    mkdir(report_output_path);
-end
-if(~isfolder(fullfile(report_output_path,'Reports')))
-    mkdir(fullfile(report_output_path,'Reports'));
-end
-if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName)))
-    mkdir(fullfile(report_output_path,'Reports',ProtocolName));
-end
-if(~isfolder(fullfile(report_output_path,'Reports',ProtocolName,subID)))
-    mkdir(fullfile(report_output_path,'Reports',ProtocolName,subID));
-end
-subject_report_path = fullfile(report_output_path,'Reports',ProtocolName,subID);
-report_name         = fullfile(subject_report_path,[subID,'.html']);
-iter                = 2;
-while(isfile(report_name))
-    report_name     = fullfile(subject_report_path,[subID,'_Iter_', num2str(iter),'.html']);
-    iter            = iter + 1;
-end
+[subject_report_path] = get_report_path(properties, subID);
 
 %%
 %% Genering Subject Template
@@ -243,6 +222,45 @@ savefig( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI regist
 % Close figures
 close(hFigMri15);
 
+
+%%
+%% Process: Import Atlas
+%%
+if(isfield(properties.anatomy_params.anat_config,'default_atlas'))
+    atlas_type = 'default';
+else
+    atlas_type = 'template';
+end
+atlas_error = process_import_atlas(properties, atlas_type, subID);
+
+%%
+%% Quality control
+%%
+%
+%             panel_scout('SetScoutsOptions',0, 0, 1, 'all', 0.7, 0, 0, 0);
+%             panel_scout('SetScoutContourVisible',0, 1);
+%             panel_scout('SetScoutTextVisible',0, 1);
+%             panel_scout('SetDefaultOptions',1);
+hFigSurf24 = view_surface(CortexFile);
+% Deleting the Atlas Labels and Countour from Cortex
+delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
+delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));
+delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
+
+bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
+savefig( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
+%Left
+view(1,180)
+bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
+% Bottom
+view(90,270)
+bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
+% Rigth
+view(0,360)
+bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
+% Closing figure
+close(hFigSurf24)
+
 %%
 %% ===== IMPORT CHANNEL =====
 %%
@@ -332,89 +350,9 @@ else
 end
 
 %%
-%% Process: Import Atlas
-%%
-if(isfield(properties.anatomy_params.anat_config,'default_atlas'))
-    atlas_type = 'default';
-else
-    atlas_type = 'template';
-end
-atlas_error = process_import_atlas(properties, atlas_type, subID);
-
-%%
-%% Quality control
-%%
-%
-%             panel_scout('SetScoutsOptions',0, 0, 1, 'all', 0.7, 0, 0, 0);
-%             panel_scout('SetScoutContourVisible',0, 1);
-%             panel_scout('SetScoutTextVisible',0, 1);
-%             panel_scout('SetDefaultOptions',1);
-hFigSurf24 = view_surface(CortexFile);
-% Deleting the Atlas Labels and Countour from Cortex
-delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
-delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));
-delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
-
-bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
-savefig( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
-%Left
-view(1,180)
-bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
-% Bottom
-view(90,270)
-bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
-% Rigth
-view(0,360)
-bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
-% Closing figure
-close(hFigSurf24)
-
-%%
 %% Getting Headmodeler options
 %%
-[sStudy iStudy] = bst_get('Study');
-if(isempty(iStudy) || isequal(sStudy.Name,'@default_study'))
-    [sStudy, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
-end
-headmodel_options = get_headmodeler_options(modality, subID, iStudy);
-
-%%
-%% Process: OpenMEEG
-%%
-[headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
-if(~isempty(headmodel_options))
-    sStudy = bst_get('Study', iStudy);
-    % If a new head model is available
-    sHeadModel                      = db_template('headmodel');
-    sHeadModel.FileName             = file_short(headmodel_options.HeadModelFile);
-    sHeadModel.Comment              = headmodel_options.Comment;
-    sHeadModel.HeadModelType        = headmodel_options.HeadModelType;
-    % Update Study structure
-    iHeadModel                      = length(sStudy.HeadModel) + 1;
-    sStudy.HeadModel(iHeadModel)    = sHeadModel;
-    sStudy.iHeadModel               = iHeadModel;
-    sStudy.iChannel                 = length(sStudy.Channel);
-    % Update DataBase
-    bst_set('Study', iStudy, sStudy);
-    db_save();
-    
-    %%
-    %% Quality control of Head model
-    %%
-    qc_headmodel(headmodel_options,modality,subject_report_path);
-    
-    %%
-    %% Save and display report
-    %%
-    ReportFile = bst_report('Save', []);
-    bst_report('Export',  ReportFile,report_name);
-    bst_report('Open', ReportFile);
-    bst_report('Close');
-    processed = true;
-    disp(strcat("-->> Process finished for subject: Template"));    
-else
-    subjects_process_error = [subjects_process_error; subID];
-end
+[headmodel_options, errMessage] = process_comp_headmodel(properties, subID);
 
 %%
 %% Geting subjects
@@ -444,10 +382,12 @@ else
             [~,subID,~] = fileparts(subject.name);
         end
         disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
+        disp('=================================================================');
         if(properties.general_params.bcv_config.export)
-            export_subject_BCV_structure(properties,subID,'iTemplate',iSubject,'FSAve_interp',true, 'iter', i);
+            export_subject_BCV_structure(properties,subID,'iTemplate',iSubject,'FSAve_interp',true, 'iter', 2);
         end
         disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+        disp('=================================================================');
     end
 end
 disp(strcat('-->> Process finished....'));

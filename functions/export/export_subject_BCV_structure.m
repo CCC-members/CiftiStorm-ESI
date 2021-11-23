@@ -40,7 +40,7 @@ disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
 %% Genering leadfield file
 %%
 disp ("-->> Genering leadfield file");
-[HeadModels,iHeadModel,modality] = get_headmodels(ProtocolInfo.STUDIES,sStudy);
+[HeadModel,iHeadModel,modality] = get_headmodels(ProtocolInfo.STUDIES,sStudy);
 
 %%
 %% Genering Channels file
@@ -81,15 +81,14 @@ elseif(isequal(properties.prep_data_params.process_type.type,2))
 end
 if(exist('data_path','var') && (isfile(data_path) || isfolder(data_path)))    
     disp ("-->> Genering MEG/EEG file");
+    preprocessed_data.general_params = properties.general_params;
     preprocessed_data.clean_data = properties.prep_data_params.clean_data;
     preprocessed_data.channel_label_file = properties.channel_params.channel_label_file;
-    [HeadModels,Cdata, MEEGs] = load_preprocessed_data(modality,subID,preprocessed_data,data_path,HeadModels,Cdata);
+    [HeadModels,Cdatas, MEEGs] = load_preprocessed_data(modality,subID,preprocessed_data,data_path,HeadModel,Cdata);
 else
     export_error = "Missing preprocessed data";
     return;
 end
-
-scalp.Cdata     = Cdata;
 
 %%
 %% Creating structure for the subject and save the output files
@@ -97,6 +96,6 @@ scalp.Cdata     = Cdata;
 if(~exist('MEEGs','var') && isempty(MEEGs))
     MEEGs.subID = subID;   
 end
-save_output_files(properties,modality,MEEGs,HeadModels,iHeadModel,scalp,outerS,innerS,surf);
+save_output_files(properties,modality,MEEGs,HeadModels,Cdatas,scalp,outerS,innerS,surf);
 end
 

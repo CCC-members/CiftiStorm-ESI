@@ -15,7 +15,7 @@
                     "name":"hcp_anat_template",
                     "description":"Use this configuration as anatomy template",
                     "template_name":"ICBM152_2019",
-                    "base_path":"E:/Data/Joan/Ciftify",
+                    "base_path":"E:/Data/Template/Ciftify",
                     "file_location":"T1w/T1w.nii.gz",
                     "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
                     "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
@@ -24,11 +24,11 @@
                 {
                     "name":"hcp_anat_individual",
                     "description":"",
-                    "subID_prefix":"P-",
-                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_P/155_CMI/ciftify/P-SubID",
+                    "subID_prefix":"",
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/update_data/ciftify/SubID",
                     "file_location":"T1w/T1w.nii.gz",
-                    "L_surface_location":"T1w/fsaverage_LR32k/P-SubID.L.midthickness.32k_fs_LR.surf.gii",
-                    "R_surface_location":"T1w/fsaverage_LR32k/P-SubID.R.midthickness.32k_fs_LR.surf.gii",
+                    "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
+                    "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
                     "Atlas_seg_location":"T1w/aparc.a2009s+aseg.nii.gz"
                 }
             ]
@@ -39,10 +39,10 @@
             "file_location":"MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_P/155_CMI/non-brain/P-SubID",
-            "head_file_location":"P-SubID_outskin_mesh.nii.gz",
-            "outerfile_file_location":"P-SubID_outskull_mesh.nii.gz",
-            "innerfile_file_location":"P-SubID_inskull_mesh.nii.gz"
+            "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/update_data/non-brain/SubID",
+            "head_file_location":"SubID_outskin_mesh.nii.gz",
+            "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
+            "innerfile_file_location":"SubID_inskull_mesh.nii.gz"
         },
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample each surface: default <<8000>>",

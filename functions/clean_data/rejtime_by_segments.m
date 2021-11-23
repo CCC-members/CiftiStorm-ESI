@@ -1,7 +1,7 @@
-function newEEG = rejtime_by_segments(EEG,varargin)
+function newEEG = rejtime_by_segments(EEG,source,varargin)
 
 if(isequal(nargin,1))
-     regions = [EEG.TW];
+    regions = [EEG.TW];
     rej_regions = [];
     for i=1:length(regions)
         if(isempty(rej_regions))
@@ -14,7 +14,7 @@ if(isequal(nargin,1))
         end
     end
     time_start          = regions(end).end + 1;
-    time_end            = length(EEG.times) ;    
+    time_end            = length(EEG.times) ;
     rej_regions         = [rej_regions; time_start time_end];
     
     newEEG                 = eeg_eegrej(EEG, rej_regions);
@@ -28,15 +28,25 @@ else
     sufix               = events_translate{row,end};
     EEG.setname         = strcat(EEG.setname,'_',sufix) ;
     EEG.subID           = strcat(EEG.setname) ;
-    regions             = [EEG.TW];
-    
+    EEG.subID_sufix     = sufix ;
+    if(isequal(source,'TW'))
+        regions             = [EEG.TW];
+    elseif(isequal(source,'derivatives'))
+        regions = EEG.derivatives;
+        for i=1:length(regions.label)
+            TW(i).type = regions.label{i};
+            TW(i).start = regions.onset(i)*200;
+            TW(i).end = regions.onset(i)*200 + regions.duration(i)*200;
+        end
+        regions = [TW];
+    else
+    end
     select_regions      = zeros(1,length(regions));
     for i=1:size(events_translate,2)
-        select_regions_part     = strcmp({regions.type}, events_translate{row,i});        
+        select_regions_part     = strcmp({regions.type}, events_translate{row,i});
         select_regions          = select_regions + select_regions_part;
-    end    
+    end
     regions(find(select_regions==0)) = [];
-    
     if(~isempty(regions))
         rej_regions = [];
         for i=1:length(regions)
@@ -50,7 +60,7 @@ else
             end
         end
         time_start          = regions(end).end + 1;
-        time_end            = length(EEG.times);        
+        time_end            = length(EEG.times);
         rej_regions         = [rej_regions; time_start time_end];
         
         newEEG              = eeg_eegrej(EEG, rej_regions);

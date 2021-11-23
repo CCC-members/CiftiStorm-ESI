@@ -1,14 +1,13 @@
-function  options = get_headmodeler_options(modality, subID, iStudy)
-%GET_HEADMODELER_OPTIONS Summary of this function goes here
-%   Detailed explanation goes here
+function [headmodel_options, errMessage] = process_comp_headmodel(properties, subID)
 
 %%
-%% Get Protocol information
+%% Getting Headmodel options
 %%
+% Get Protocol information
 ProtocolInfo                = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject]                  = bst_get('Subject', subID);
-
+[sStudies, iStudy]          = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 sStudy                      = bst_get('Study', iStudy);
 options                     = struct();
 
@@ -23,8 +22,8 @@ options.Channel             = BSTChannels.Channel;
 options.ECOGMethod          = '';
 options.SEEGMethod          = '';
 options.HeadCenter          = [];
-options.Radii               = [0.88,0.93,1];
-options.Conductivity        = [0.33,0.0042,0.33];
+options.Radii               = properties.headmodel_params.general.radii';
+options.Conductivity        = properties.headmodel_params.general.conductivity';
 options.SourceSpaceOptions  = [];
 % Uploading head
 ScalpFile                   = sSubject.Surface(sSubject.iScalp).FileName;
@@ -47,7 +46,7 @@ options.GridAtlas           = [];
 options.Interactive         = true;
 options.SaveFile            = true;
 
-if(isequal(modality,'EEG'))
+if(isequal(properties.general_params.modality,'EEG'))
     
     options.Comment         = 'OpenMEEG BEM';
     options.MegRefCoef      = [];
@@ -79,5 +78,45 @@ else
     options.EEGMethod       = '';
     options.OuterSkullFile  = [];
 end
+
+%%
+%% Computing Headmodel 
+%%
+[headmodel_options, errMessage] = bst_headmodeler(options);
+
+sStudy = bst_get('Study', iStudy);
+% If a new head model is available
+sHeadModel                      = db_template('headmodel');
+sHeadModel.FileName             = file_short(headmodel_options.HeadModelFile);
+sHeadModel.Comment              = headmodel_options.Comment;
+sHeadModel.HeadModelType        = headmodel_options.HeadModelType;
+% Update Study structure
+iHeadModel                      = length(sStudy.HeadModel) + 1;
+sStudy.HeadModel(iHeadModel)    = sHeadModel;
+sStudy.iHeadModel               = iHeadModel;
+sStudy.iChannel                 = length(sStudy.Channel);
+% Update DataBase
+bst_set('Study', iStudy, sStudy);
+db_save();
+
+%%
+%% Quality control of Head model
+%%
+%%
+%% Checking the report output structure
+%%
+[subject_report_path, report_name] = get_report_path(properties, subID);
+qc_headmodel(headmodel_options,properties.general_params.modality,subject_report_path);
+
+%%
+%% Save and display report
+%%
+ReportFile = bst_report('Save', []);
+bst_report('Export',  ReportFile,report_name);
+bst_report('Open', ReportFile);
+bst_report('Close');
+processed = true;
+disp(strcat("-->> Process finished for subject: Template"));
+
 end
 

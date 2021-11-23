@@ -1,0 +1,38 @@
+{
+    "description":"",
+    "params":{
+        "general":{
+            "radii":[0.88,0.93,1],
+            "conductivity":[0.33,0.0042,0.33]
+        },
+        "method_type":{
+            "description":"Default:<<1>>. Select the method to compute the headmodel. <<1>> OpenMEEG BEM. <<2>> Overlapping spheres <<3>> Duneuro FEM",
+            "type":1,
+            "type_list":[
+                {
+                    "name":"OpenMEEG BEM",            
+                    "description":"Select the group and name of the sensor layout. See app/bst_default_anatomy.json file and select all params from there",
+                    "EEGMethod":"openmeeg",
+                    "BemNames":["Scalp","Skull","Brain"],
+                    "BemCond":[1,0.0125,1],
+                    "BemSelect":[true,true,true],
+                    "isAdjoint":false,
+                    "isAdaptative":true,
+                    "isSplit":false,
+                    "SplitLength":4000
+                },
+                {
+                    "name":"Overlapping spheres",
+                    "description":"Use this configuration as anatomy template",
+                    "MEGMethod":"os_meg"
+                },
+                {
+                    "name":"DUNEuro FEM",
+                    "description":"",
+                    "FemCond":[1.79,0.0080,0.43],
+                    "FemSelect":[1,1,1]
+                }
+            ]
+        }
+    }
+}

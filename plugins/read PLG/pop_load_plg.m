@@ -8,7 +8,7 @@ if (nargin == 0)
     [filename, pathname] = uigetfile('*.plg', 'Load a PLG-file');
     if filename == 0 return; end;
 
-    [pathname, filename, extname] = fileparts([pathname filename]);
+    [pathname, filename, extname] = fileparts(fullfile(pathname, filename));
 else
     filename = varargin{1};
     [pathname, filename, extname] = fileparts(filename);

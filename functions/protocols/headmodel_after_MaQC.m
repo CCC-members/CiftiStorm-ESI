@@ -63,11 +63,12 @@ for i=1:length(ProtocolFiles)
     subjects            = bst_get('ProtocolSubjects');
     for j=1:length(subjects.Subject)   
         sSubject        = subjects.Subject(j);     
-        subID           = sSubject.Name;
+        subID           = sSubject.Name;        
         if(isempty(find(ismember(subject_correct,subID),1)))
             continue;
         end
-       
+        disp(strcat('-->> Processing subject: ', subID));
+        disp('=================================================================');
         %%
         %% Checking the report output structure
         %%
@@ -197,7 +198,7 @@ for i=1:length(ProtocolFiles)
         %% Test
         %%
         %%
-        script_tess_force_envelope(CortexFile, InnerSkullFile);
+%         script_tess_force_envelope(CortexFile, InnerSkullFile);
         
         sSubject        = bst_get('Subject', subID);
         MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
@@ -336,7 +337,6 @@ for i=1:length(ProtocolFiles)
             bst_report('Open', ReportFile);
             bst_report('Close');
             processed = true;
-            disp(strcat("-->> Process finished for subject: ", subID));
           
             %%
             %% Export Subject to BC-VARETA
@@ -347,7 +347,8 @@ for i=1:length(ProtocolFiles)
                     export_subject_BCV_structure(properties,subID);
                 end
             end   
-            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+            disp(strcat('-->> Subject:' , subID, '. Processing finished.'));            
+            disp('=================================================================');
         end
     end
 end

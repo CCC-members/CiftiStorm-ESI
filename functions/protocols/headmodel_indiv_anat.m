@@ -23,11 +23,13 @@ anatomy_type            = properties.anatomy_params.anatomy_type.type_list{3};
 disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
 [base_path,name,ext] = fileparts(anatomy_type.base_path);
 subjects = dir(base_path);
+% load("templates/good_cases_wMRI_Usama.mat");
+% subjects(~ismember( {subjects.name}, IDg)) = []; 
 subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
 subjects_process_error = [];
 subjects_processed =[];
-Protocol_count = 140;
-for j=151:length(subjects)
+Protocol_count = 0;
+for j=1:length(subjects)
     subject_name = subjects(j).name;
     if(isequal(anatomy_type.subID_prefix,'none') || isempty(anatomy_type.subID_prefix))
         subID = subject_name;
@@ -36,7 +38,7 @@ for j=151:length(subjects)
         subID = strrep(subject_name, subID_prefix,'');
     end
     disp(strcat('-->> Processing subject: ', subID));
-    
+    disp('=================================================================');
     %%
     %% Checking the report output structure
     %%
@@ -282,6 +284,41 @@ for j=151:length(subjects)
         close(hFigMri15);
         
         %%
+        %% Process: Import Atlas
+        %%
+        atlas_error = process_import_atlas(properties, 'individual', subID);
+        
+        %%
+        %% Quality control
+        %%
+        panel_scout('SetScoutsOptions', 0, 0, 1, 'all', 1, 0, 0, 0);
+        panel_scout('UpdateScoutsDisplay', 'all');
+        panel_scout('SetScoutContourVisible', 0, 0);        
+        panel_scout('SetScoutTransparency', 0);
+        panel_scout('SetScoutTextVisible', 0, 1);
+        
+        hFigSurf24 = view_surface(CortexFile);
+        % Deleting the Atlas Labels and Countour from Cortex
+        
+        delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
+        delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));
+        delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
+        
+        bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
+        savefig( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
+        %Left
+        view(1,180);
+        bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
+        % Bottom
+        view(90,270);
+        bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
+        % Rigth
+        view(0,360);
+        bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
+        % Closing figure
+        close(hFigSurf24);
+        
+        %%
         %% ===== IMPORT CHANNEL =====
         %%
         iSurfaces = {iScalp, iOuterSkull, iInnerSkull, iCortex};
@@ -370,98 +407,22 @@ for j=151:length(subjects)
             % Close figures
             close(hFigScalp20);
         end
-        %%
-        %% Process: Import Atlas
-        %%
-        atlas_error = process_import_atlas(properties, 'individual', subID);
-        
-        %%
-        %% Quality control
-        %%
-        panel_scout('SetScoutsOptions', 0, 0, 1, 'all', 1, 0, 0, 0);
-        panel_scout('UpdateScoutsDisplay', 'all');
-        panel_scout('SetScoutContourVisible', 0, 0);        
-        panel_scout('SetScoutTransparency', 0);
-        panel_scout('SetScoutTextVisible', 0, 1);
-        
-        hFigSurf24 = view_surface(CortexFile);
-        % Deleting the Atlas Labels and Countour from Cortex
-        
-        delete(findobj(hFigSurf24, 'Tag', 'ScoutLabel'));
-        delete(findobj(hFigSurf24, 'Tag', 'ScoutMarker'));
-        delete(findobj(hFigSurf24, 'Tag', 'ScoutContour'));
-        
-        bst_report('Snapshot',hFigSurf24,[],'surface view', [200,200,750,475]);
-        savefig( hFigSurf24,fullfile(subject_report_path,'Surface view.fig'));
-        %Left
-        view(1,180);
-        bst_report('Snapshot',hFigSurf24,[],'Surface left view', [200,200,750,475]);
-        % Bottom
-        view(90,270);
-        bst_report('Snapshot',hFigSurf24,[],'Surface bottom view', [200,200,750,475]);
-        % Rigth
-        view(0,360);
-        bst_report('Snapshot',hFigSurf24,[],'Surface right view', [200,200,750,475]);
-        % Closing figure
-        close(hFigSurf24);
-        
+                
         %%
         %% Getting Headmodeler options
-        %%        
-        [sStudy, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');                
-        headmodel_options = get_headmodeler_options(modality, subID, iStudy);
-        
         %%
-        %% Process: OpenMEEG
+        [headmodel_options, errMessage] = process_comp_headmodel(properties, subID);
+
+        %     catch
+        %         subjects_process_error = [subjects_process_error; subID];
+        %         [~, iSubject] = bst_get('Subject', subID);
+        %         db_delete_subjects( iSubject );
+        %         processed = false;
+        %         continue;
+        %     end
         %%
-        [headmodel_options, errMessage] = bst_headmodeler(headmodel_options);
-        
-        if(~isempty(headmodel_options))
-            sStudy = bst_get('Study', iStudy);
-            % If a new head model is available
-            sHeadModel = db_template('headmodel');
-            sHeadModel.FileName      = file_short(headmodel_options.HeadModelFile);
-            sHeadModel.Comment       = headmodel_options.Comment;
-            sHeadModel.HeadModelType = headmodel_options.HeadModelType;
-            % Update Study structure
-            iHeadModel = length(sStudy.HeadModel) + 1;
-            sStudy.HeadModel(iHeadModel) = sHeadModel;
-            sStudy.iHeadModel = iHeadModel;
-            sStudy.iChannel = length(sStudy.Channel);
-            % Update DataBase
-            bst_set('Study', iStudy, sStudy);
-            db_save();
-            
-            %%
-            %% Quality control of Head model
-            %%
-            qc_headmodel(headmodel_options,modality,subject_report_path);
-            
-            %%
-            %% Save and display report
-            %%
-            ReportFile = bst_report('Save', sFiles);
-            bst_report('Export',  ReportFile,report_name);
-            bst_report('Open', ReportFile);
-            bst_report('Close');
-            processed = true;
-            disp(strcat("-->> Process finished for subject: ", subID));
-            
-            Protocol_count = Protocol_count+1;
-        else
-            subjects_process_error = [subjects_process_error; subID];
-            continue;
-        end
-%     catch
-%         subjects_process_error = [subjects_process_error; subID];
-%         [~, iSubject] = bst_get('Subject', subID);
-%         db_delete_subjects( iSubject );
-%         processed = false;
-%         continue;
-%     end
-    %%
-    %% Export Subject to BC-VARETA
-    %%
+        %% Export Subject to BC-VARETA
+        %%
     if(processed)
         disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
         if(properties.general_params.bcv_config.export)
@@ -478,6 +439,7 @@ for j=151:length(subjects)
         %                     generate_MaQC_file();
     end
     disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+    disp('=================================================================');
     
 end
 disp(strcat('-->> Process finished....'));

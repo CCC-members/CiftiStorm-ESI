@@ -2,7 +2,7 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %% Example of batch code to reject bad channels...
 %
 %
-%  Usage:    >> EEG = eeglab_preproc( subID, file_name, data_type, eeglab_path, 'key2', value1, 'key2', value2, ... );
+%  Usage:    >> EEGs = eeglab_preproc( subID, file_name, data_type, eeglab_path, 'key2', value1, 'key2', value2, ... );
 %
 %
 % Inputs:
@@ -30,12 +30,16 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %                   ranges in the middle of epochs cannot be removed from epoched data.
 %   use_raw_data    - Import data from raw data (key='use_raw_data',value=true OR false)
 %
+% Outputs:
+%   EEGs            - Cleanned EEGs structure
+%
+%
 % Author: Eduardo Gonzalez-Moreira
 % Date: Oct-2020
 %
 %
-% Updates by:   Ariosky Areces Gonzalez
-%               Deirel Paz Linares
+% Updates by:   Ariosky Areces-Gonzalez
+%               Deirel Paz-Linares
 %
 
 %%
@@ -52,7 +56,7 @@ end
 
 % Initializing empty params
 if(~exist('verbosity','var'))
-    verbosity = true;
+    verbosity           = true;
 end
 if(~exist('max_freq','var'))
     max_freq = 90;
@@ -68,7 +72,7 @@ switch lower(data_type)
     case 'mat'
         load(file_name);
         if(use_raw_data)
-           EEG = F.header.EEG; 
+            EEG = F.header.EEG;
         else
             srate       = SAMPLING_FREQ;
             % For Pedrito's data selection
@@ -101,7 +105,7 @@ switch lower(data_type)
             EEG.chanlocs(length(labels)+1:end,:)    = [];
             new_labels                              = labels;
             [EEG.chanlocs.labels]                   = new_labels{:};
-        end        
+        end
     case 'dat'
         EEG         = pop_loadBCI2000(file_name);
     case 'plg'
@@ -166,37 +170,50 @@ end
 %% Step 4: Visualization.
 if verbosity
     eegplot(EEG.data);
+    FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
+    FigHandle   = FigList(1);
+    FigName     = 'EGG signal.fig';
+    savefig(FigHandle, fullfile(save_path, FigName));
+    close(FigHandle);
 end
 
-%% Step 5: Appling notch filter to 6Hz.
+%% Step 5: Appling notch filter to 60Hz.
 % EEG = pop_cleanline(EEG,'arg_direct',0,'linefreqs',60,'scanforlines',1,'p',0.01,...
 %     'bandwidth',2,'sigtype','Channels','chanlist',1:EEG.nbchan,'taperbandwidth',2,...
 %     'winsize',4,'winstep',1,'tau',100,'pad',2,'computepower',1,'normSpectrum',1,'verb',1,'plotfigures',0);
 
 %% Step 6: Downsample the data.
 if EEG.srate > 300
-    EEG = pop_resample(EEG, 200);
+    EEG     = pop_resample(EEG, 200);
 end
 
 %% Step 7: Filtering the data at 0Hz and Max frequency Hz.
-EEG = pop_eegfiltnew(EEG, 'locutoff', 0, 'hicutoff',max_freq, 'filtorder', 3300);
+EEG         = pop_eegfiltnew(EEG, 'locutoff', 0, 'hicutoff',max_freq, 'filtorder', 3300);
 
 %% Step 8: Import channel info.
-EEG = pop_chanedit(EEG, 'lookup',fullfile(eeglab_path,'plugins/dipfit/standard_BEM/elec/standard_1005.elc'),'eval','chans = pop_chancenter( chans, [],[]);');
-clear_ind = [];
+EEG         = pop_chanedit(EEG, 'lookup',fullfile(eeglab_path,'plugins/dipfit/standard_BEM/elec/standard_1005.elc'),'eval','chans = pop_chancenter( chans, [],[]);');
+clear_ind   = [];
 for i=1:length(EEG.chanlocs)
     if(isempty(EEG.chanlocs(i).X))
         clear_ind = [clear_ind; i];
     end
 end
 EEG.chanlocs(clear_ind) = [];
-EEG.data(clear_ind,:) = [];
-EEG.nbchan = length(EEG.chanlocs);
+EEG.data(clear_ind,:)   = [];
+EEG.nbchan              = length(EEG.chanlocs);
 if verbosity
-    figure;
     [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
+    FigList         = findobj(allchild(0), 'flat', 'Type', 'figure');
+    FigHandle       = FigList(1);
+    FigName         = 'Cross-spectrum.fig';
+    savefig(FigHandle, fullfile(save_path, FigName));
+    close(FigHandle);
 end
-
+if(exist('derivatives','var'))
+    EEG.derivatives = derivatives;
+else
+    EEG.derivatives = [];
+end
 %%
 %%  Step 9: Getting marks and segments
 %%
@@ -204,49 +221,91 @@ EEGs = get_marks_and_segments(EEG, 'select_events', select_events);
 try
     for i=1:length(EEGs)
         EEG = EEGs(i);
-        if verbosity
-            figure;
-            [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
-            eegplot(EEG.data);
+        events      = select_events.events;
+        if(~isempty(events))
+            save_forder = fullfile(save_path,EEG.subID_sufix);
+            if(~isfolder(save_forder))
+                mkdir(save_forder);
+            end
+        else
+            save_forder = save_path;
         end
-              
-        %% Step 10: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
-        EEG_cleaned = clean_artifacts(EEG);
         if verbosity
-            vis_artifacts(EEG_cleaned,EEG);
+            [spectra,freqs] = spectopo(EEG.data,0,EEG.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG.chanlocs,'chaninfo',EEG.chaninfo,'freq',freq_list);
+            FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+            FigHandle = FigList(1);
+            FigName   = 'Cross-spectrum.fig';
+            savefig(FigHandle, fullfile(save_forder, FigName));
+            close(FigHandle);
+            
+            eegplot(EEG.data);
+            FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+            FigHandle = FigList(1);
+            FigName   = 'EGG signal.fig';
+            savefig(FigHandle, fullfile(save_forder, FigName));
+            close(FigHandle);
         end
         
-        %% Step 11: Interpolate all the removed channels.
-        EEG_interp = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
+        %% Step 10: Apply clean_rawdata() to reject bad channels and correct continuous data using Artifact Subspace Reconstruction (ASR).
+        if(clean_art_params.default)
+            EEG_cleaned     = clean_artifacts(EEG);
+        else
+            args            = clean_art_params.arguments;           
+            EEG_cleaned     = clean_artifacts(EEG,'FlatlineCriterion',args.FlatlineCriterion,...
+                                'ChannelCriterion',args.ChannelCriterion,...
+                                'LineNoiseCriterion',args.LineNoiseCriterion,...
+                                'Highpass',args.Highpass,...
+                                'BurstCriterion',args.BurstCriterion,...
+                                'WindowCriterion',args.WindowCriterion,...
+                                'BurstRejection',args.BurstRejection,...
+                                'Distance',args.Distance,...
+                                'WindowCriterionTolerances',args.WindowCriterionTolerances);
+        end
         if verbosity
-            eegplot(EEG_interp.data)
-            figure;
+            vis_artifacts(EEG_cleaned,EEG);
+            FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
+            FigHandle   = FigList(1);
+            FigName     = 'Checking artifacts.fig';
+            savefig(FigHandle, fullfile(save_forder, FigName));
+            close(FigHandle);
+        end
+        
+        if(isequal(lower(chan_action),'interpolate'))
+            %% Step 11: Interpolate all the removed channels.
+            EEG_interp = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
+%         elseif(isequal(lower(chan_action),'reject'))
+%             %% Reject channels
+%             [EEG_interp,EEG_interp.reject.indelec] = pop_rejchan(EEG_cleaned, 'elec', [1:length(EEG_cleaned.chanlocs)], 'threshold', 5, 'norm', 'on', 'measure', 'kurt');
+        else
+            EEG_interp = EEG_cleaned;
+        end
+        %%
+        if verbosity
+            eegplot(EEG_interp.data);
+            FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
+            FigHandle   = FigList(1);
+            FigName     = 'EGG signal_cleaned.fig';
+            savefig(FigHandle, fullfile(save_forder, FigName));
+            close(FigHandle);
+            
             [spectra,freqs] = spectopo(EEG_interp.data,0,EEG_interp.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG_interp.chanlocs,'chaninfo',EEG_interp.chaninfo,'freq',freq_list);
+            FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
+            FigHandle   = FigList(1);
+            FigName     = 'Cross-spectrum_cleaned.fig';
+            savefig(FigHandle, fullfile(save_forder, FigName));
+            close(FigHandle);
         end
         
         %% Step 12: Saving figures
-        if(exist('save_path','var'))
-            if(~isfolder(save_path))
-                mkdir(save_path);
-            end
-            save(fullfile(save_path,strcat(subID, 'EEG_raw.mat')),'EEG','-v7.3');
+        if verbosity
+            save(fullfile(save_forder,strcat(subID, '_EEG_raw.mat')),'-struct','EEG','-v7.3');  
             EEG = EEG_interp;
-            save(fullfile(save_path,strcat(subID, 'EEG_interp.mat')),'EEG','-v7.3');
-            
-            FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
-            for iFig = 1:length(FigList)
-                FigHandle = FigList(iFig);
-                FigName   = get(FigHandle, 'Name');
-                savefig(FigHandle, fullfile(save_path, strcat(subID, '_', num2str(iFig), '.fig')));
-            end
-        else
-            EEG = EEG_interp;
+            save(fullfile(save_forder,strcat(subID, '_EEG_cleaned.mat')),'-struct','EEG','-v7.3');       
         end
+        EEG = EEG_interp;
         EEGs(i) = EEG;
-        close all;
-    end    
+    end
 catch
-    
 end
-close all;
+
 end

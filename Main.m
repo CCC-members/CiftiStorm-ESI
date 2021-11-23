@@ -79,6 +79,7 @@ properties.general_params       = properties.general_params.params;
 properties.anatomy_params       = properties.anatomy_params.params;
 properties.channel_params       = properties.channel_params.params;
 properties.prep_data_params     = properties.prep_data_params.params;
+properties.headmodel_params     = properties.headmodel_params.params;
 properties.qc_params            = properties.qc_params.params;
 
 if(isfile(properties.general_params.colormap))
@@ -120,6 +121,18 @@ if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'openmeeg');
     else
         fprintf(2,"\n ->> Error: We can not install tha openmeeg plugin. Please see the fallow error and restart the process. \n");
+        disp("-->> Message error");
+        disp(errMsg);
+        disp('-->> Process stoped!!!');
+        return;
+    end
+end
+if(isempty(bst_plugin('GetInstalled', 'duneuro')))
+    [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'duneuro', 0, []);
+    if(isOk)
+        [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'duneuro');
+    else
+        fprintf(2,"\n ->> Error: We can not install tha duneuro plugin. Please see the fallow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
         disp('-->> Process stoped!!!');

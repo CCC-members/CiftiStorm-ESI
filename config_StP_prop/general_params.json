@@ -7,14 +7,14 @@
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_CMI",
+            "protocol_name":"HeadModel_Test",
             "protocol_reset":true,
             "protocol_subjet_count":10,            
             "bst_path":"D:/Tools/brainstorm3",
             "db_path":"local",
             "after_MaQC":{
-                "run":true,
-                "cases_file":"Subjects_155.json"
+                "run":false,
+                "cases_file":"CHBM_58_subj.json"
             }
         },        
         "spm_config":{
@@ -23,11 +23,11 @@
         },
         "bcv_config":{
             "export":true,
-            "export_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_june_2021/BC-V_Structure/VNavNorm_T1w"
+            "export_path":"E:/Data/Test"
         },
         "reports":{
             "description":"",
-            "output_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI_encrypted/Run_june_2021/BST_Output/VNavNorm_T1w"
+            "output_path":"E:/Data/Test"
         },
         "tmp_path":{
             "description":"",

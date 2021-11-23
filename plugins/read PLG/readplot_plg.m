@@ -7,12 +7,12 @@ if (nargin == 0)
     [filename, pathname] = uigetfile('*.plg', 'Load a PLG-file');
     if filename == 0 return; end;
 
-    [pathname, filename, extname] = fileparts([pathname filename]);
+    [pathname, filename, extname] = fileparts(fullfile(pathname, filename));
 else
     filename = varargin{1};
     [pathname, filename, extname] = fileparts(filename);
 end
-pathname = [pathname '\'];
+% pathname = [pathname '\'];
 if(strcmp(extname,'xml'))
     [pat_info inf_info plg_info mrk_info win_info cdc_info states_name] = plg_read(fullfile(pathname, filename));
 else

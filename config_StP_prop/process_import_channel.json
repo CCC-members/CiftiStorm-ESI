@@ -19,8 +19,8 @@
                 {
                     "name":"import_channel",
                     "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
-                    "group_layout_name":"Colin27",
-                    "channel_layout_name":"GSN 129"                    
+                    "group_layout_name":"ICBM152",
+                    "channel_layout_name":"10-20 19"                    
                 },
                 {
                     "name":"template_data",
@@ -34,6 +34,6 @@
 
             ]
         },
-        "channel_label_file":"none"
+        "channel_label_file":"labels_chbm_10_20_19Ch.json"
     }
 }
