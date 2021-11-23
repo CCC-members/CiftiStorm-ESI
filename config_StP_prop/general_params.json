@@ -4,37 +4,34 @@
         "modality":"EEG",
         "name":"HeadModel_EEG",
         "description":"",
-        "colormap":"tools/mycolormap.mat",
-        "protocol_name":"HeadModel_ICBM152_Templ",
-        "protocol_subjet_count":10,
-        "protocol_reset":true,
-        "use_default_anatomy":false,
-        "use_default_channel":false,
-        "use_raw_data":false,
-        "sub_prefix":"none",
+        "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "bst_path":"D:/Tools/brainstorm3"
-        },
-        "bst_database":{
-            "description":"",
-            "db_path":"local"
-        },
+            "protocol_name":"HeadModel_Test",
+            "protocol_reset":true,
+            "protocol_subjet_count":10,            
+            "bst_path":"D:/Tools/brainstorm3",
+            "db_path":"local",
+            "after_MaQC":{
+                "run":false,
+                "cases_file":"CHBM_58_subj.json"
+            }
+        },        
         "spm_config":{
             "description":"",
             "spm_path":"D:/Tools/spm12"
         },
         "bcv_config":{
             "export":true,
-            "export_path":"E:/Data/Joan/BC-V_Structure"
+            "export_path":"E:/Data/Test"
+        },
+        "reports":{
+            "description":"",
+            "output_path":"E:/Data/Test"
         },
         "tmp_path":{
             "description":"",
             "value":"local"
-        },
-        "reports":{
-            "description":"",
-            "output_path":"E:/Data/Joan/BST_Output"
         }                
     }
 }

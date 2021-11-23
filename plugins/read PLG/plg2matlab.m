@@ -13,14 +13,14 @@ cdc_info = [];
 if (nargin == 0) || isempty(path_filename)
     [filename, pathname] = uigetfile('*.pat', 'Pick a .pat file info');
     if filename == 0, return; end;
-    path_filename = [pathname filename];
+    path_filename = fullfile(pathname, filename);
     clear pathname filename;
 end
 [pathname, filename] = fileparts(path_filename);
-pathname = [pathname '\'];
+% pathname = [pathname '\'];
 
 %% reading .pat
-path_filename = [pathname filename '.pat'];
+path_filename = fullfile(pathname, [filename '.pat']);
 [sfield, s_igual, nval, value] = textread(path_filename,'%s%s%s%s');
 ind = find(strcmp(sfield, 'Center'));
 if ~isempty(ind), pat_info.Center = value{ind}; end
@@ -54,7 +54,7 @@ if ~isempty(ind), pat_info.Medication = value{ind}; end
 % keep pathname filename pat_info
 
 %% reading .inf
-path_filename = [pathname filename '.inf'];
+path_filename = fullfile(pathname, [filename '.inf']);
 if (exist(path_filename, 'file') == 2)
     fid = fopen(path_filename, 'r');
 %     states_name = containers.Map;
@@ -199,7 +199,7 @@ end
 % keep pathname filename pat_info inf_info
 
 %% reading .plg
-path_filename = [pathname filename '.plg'];
+path_filename = fullfile(pathname, [filename '.plg']);
 if (exist(path_filename, 'file') == 2)
     fid = fopen(path_filename, 'r');
     data = fread(fid, [inf_info.PLGNC inf_info.PLGNS], 'int16');
@@ -211,7 +211,7 @@ end
 % keep pathname filename pat_info inf_info plg_info
 
 %% reading .mrk
-path_filename = [pathname filename '.mrk'];
+path_filename = fullfile(pathname, [filename '.mrk']);
 if (exist(path_filename, 'file') == 2 & ~isempty(states_name))
     fid = fopen(path_filename, 'r');    
     nmrk_data = 0;
@@ -248,7 +248,7 @@ end
 % keep pathname filename pat_info inf_info plg_info mrk_info
 
 %% reading .win
-path_filename = [pathname filename '.win'];
+path_filename = fullfile(pathname, [filename '.win']);
 if (exist(path_filename, 'file') == 2  & ~isempty(states_name))
     fid = fopen(path_filename, 'r');
     nwin_data = 0;
@@ -293,7 +293,7 @@ end
 % keep pathname filename pat_info inf_info plg_info mrk_info win_info
 
 %% reading .cdc
-path_filename = [pathname filename '.cdc'];
+path_filename = fullfile(pathname, [filename '.cdc']);
 if (exist(path_filename, 'file') == 2)
     fid = fopen(path_filename, 'r');
     cdc_data = fread(fid, [2, inf_info.PLGNC], 'float32')';

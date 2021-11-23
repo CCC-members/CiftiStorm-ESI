@@ -8,16 +8,19 @@
                 {
                     "name":"raw_data",
                     "description":"",
-                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/HCP-GUSHI-2019/Selected_data/SubID",
-                    "file_location":"unprocessed/MEG/5-Restin/4D/c,rfDC",
-                    "data_format":"4D",
-                    "isfile":true                    
+                    "subID_prefix":"",
+                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI-HBN_data/whole_eeg/SubID",
+                    "file_location":"EEG/raw/mff_format/SubID",
+                    "data_format":"mff",
+                    "isfile":false,
+                    "group_layout_name":"Colin27",
+                    "channel_layout_name":"GSN 129"  
                 },
                 {
                     "name":"import_channel",
                     "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
                     "group_layout_name":"ICBM152",
-                    "channel_layout_name":"BioSemi 32"                    
+                    "channel_layout_name":"10-20 19"                    
                 },
                 {
                     "name":"template_data",
@@ -31,6 +34,6 @@
 
             ]
         },
-        "channel_label_file":"Biosemi_32.json"
+        "channel_label_file":"labels_chbm_10_20_19Ch.json"
     }
 }

@@ -1,4 +1,4 @@
-function subj_error = headmodel_indiv_anat(properties)
+function subj_error = headmodel_template_anat_raw_data(properties)
 % Description here
 %
 %

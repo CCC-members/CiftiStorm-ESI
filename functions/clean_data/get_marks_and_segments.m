@@ -14,7 +14,9 @@ events      = select_events.events;
 if(isempty(events))
     if(isequal(select_by,'segments'))
         if( isfield(EEG,'TW') && ~isempty(EEG.TW))
-            EEGs    = rejtime_by_segments(EEG);
+            EEGs    = rejtime_by_segments(EEG,'TW');
+        elseif(isfield(EEG,'derivatives') && ~isempty(EEG.derivatives))
+            EEGs    = rejtime_by_segments(EEG,'derivatives');
         else
             EEGs    = EEG;
         end
@@ -27,15 +29,22 @@ else
         event   = events(j);
         newEEG  = EEG;        
         if(isequal(select_by,'segments'))
-            if(~isempty(newEEG.TW))
-                newEEG          = rejtime_by_segments(newEEG,'event',event);
+            if(isfield(newEEG,'TW') && ~isempty(newEEG.TW))
+                newEEG          = rejtime_by_segments(newEEG,'TW','event',event);
+                if(~isempty(newEEG))
+                    EEGs(countEEG)  = newEEG;
+                    countEEG        = countEEG + 1;
+                end
+            end
+            if(isfield(newEEG,'derivatives') && ~isempty(newEEG.derivatives))
+                newEEG              = rejtime_by_segments(newEEG,'derivatives','event',event);
                 if(~isempty(newEEG))
                     EEGs(countEEG)  = newEEG;
                     countEEG        = countEEG + 1;
                 end
             end
         else
-            newEEG              = rejtime_by_marks(newEEG,'event',event);
+            newEEG                  = rejtime_by_marks(newEEG,'event',event);
             if(~isempty(newEEG))
                 EEGs(countEEG)      = newEEG;
                 countEEG            = countEEG + 1;

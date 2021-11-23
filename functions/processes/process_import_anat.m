@@ -1,6 +1,6 @@
 function anat_error = process_import_anat(properties, type, iSubject, subID)
 % === ANATOMY ===
-anat_error = [];
+anat_error = struct;
 
 %%
 %% Surfaces resolution
@@ -35,22 +35,29 @@ if(isequal(type,'template') || isequal(type,'template_raw') || isequal(type,'ind
         innerskull_file     = fullfile(base_path, anatomy_type.template_name, filepath);
     else
         anatomy_type    = properties.anatomy_params.anatomy_type.type_list{3};
+        if(isequal(anatomy_type.subID_prefix,'none') || isempty(anatomy_type.subID_prefix))
+            SubID_repl = 'SubID';
+            subID_prefix = '';
+        else
+            subID_prefix = anatomy_type.subID_prefix;
+            SubID_repl = strcat(subID_prefix,'SubID');
+        end
         % MRI File
-        base_path           = strrep(anatomy_type.base_path,'SubID',subID);
-        filepath            = strrep(anatomy_type.file_location,'SubID',subID);
+        base_path           = strrep(anatomy_type.base_path,SubID_repl,strcat(subID_prefix, subID));
+        filepath            = strrep(anatomy_type.file_location,SubID_repl,strcat(subID_prefix, subID));
         T1w_file            = fullfile(base_path,filepath);
         % Cortex Surfaces
-        filepath            = strrep(anatomy_type.L_surface_location,'SubID',subID);
+        filepath            = strrep(anatomy_type.L_surface_location,SubID_repl,strcat(subID_prefix, subID));
         L_surface_file      = fullfile(base_path,filepath);
-        filepath            = strrep(anatomy_type.R_surface_location,'SubID',subID);
+        filepath            = strrep(anatomy_type.R_surface_location,SubID_repl,strcat(subID_prefix, subID));
         R_surface_file      = fullfile(base_path,filepath);
         % Non-Brain surface files
-        base_path           = strrep(non_brain_surfaces.base_path,'SubID',subID);
-        filepath            = strrep(non_brain_surfaces.head_file_location,'SubID',subID);
+        base_path           = strrep(non_brain_surfaces.base_path,SubID_repl,strcat(subID_prefix, subID));
+        filepath            = strrep(non_brain_surfaces.head_file_location,SubID_repl,strcat(subID_prefix, subID));
         head_file           = fullfile(base_path,filepath);
-        filepath            = strrep(non_brain_surfaces.outerfile_file_location,'SubID',subID);
+        filepath            = strrep(non_brain_surfaces.outerfile_file_location,SubID_repl,strcat(subID_prefix, subID));
         outerskull_file     = fullfile(base_path,filepath);
-        filepath            = strrep(non_brain_surfaces.innerfile_file_location,'SubID',subID);
+        filepath            = strrep(non_brain_surfaces.innerfile_file_location,SubID_repl,strcat(subID_prefix, subID));
         innerskull_file     = fullfile(base_path,filepath);
     end
     if(~isfile(T1w_file) || ~isfile(L_surface_file) || ~isfile(R_surface_file))
@@ -69,6 +76,7 @@ if(isequal(type,'template') || isequal(type,'template_raw') || isequal(type,'ind
         disp(string(innerskull_file));
         fprintf(2,strcat('\n -->> Do not exist. \n'));
         fprintf(2,strcat('\n -->> Jumping to an other subject. \n'));
+        anat_error(end+1).text = "One or more non-brain surfaces do not exist";
         return;
     end
 end

@@ -3,8 +3,12 @@ data        = EEG.data;
 labels      = {EEG.chanlocs.labels}';
 from        = 1;
 limit       = size(data,1);
+clean_labels = {size(user_labels,1),1};
+for i=1:length(user_labels)
+    clean_labels{i} = strrep(user_labels{i},' ','');
+end
 while(from <= limit)
-    pos = find(strcmpi(labels{from}, user_labels), 1);
+    pos = find(strcmpi(labels{from}, clean_labels), 1);
     if (isempty(pos))
         data(from,:)    = [];
         labels(from)    = [];

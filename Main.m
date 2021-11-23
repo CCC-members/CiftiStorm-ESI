@@ -20,7 +20,7 @@ clc;
 close all;
 clear all;
 disp('-->> Starting process');
-restoredefaultpath;
+% restoredefaultpath;
 
 %%
 %------------ Preparing properties --------------------
@@ -29,7 +29,6 @@ addpath(fullfile('app'));
 addpath('bst_templates');
 addpath(fullfile('config_labels'));
 addpath(fullfile('config_MaQC'));
-addpath(fullfile('config_protocols'));
 addpath(fullfile('config_StP_prop'));
 addpath(fullfile('external'));
 addpath(genpath(fullfile('functions')));
@@ -49,9 +48,9 @@ catch EM
 end
 
 %% Printing data information
-disp(strcat("-->> Name:",app_properties.generals.name));
-disp(strcat("-->> Version:",app_properties.generals.version));
-disp(strcat("-->> Version date:",app_properties.generals.version_date));
+disp(strcat("-->> Name: ",app_properties.generals.name));
+disp(strcat("-->> Version: ",app_properties.generals.version));
+disp(strcat("-->> Version date: ",app_properties.generals.version_date));
 disp("=================================================================");
 
 %% ------------ Checking MatLab compatibility ----------------
@@ -80,6 +79,7 @@ properties.general_params       = properties.general_params.params;
 properties.anatomy_params       = properties.anatomy_params.params;
 properties.channel_params       = properties.channel_params.params;
 properties.prep_data_params     = properties.prep_data_params.params;
+properties.headmodel_params     = properties.headmodel_params.params;
 properties.qc_params            = properties.qc_params.params;
 
 if(isfile(properties.general_params.colormap))
@@ -89,8 +89,8 @@ else
 end
 %%
 disp('-->> Preparing BrainStorm properties.');
-bst_path        =  properties.general_params.bst_config.bst_path;
-bst_db_path     = properties.general_params.bst_database.db_path;
+bst_path        = properties.general_params.bst_config.bst_path;
+bst_db_path     = properties.general_params.bst_config.db_path;
 spm_path        = properties.general_params.spm_config.spm_path;
 addpath(genpath(bst_path));
 addpath(spm_path);
@@ -99,9 +99,22 @@ addpath(spm_path);
 
 brainstorm reset
 brainstorm nogui local
-
 disp("-->> Installing external plugins.");
-bst_plugin('SetCustomPath','spm', spm_path);
+if(~isempty(bst_plugin('GetInstalled', 'spm12')))
+    [isOk, errMsg, PlugDesc] = bst_plugin('Unload', 'spm12');
+end
+[isOk, errMsg, PlugDesc] = bst_plugin('Install', 'spm12', 0, []);
+% bst_plugin('SetCustomPath','spm12', spm_path);
+if(isOk)
+    [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'spm12');
+else
+    fprintf(2,"\n ->> Error: We can not install the spm12 plugin. Please see the fallow error and restart the process. \n");
+    disp("-->> Message error");
+    disp(errMsg);
+    disp('-->> Process stoped!!!');
+    return;
+end
+
 if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
     [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'openmeeg', 0, []);
     if(isOk)
@@ -114,9 +127,22 @@ if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
         return;
     end
 end
-if(isempty(bst_plugin('GetInstalled', 'mff')))
-    [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'mff', 0, []);
+if(isempty(bst_plugin('GetInstalled', 'duneuro')))
+    [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'duneuro', 0, []);
     if(isOk)
+        [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'duneuro');
+    else
+        fprintf(2,"\n ->> Error: We can not install tha duneuro plugin. Please see the fallow error and restart the process. \n");
+        disp("-->> Message error");
+        disp(errMsg);
+        disp('-->> Process stoped!!!');
+        return;
+    end
+end
+[PlugDesc, SearchPlugs] = bst_plugin('GetInstalled', 'mff');
+if(isempty(PlugDesc))
+    [isInstalled, errMsg] = bst_plugin('Install', 'mff', 0);
+    if(isInstalled)
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'mff');
     else
         fprintf(2,"\n ->> Error: We can not install tha mff plugin. Please see the fallow error and restart the process. \n");

@@ -1,0 +1,19 @@
+[
+{
+"protocol_name":"HeadModel_CHBM_QC_rej_chan_40",
+"subjects":[
+    "sub-CBM00214",
+    "sub-CBM00231"
+]
+},
+{
+"protocol_name":"HeadModel_CHBM_QC_rej_chan_50",
+"subjects":[
+    "sub-CBM00258",
+    "sub-CBM00266",
+    "sub-CBM00267",
+    "sub-CBM00273",
+    "sub-CBM00282"
+]
+}
+]

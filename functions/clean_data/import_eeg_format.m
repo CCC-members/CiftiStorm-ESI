@@ -1,22 +1,51 @@
-function EEGs = import_eeg_format(subID, properties, base_path)
+function EEGs = import_eeg_format(subID, properties, data_path)
 
 data_type    = properties.format;
 if(~isequal(properties.channel_label_file,"none") && ~isempty(properties.channel_label_file))
-    user_labels = jsondecode(fileread(properties.channel_label_file));    
+    user_labels = jsondecode(fileread(properties.channel_label_file));   
+else
+    user_labels = [];
+end
+if(~isequal(properties.electrodes_file,"none") && ~isempty(properties.electrodes_file))
+    filepath = strrep(properties.electrodes_file,'SubID',subID);
+    base_path =  strrep(properties.base_path,'SubID',subID);
+    electrodes_file = fullfile(base_path,filepath);    
+    if(isfile(electrodes_file))
+        electrodes = tsvread(electrodes_file);
+        user_labels = electrodes.name;
+    end
+end
+if(~isequal(properties.derivatives_file,"none") && ~isempty(properties.derivatives_file))
+    derivatives_file = strrep(properties.derivatives_file,'SubID',subID);
+    if(isfile(derivatives_file))
+        derivatives = tsvread(derivatives_file);
+    else
+        derivatives = [];
+    end
+else
+    derivatives = [];
 end
 if(properties.clean_data.run)    
     if(isequal(lower(properties.clean_data.toolbox),'eeglab'))
         toolbox_path    = properties.clean_data.toolbox_path;
-        max_freq        = properties.clean_data.max_freq;            
+        max_freq        = properties.clean_data.max_freq;
+        chan_action     = properties.clean_data.rej_or_interp_chan.action;
         select_events   = properties.clean_data.select_events;
-        %         save_path    = fullfile(selected_data_set.report_output_path,'Reports',selected_data_set.protocol_name,subject_info.name,'EEGLab_preproc');
-        if(exist('user_labels','var'))
-            EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                'labels', user_labels, 'select_events', select_events);
+        clean_art_params = properties.clean_data.clean_artifacts;
+        if(isequal(properties.name,'raw_data'))
+           use_raw_data = true; 
         else
-            EEGs      = eeglab_preproc(subID, base_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
-                 'select_events', select_events);
+            use_raw_data = false;
         end
+        report_output_path  = properties.general_params.reports.output_path;
+        ProtocolName        = properties.general_params.bst_config.protocol_name;
+        subject_report_path = fullfile(report_output_path,'Reports',ProtocolName,subID);
+        if(~isfolder(subject_report_path))
+            mkdir(subject_report_path);
+        end        
+        EEGs      = eeglab_preproc(subID, data_path, data_type, toolbox_path, 'verbosity', true, 'max_freq', max_freq,...
+            'labels', user_labels, 'select_events', select_events, 'use_raw_data', use_raw_data, 'derivatives', derivatives,...
+            'save_path', subject_report_path, 'chan_action', chan_action, 'clean_art_params', clean_art_params);        
         for i=1:length(EEGs)
             EEGs(i).labels   = {EEGs(i).chanlocs(:).labels};
         end
@@ -24,13 +53,13 @@ if(properties.clean_data.run)
 else    
     switch data_type
         case 'edf'
-            [hdr, data]     = edfread(base_path);
+            [hdr, data]     = edfread(data_path);
              EEG.data    = data;
              EEG.labels  = strrep(hdr.label,'REF','');
              EEG.srate   = hdr.samples(1);
         case 'plg'
             try
-                EEG         = readplot_plg(fullfile(base_path));
+                EEG         = readplot_plg(fullfile(data_path));
             catch
                 EEGs = [];
                 return;
@@ -55,11 +84,11 @@ else
             EEG.chaninfo = template.EEG.chaninfo;
         case 'txt'
             load('templates/EEG_template_58Ch.mat');
-            [filepath,filename,~]   = fileparts(base_path);
+            [filepath,filename,~]   = fileparts(data_path);
             EEG.filename            = filename;
             EEG.filepath            = filepath;
             EEG.subject             = subID;
-            data                    = readmatrix(base_path);
+            data                    = readmatrix(data_path);
             data                    = data';
             EEG.data                = data;
             EEG.nbchan              = length(EEG.chanlocs);
