@@ -23,9 +23,9 @@ anatomy_type            = properties.anatomy_params.anatomy_type.type_list{3};
 disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
 [base_path,name,ext] = fileparts(anatomy_type.base_path);
 subjects = dir(base_path);
-% load("templates/good_cases_wMRI_Usama.mat");
-% subjects(~ismember( {subjects.name}, IDg)) = []; 
-subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
+load("templates/good_cases_wMRI_Usama.mat");
+subjects(~ismember( {subjects.name}, IDg)) = []; 
+%subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
 subjects_process_error = [];
 subjects_processed =[];
 Protocol_count = 0;
@@ -423,7 +423,7 @@ for j=1:length(subjects)
         %%
         %% Export Subject to BC-VARETA
         %%
-    if(processed)
+    if(isempty(errMessage))
         disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
         if(properties.general_params.bcv_config.export)
             try

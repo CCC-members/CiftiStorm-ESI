@@ -250,16 +250,16 @@ try
         if(clean_art_params.default)
             EEG_cleaned     = clean_artifacts(EEG);
         else
-            args            = clean_art_params.arguments;           
+            args            = clean_art_params.arguments;
             EEG_cleaned     = clean_artifacts(EEG,'FlatlineCriterion',args.FlatlineCriterion,...
-                                'ChannelCriterion',args.ChannelCriterion,...
-                                'LineNoiseCriterion',args.LineNoiseCriterion,...
-                                'Highpass',args.Highpass,...
-                                'BurstCriterion',args.BurstCriterion,...
-                                'WindowCriterion',args.WindowCriterion,...
-                                'BurstRejection',args.BurstRejection,...
-                                'Distance',args.Distance,...
-                                'WindowCriterionTolerances',args.WindowCriterionTolerances);
+                'ChannelCriterion',args.ChannelCriterion,...
+                'LineNoiseCriterion',args.LineNoiseCriterion,...
+                'Highpass',args.Highpass,...
+                'BurstCriterion',args.BurstCriterion,...
+                'WindowCriterion',args.WindowCriterion,...
+                'BurstRejection',args.BurstRejection,...
+                'Distance',args.Distance,...
+                'WindowCriterionTolerances',args.WindowCriterionTolerances);
         end
         if verbosity
             vis_artifacts(EEG_cleaned,EEG);
@@ -272,37 +272,52 @@ try
         
         if(isequal(lower(chan_action),'interpolate'))
             %% Step 11: Interpolate all the removed channels.
-            EEG_interp = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
-%         elseif(isequal(lower(chan_action),'reject'))
-%             %% Reject channels
-%             [EEG_interp,EEG_interp.reject.indelec] = pop_rejchan(EEG_cleaned, 'elec', [1:length(EEG_cleaned.chanlocs)], 'threshold', 5, 'norm', 'on', 'measure', 'kurt');
-        else
-            EEG_interp = EEG_cleaned;
+            EEG_cleaned = pop_interp(EEG_cleaned, EEG.chanlocs, 'spherical');
         end
-        %%
+        
+        %% Running ICA        
+        if(decompose_ica.run)
+            icatype = decompose_ica.icatype.value;
+            extended = decompose_ica.extended;
+            reorder = decompose_ica.reorder;
+            concatenate = decompose_ica.concatenate;
+            concatcond = decompose_ica.concatcond;
+            EEG_cleaned = pop_runica( EEG_cleaned, 'icatype', icatype, 'options', {'extended', extended}, 'reorder', reorder, 'concatenate', concatenate, 'concatcond', concatcond, 'chanind', []);
+            
+            
+            [EEG_cleaned, varargout] = pop_iclabel(EEG_cleaned, 'default');
+            
+            thresh                  = struct2array(decompose_ica.remove_comp.thresh)';
+            [EEG_cleaned,com]       = pop_icflag(EEG_cleaned, thresh);
+            components              = find(EEG_cleaned.reject.gcompreject == 1);
+            plotag = 0;
+            keepcomp = 0;
+            [EEG_cleaned LASTCOM]   = pop_subcomp(EEG_cleaned,components, plotag, keepcomp);
+            save(fullfile(save_forder,strcat(subID, '_EEG_ICA.mat')),'-struct','EEG_cleaned','-v7.3');
+        end
+        
+        %% Saving EEG plots after cleaned
         if verbosity
-            eegplot(EEG_interp.data);
+            eegplot(EEG_cleaned.data);
             FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
             FigHandle   = FigList(1);
             FigName     = 'EGG signal_cleaned.fig';
             savefig(FigHandle, fullfile(save_forder, FigName));
             close(FigHandle);
             
-            [spectra,freqs] = spectopo(EEG_interp.data,0,EEG_interp.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG_interp.chanlocs,'chaninfo',EEG_interp.chaninfo,'freq',freq_list);
+            [spectra,freqs] = spectopo(EEG_cleaned.data,0,EEG_cleaned.srate,'limits',[0 max_freq NaN NaN -10 10],'chanlocs',EEG_cleaned.chanlocs,'chaninfo',EEG_cleaned.chaninfo,'freq',freq_list);
             FigList     = findobj(allchild(0), 'flat', 'Type', 'figure');
             FigHandle   = FigList(1);
             FigName     = 'Cross-spectrum_cleaned.fig';
             savefig(FigHandle, fullfile(save_forder, FigName));
             close(FigHandle);
-        end
-        
-        %% Step 12: Saving figures
-        if verbosity
-            save(fullfile(save_forder,strcat(subID, '_EEG_raw.mat')),'-struct','EEG','-v7.3');  
-            EEG = EEG_interp;
-            save(fullfile(save_forder,strcat(subID, '_EEG_cleaned.mat')),'-struct','EEG','-v7.3');       
-        end
-        EEG = EEG_interp;
+            
+            % Step 12: Saving EEGs before and after cleaned
+            save(fullfile(save_forder,strcat(subID, '_EEG_raw.mat')),'-struct','EEG','-v7.3');
+            EEG = EEG_cleaned;
+            save(fullfile(save_forder,strcat(subID, '_EEG_cleaned.mat')),'-struct','EEG','-v7.3');            
+        end       
+        EEG = EEG_cleaned;
         EEGs(i) = EEG;
     end
 catch
