@@ -49,15 +49,14 @@
             },
             "rej_or_interp_chan":{
                 "description":"Default:<<interpolate>>. Type <<interpolate>> for interpolate bad channels. Type <<reject>> for reject bad channels",
-                "action":"interpolate"
+                "action":"reject"
             },
             "select_events":{                  
                 "by_description":"Default:<<empty>>. Selection of the data by <<marks>> way or <<segments>> way",
                 "by":"segments",
                 "events_description":"Type the events that you want to select from the data. If you want to extract all data leave the events list empty. For select a specific event fill the list like the events_example tab",
                 "events":[
-                    "open_eyes",
-                    "closed_eyes"
+                    "open_eyes"
                 ],
                 "events_example":[
                     "open_eyes",
@@ -66,7 +65,31 @@
                     "recuperation",
                     "another_event"
                 ]
+            },
+            "decompose_ica":{
+                "run":true,
+                "icatype":{
+                    "description":"defaul <<runica>>. Options <<runica>> <<binica>> <<jader>> <<sobi>> <<ng_ol>> <<acsobiro>>",
+                    "value":"runica"
+                },
+                "extended":1,
+                "reorder":"on",
+                "concatenate":"off",
+                "concatcond":"off",
+                "remove_comp":{
+                    "description":"[7x2 float] array with threshold values with limits to include for selection as artifacts. The 6 categories are (in order) Brain - Muscle - Eye - Heart - Line Noise - Channel Noise - Other.",
+                    "thresh":{
+                        "brain":[0, 0.5],
+                        "muscle":[0.25, 1],
+                        "eye":[0.25, 1],
+                        "heart":[0.25, 1],
+                        "line_noise":[0.25, 1],
+                        "channel_noise":[0.25, 1],
+                        "other":[0.25, 1]
+                    }
+                }
             }
-        }       
+        },
+         "channel_label_file":"labels_chbm_58.json"
     }
 }
