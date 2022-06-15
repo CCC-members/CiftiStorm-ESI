@@ -1,30 +1,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%         Brainstorm Protocol for Automatic Head Model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 % Scripted leadfield pipeline for Freesurfer anatomy files
 % Brainstorm (25-Sep-2019) or higher
 %
-
-
+%
+%
 % Authors
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares
 %
 %    November 15, 2019
 
-
+%%
 %% Preparing WorkSpace
+%%
 clc;
 close all;
 clear all;
+restoredefaultpath;
 disp('-->> Starting process');
-% restoredefaultpath;
 
 %%
-%------------ Preparing properties --------------------
-% brainstorm('stop');
+%% Preparing properties
+%%
 addpath(fullfile('app'));
 addpath('bst_templates');
 addpath(fullfile('config_labels'));
@@ -47,23 +46,33 @@ catch EM
     return;
 end
 
+%%
 %% Printing data information
+%%
 disp(strcat("-->> Name: ",app_properties.generals.name));
 disp(strcat("-->> Version: ",app_properties.generals.version));
 disp(strcat("-->> Version date: ",app_properties.generals.version_date));
-disp("=================================================================");
+disp('==========================================================================');
 
-%% ------------ Checking MatLab compatibility ----------------
+%%
+%% Checking MatLab compatibility
+%%
 disp('-->> Checking installed matlab version');
 if(~check_matlab_version())
     return;
 end
-%% ------------  Checking updates --------------------------
+
+%%
+%% Checking updates
+%%
 disp('-->> Checking project laster version');
 if(isequal(check_version,'updated'))
     return;
 end
-%% ------------  Checking app properties --------------------------
+
+%%
+%% Checking app properties
+%%
 properties  = get_properties();
 if(isequal(properties,'canceled'))
     return;
@@ -78,7 +87,6 @@ end
 properties.general_params       = properties.general_params.params;
 properties.anatomy_params       = properties.anatomy_params.params;
 properties.channel_params       = properties.channel_params.params;
-properties.prep_data_params     = properties.prep_data_params.params;
 properties.headmodel_params     = properties.headmodel_params.params;
 properties.qc_params            = properties.qc_params.params;
 
@@ -95,16 +103,26 @@ spm_path        = properties.general_params.spm_config.spm_path;
 addpath(genpath(bst_path));
 addpath(spm_path);
 
-%---------------- Starting BrainStorm-----------------------
-
+%%
+%% Starting BrainStorm 
+%%
 brainstorm reset
 brainstorm nogui local
+BrainstormUserDir = bst_get('BrainstormUserDir');
+if(isempty(properties.general_params.bst_config.db_path) || isequal(properties.general_params.bst_config.db_path,'local'))
+    db_import(fullfile(BrainstormUserDir,'local_db'));
+else
+    db_import(properties.general_params.bst_config.db_path);
+end
+
+%%
+%% Loading BST modules
+%%
 disp("-->> Installing external plugins.");
 if(~isempty(bst_plugin('GetInstalled', 'spm12')))
     [isOk, errMsg, PlugDesc] = bst_plugin('Unload', 'spm12');
 end
 [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'spm12', 0, []);
-% bst_plugin('SetCustomPath','spm12', spm_path);
 if(isOk)
     [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'spm12');
 else
@@ -139,37 +157,9 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
         return;
     end
 end
-[PlugDesc, SearchPlugs] = bst_plugin('GetInstalled', 'mff');
-if(isempty(PlugDesc))
-    [isInstalled, errMsg] = bst_plugin('Install', 'mff', 0);
-    if(isInstalled)
-        [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'mff');
-    else
-        fprintf(2,"\n ->> Error: We can not install tha mff plugin. Please see the fallow error and restart the process. \n");
-        disp("-->> Message error");
-        disp(errMsg);
-        disp('-->> Process stoped!!!');
-        return;
-    end
-end
 
 if(~isequal(bst_db_path,'local'))
     bst_set('BrainstormDbDir', app_properties.bst_db_path);
-end
-
-if(properties.prep_data_params.clean_data.run)
-    toolbox = properties.prep_data_params.clean_data.toolbox;
-    switch toolbox
-        case 'eeglab'
-            if(isfile(fullfile(properties.prep_data_params.clean_data.toolbox_path,'eeglab.m')))
-                toolbox_path    = properties.prep_data_params.clean_data.toolbox_path;
-                addpath(toolbox_path);
-                eeglab nogui;
-            else
-                fprintf(2,'\n ->> Error: The eeglab path is wrong.');
-            end
-    end
-else
 end
 
 %% Process selected dataset and compute the leadfield subjects
@@ -179,7 +169,7 @@ end
 process_error = headmodel_process_interface(properties);
 
 %% Stoping BrainStorm
-disp("=================================================================");
+disp('==========================================================================');
 brainstorm('stop');
 close all;
 clear all;

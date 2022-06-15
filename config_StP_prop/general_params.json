@@ -7,10 +7,9 @@
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_Test",
-            "protocol_reset":true,
-            "protocol_subjet_count":10,            
-            "bst_path":"D:/Tools/brainstorm3",
+            "protocol_name":"HeadModel_CMI_DistC",
+            "protocol_reset":false,          
+            "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
             "after_MaQC":{
                 "run":false,
@@ -19,15 +18,19 @@
         },        
         "spm_config":{
             "description":"",
-            "spm_path":"D:/Tools/spm12"
+            "spm_path":"/mnt/Develop/Tools/spm12"
         },
         "bcv_config":{
             "export":true,
-            "export_path":"E:/Data/Test"
+            "export_path":"/mnt/Store/Data/CMI_QC/BC-V_Structure"
+        },
+        "bst_export":{
+            "description":"Folder to export the Brainstorm subject zip",
+            "output_path":"/mnt/Store/Data/CMI_QC/BST_Output"
         },
         "reports":{
-            "description":"",
-            "output_path":"E:/Data/Test"
+            "description":"Folder to export the anatomy report",
+            "output_path":"/mnt/Store/Data/CMI_QC/BST_Output"
         },
         "tmp_path":{
             "description":"",

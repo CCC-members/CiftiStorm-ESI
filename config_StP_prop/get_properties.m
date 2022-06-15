@@ -34,7 +34,5 @@ properties.anatomy_params.params.anat_config = properties.anatomy_params.params.
 channel_type = properties.channel_params.params.channel_type.type;
 properties.channel_params.params.chann_config = properties.channel_params.params.channel_type.type_list{channel_type};
 
-prep_data_type = properties.prep_data_params.params.process_type.type;
-properties.prep_data_params.params.prep_data_config = properties.prep_data_params.params.process_type.type_list{prep_data_type};
 end
 

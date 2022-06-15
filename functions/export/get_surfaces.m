@@ -1,13 +1,12 @@
-function [scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter)
+function [Shead, Sout, Sinn, Scortex] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter)
 
-anat_path = ProtocolInfo.SUBJECTS;
+anat_path           = ProtocolInfo.SUBJECTS;
 %%
 %% Genering scalp file
 %%
 disp ("-->> Genering scalp file");
 ScalpFile           = fullfile(anat_path,sSubject.Surface(sSubject.iScalp).FileName);
-Sh                  = load(ScalpFile);
-scalp.Sh            = Sh;
+Shead               = load(ScalpFile);
 
 %%
 %% Genering outer skull file
@@ -15,7 +14,6 @@ scalp.Sh            = Sh;
 disp ("-->> Genering outer skull file");
 OuterSkullFile      = fullfile(anat_path,sSubject.Surface(sSubject.iOuterSkull).FileName);
 Sout                = load(OuterSkullFile);
-outerS.Sout         = Sout;
 
 %%
 %% Genering inner skull file
@@ -23,7 +21,6 @@ outerS.Sout         = Sout;
 disp ("-->> Genering inner skull file");
 InnerSkullFile      = fullfile(anat_path,sSubject.Surface(sSubject.iInnerSkull).FileName);
 Sinn                = load(InnerSkullFile);
-innerS.Sinn         = Sinn;
 
 %%
 %% Genering surf file
@@ -88,9 +85,9 @@ for h=1:length(sSubject.Surface)
 end
 
 % Loadding subject surfaces
-surf.Sc             = Sc;
-surf.sub_to_FSAve   = sub_to_FSAve;
-surf.iCortex        = iCortex;
+Scortex.Sc             = Sc;
+Scortex.sub_to_FSAve   = sub_to_FSAve;
+Scortex.iCortex        = iCortex;
 
 end
 

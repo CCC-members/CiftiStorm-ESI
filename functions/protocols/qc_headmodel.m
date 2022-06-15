@@ -1,11 +1,18 @@
-function qc_headmodel(headmodel_options,modality,subject_report_path)
+function qc_headmodel(headmodel_options,properties, subID)
 %QC_HEADMODEL Summary of this function goes here
 %   Detailed explanation goes here
+
+%%
+%% Getting report path
+%%
+modality                = properties.general_params.modality;
+[subject_report_path]   = get_report_path(properties, subID);
+
 %%
 %% Quality control
 %%
-ProtocolInfo = bst_get('ProtocolInfo');
-[sStudy iStudy] = bst_get('Study');
+ProtocolInfo        = bst_get('ProtocolInfo');
+[sStudy iStudy]     = bst_get('Study');
 if(isempty(iStudy))
     [sStudy, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 end
@@ -35,7 +42,7 @@ if(isequal(modality,'EEG'))
     
     %computing homogeneous lead field
     [Kn, Khom, KhomN]   = computeNunezLF(Ke, VoxelCoord, VertNorms, Channels, ChannOri, modality);
-    
+    save(fullfile(subject_report_path,'qc_output.mat'),'Ke', 'VoxelCoord', 'VertNorms', 'Channels', 'ChannOri', 'modality', 'Kn', 'Khom');
     %%
     %% Ploting sensors and sources on the scalp and cortex
     %%
@@ -74,8 +81,8 @@ if(isequal(modality,'EEG'))
     VertNorms   = repmat(VertNorms,[Ne,1,1]);
     Kn          = sum(Kn.*VertNorms,3);
     Khom        = sum(Khom.*VertNorms,3);
-    KhomN        = sum(KhomN.*VertNorms,3);
-    
+    KhomN       = sum(KhomN.*VertNorms,3);
+    save(fullfile(subject_report_path,'qc_Khom_vs_Kn.mat'),'VertNorms', 'Kn', 'Khom');
     %Homogenous Lead Field vs. Tester Lead Field Plot
     hFig27 = figure;
     scatter(Khom(:),Kn(:));
@@ -91,6 +98,7 @@ if(isequal(modality,'EEG'))
     for k=1:size(Kn,1)
         corelch(k,1)=corr(Khom(k,:).',Kn(k,:).');
     end
+    save(fullfile(subject_report_path,'qc_corelch.mat'),'corelch');
     %plotting channel wise correlation
     hFig28 = figure;
     plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
@@ -103,13 +111,14 @@ if(isequal(modality,'EEG'))
     close(hFig28);
     
     zKhom = zscore(Khom')';
-    zK = zscore(Kn')';
+    zKn = zscore(Kn')';
     %computing voxel-wise correlation
     for k=1:Nv
-        corelv(k,1)=corr(zKhom(:,k),zK(:,k));
+        corelv(k,1)=corr(zKhom(:,k),zKn(:,k));
     end
     corelv(isnan(corelv))=0;
     corr2d = corr2(Khom, Kn);
+    save(fullfile(subject_report_path,'qc_corelv.mat'),'corelv','zKhom','zKn');
     %plotting voxel wise correlation
     hFig29 = figure;
     plot([1:Nv],corelv);

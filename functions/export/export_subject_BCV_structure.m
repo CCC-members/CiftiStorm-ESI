@@ -35,6 +35,7 @@ end
 
 %% Uploding Subject file into BrainStorm Protocol
 disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
+disp('==========================================================================');
 
 %%
 %% Genering leadfield file
@@ -61,41 +62,44 @@ end
 if(~exist('iter','var'))
     iter = 1;
 end
-[scalp, outerS, innerS, surf] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter);
+[Shead, Sout, Sinn, Scortex] = get_surfaces(ProtocolInfo,sSubject,FSAve_interp,iter);
 
 %%
-%% Genering MEG/EEG file
+%% Saving files in BC-VARETA Structure
 %%
-if(isequal(properties.prep_data_params.process_type.type,1))
-    preprocessed_data = properties.prep_data_params.process_type.type_list{1};
-    filepath = strrep(preprocessed_data.file_location,'SubID',subID);
-    base_path =  strrep(preprocessed_data.base_path,'SubID',subID);
-    data_path = fullfile(base_path,filepath);
-elseif(isequal(properties.prep_data_params.process_type.type,2))
-    preprocessed_data = properties.prep_data_params.process_type.type_list{2};
-    if(~isequal(preprocessed_data.base_path,'none'))
-        filepath = strrep(preprocessed_data.file_location,'SubID',subID);
-        base_path =  strrep(preprocessed_data.base_path,'SubID',subID);
-        data_path = fullfile(base_path,filepath);
+base_path = fullfile(properties.general_params.bcv_config.export_path,ProtocolInfo.Comment);
+if(~isfolder(base_path))
+    mkdir(base_path);
+end
+
+structures  = dir(fullfile(base_path,'**',strcat(subID,'*')));
+if(~isempty(structures))
+    for i=1:length(structures)
+        structure = structures(i);
+        if(structure.isdir)
+            export_path     = fullfile(base_path,structure.name);
+            subject_file = fullfile(structure.folder,structure.name,'subject.mat');
+            if(isfile(subject_file))
+                subject_info = load(subject_file);
+                if(isfield(subject_info,'meeg_dir'))
+                    MEEG = load(fullfile(export_path,subject_info.meeg_dir));
+                    [Cdata, HeadModel]  = filter_structural_result_by_preproc_data(MEEG.labels, Cdata, HeadModel);
+                    action = 'update';
+                    save_output_files(action, base_path, modality, subject_info, subID, MEEG, HeadModel, Cdata, Shead, Sout, Sinn, Scortex);
+                else
+                    action = 'new';
+                    save_output_files(action, base_path, modality, subID, HeadModel, Cdata, Cdata, Shead, Sout, Sinn, Scortex);
+                end
+            else
+                action = 'new';
+                save_output_files(action, base_path, modality, subID, HeadModel, Cdata, Cdata, Shead, Sout, Sinn, Scortex);
+            end
+        end
     end
-end
-if(exist('data_path','var') && (isfile(data_path) || isfolder(data_path)))    
-    disp ("-->> Genering MEG/EEG file");
-    preprocessed_data.general_params = properties.general_params;
-    preprocessed_data.clean_data = properties.prep_data_params.clean_data;
-    preprocessed_data.channel_label_file = properties.channel_params.channel_label_file;
-    [HeadModels,Cdatas, MEEGs] = load_preprocessed_data(modality,subID,preprocessed_data,data_path,HeadModel,Cdata);
 else
-    export_error = "Missing preprocessed data";
-    return;
+    action = 'new';
+    save_output_files(action, base_path, modality, subID, HeadModel, Cdata, Shead, Sout, Sinn, Scortex);
 end
 
-%%
-%% Creating structure for the subject and save the output files
-%%
-if(~exist('MEEGs','var') && isempty(MEEGs))
-    MEEGs.subID = subID;   
-end
-save_output_files(properties,modality,MEEGs,HeadModels,Cdatas,scalp,outerS,innerS,surf);
 end
 
