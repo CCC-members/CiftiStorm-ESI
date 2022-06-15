@@ -25,7 +25,7 @@
                     "name":"hcp_anat_individual",
                     "description":"",
                     "subID_prefix":"",
-                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/update_data/ciftify/SubID",
+                    "base_path":"/mnt/Store/Data/CMI_QC/Ciftify/SubID",
                     "file_location":"T1w/T1w.nii.gz",
                     "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
                     "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
@@ -39,7 +39,7 @@
             "file_location":"MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/update_data/non-brain/SubID",
+            "base_path":"/mnt/Store/Data/CMI_QC/Non_brain/SubID",
             "head_file_location":"SubID_outskin_mesh.nii.gz",
             "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
             "innerfile_file_location":"SubID_inskull_mesh.nii.gz"

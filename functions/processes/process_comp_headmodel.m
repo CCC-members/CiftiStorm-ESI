@@ -180,7 +180,7 @@ sStudy = bst_get('Study', iStudy);
 % If a new head model is available
 sHeadModel                      = db_template('headmodel');
 sHeadModel.FileName             = file_short(headmodel_options.HeadModelFile);
-sHeadModel.Comment              = headmodel_options.Comment;
+sHeadModel.Comment              = strrep(headmodel_options.Comment,' ','');
 sHeadModel.HeadModelType        = headmodel_options.HeadModelType;
 % Update Study structure
 iHeadModel                      = length(sStudy.HeadModel) + 1;
@@ -194,20 +194,7 @@ db_save();
 %%
 %% Quality control of Head model
 %%
-%%
-%% Checking the report output structure
-%%
-[subject_report_path, report_name] = get_report_path(properties, subID);
-qc_headmodel(headmodel_options,properties.general_params.modality,subject_report_path);
-
-%%
-%% Save and display report
-%%
-ReportFile = bst_report('Save', []);
-bst_report('Export',  ReportFile,report_name);
-bst_report('Open', ReportFile);
-bst_report('Close');
-disp(strcat("-->> Process finished for subject: Template"));
+qc_headmodel(headmodel_options, properties, subID);
 
 end
 

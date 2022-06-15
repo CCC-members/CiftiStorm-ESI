@@ -8,7 +8,7 @@ end
 HeadModelFile               = fullfile(protocol_data_path,sStudy.HeadModel(iHeadModel).FileName);
 BSTHeadModel                = load(HeadModelFile);
 HeadModel                   = struct;
-HeadModel.Comment           = BSTHeadModel.Comment;
+HeadModel.Comment           = strrep(BSTHeadModel.Comment,' ','');
 HeadModel.Ke                = BSTHeadModel.Gain;
 HeadModel.HeadModelType     = BSTHeadModel.HeadModelType;
 HeadModel.GridOrient        = BSTHeadModel.GridOrient;
