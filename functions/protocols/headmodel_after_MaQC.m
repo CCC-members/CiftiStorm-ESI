@@ -31,7 +31,7 @@ process_error           = [];
 modality                = properties.general_params.modality;
 subjects_process_error  = [];
 subjects_processed      = [];
-report_output_path      = properties.general_params.reports.output_path;
+report_output_path      = properties.general_params.bst_export.output_path;
 general_params          = properties.general_params;
 
 new_bst_DB              = general_params.bst_config.db_path;

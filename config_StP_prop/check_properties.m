@@ -220,7 +220,7 @@ if(~general_params.bst_config.after_MaQC.run)
         count_Atlas = 0;
         for i=1:length(structures)
             structure = structures(i);
-            T1w_file = fullfile(base_path,structure.name,selected_anatomy.file_location);
+            T1w_file = fullfile(base_path,structure.name,strrep(selected_anatomy.file_location,SubID,structure.name));
             if(~isfile(T1w_file)); count_T1w = count_T1w + 1; end
             L_surf = fullfile(base_path,structure.name,strrep(selected_anatomy.L_surface_location,SubID,structure.name));
             if(~isfile(L_surf)); count_L_surf = count_L_surf + 1; end

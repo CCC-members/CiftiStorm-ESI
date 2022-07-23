@@ -9,7 +9,11 @@ Method                      = properties.headmodel_params.Method.value;
 ProtocolInfo                = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject, iSubject]        = bst_get('Subject', subID);
-[sStudies, iStudy]          = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+if(isequal(properties.channel_params.channel_type.type,1))
+    [~, iStudy]             = bst_get('StudyWithSubject', sSubject.FileName);
+else
+    [~, iStudy]             = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
 sStudy                      = bst_get('Study', iStudy);
 
 [options, errMessage]       = bst_headmodeler;
@@ -194,7 +198,7 @@ db_save();
 %%
 %% Quality control of Head model
 %%
-qc_headmodel(headmodel_options, properties, subID);
+% qc_headmodel(headmodel_options, properties, subID);
 
 end
 
