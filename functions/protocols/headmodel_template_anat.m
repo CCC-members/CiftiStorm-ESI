@@ -19,7 +19,7 @@ ProtocolName            = properties.general_params.bst_config.protocol_name;
 ProtocolName_R          = strcat(ProtocolName,'_Template');
 subjects_process_error  = [];
 subjects_processed      = [];
-report_output_path      = properties.general_params.reports.output_path;
+report_output_path      = properties.general_params.bst_export.output_path;
 protocol_reset          = properties.general_params.bst_config.protocol_reset;
 
 %%

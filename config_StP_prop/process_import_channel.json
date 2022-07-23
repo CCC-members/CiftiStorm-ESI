@@ -3,18 +3,18 @@
     "params":{
         "channel_type":{
             "description":"Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template ",
-            "type":2,
+            "type":1,
             "type_list":[
                 {
                     "name":"raw_data",
                     "description":"",
                     "subID_prefix":"",
-                    "base_path":"Z:/data3_260T/data/CCLAB_DATASETS/CMI/CMI-HBN_data/whole_eeg/SubID",
-                    "file_location":"EEG/raw/mff_format/SubID",
-                    "data_format":"mff",
-                    "isfile":false,
-                    "group_layout_name":"Colin27",
-                    "channel_layout_name":"GSN 129"  
+                    "base_path":"/mnt/Store/Data/Conectome/Sample/SubID",
+                    "file_location":"meg/SubID/unprocessed/MEG/5-Restin/4D/c,rfDC",
+                    "data_format":"4D",
+                    "isfile":true,
+                    "group_layout_name":"",
+                    "channel_layout_name":""  
                 },
                 {
                     "name":"import_channel",

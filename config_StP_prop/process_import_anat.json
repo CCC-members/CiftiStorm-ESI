@@ -25,21 +25,21 @@
                     "name":"hcp_anat_individual",
                     "description":"",
                     "subID_prefix":"",
-                    "base_path":"/mnt/Store/Data/CMI_QC/Ciftify/SubID",
-                    "file_location":"T1w/T1w.nii.gz",
-                    "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
-                    "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
-                    "Atlas_seg_location":"T1w/aparc.a2009s+aseg.nii.gz"
+                    "base_path":"/mnt/Store/Data/Conectome/Sample/SubID",
+                    "file_location":"preproc/SubID/T1w/T1w_acpc_dc_restore.nii.gz",
+                    "L_surface_location":"preproc/SubID/T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
+                    "R_surface_location":"preproc/SubID/T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
+                    "Atlas_seg_location":"preproc/SubID/T1w/aparc.a2009s+aseg.nii.gz"
                 }
             ]
         },
         "mri_transformation":{
-            "use_transformation":false,
-            "base_path":"E:/Data/Conectome/HCP_data/SubID",
-            "file_location":"MEG/anatomy/SubID_MEG_anatomy_transform.txt"
+            "use_transformation":true,
+            "base_path":"/mnt/Store/Data/Conectome/Sample/SubID",
+            "file_location":"meg/SubID/MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"/mnt/Store/Data/CMI_QC/Non_brain/SubID",
+            "base_path":"/mnt/Store/Data/Conectome/non-brain/SubID",
             "head_file_location":"SubID_outskin_mesh.nii.gz",
             "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
             "innerfile_file_location":"SubID_inskull_mesh.nii.gz"

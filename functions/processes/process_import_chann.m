@@ -34,6 +34,9 @@ switch type
         if(isequal(lower(format),'fif'))
             bst_format = 'FIF';
         end
+         if(isequal(lower(format),'4d'))
+            bst_format = '4D';
+        end
         base_path = strrep(channel_params.base_path,'SubID',subID);
         raw_ref = strrep(channel_params.file_location,'SubID',subID);
         raw_file = fullfile(base_path,raw_ref);
