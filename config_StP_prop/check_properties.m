@@ -1,7 +1,8 @@
-function status = check_properties(properties)
+function [status, reject_subjets] = check_properties(properties)
 %CHECK_PROPERTIES Summary of this function goes here
 %   Detailed explanation goes here
 status = true;
+reject_subjets = [];
 disp("-->> Checking properties");
 
 %%
@@ -214,85 +215,32 @@ if(~general_params.bst_config.after_MaQC.run)
         end
         structures = dir(base_path);
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
-        count_T1w = 0;
-        count_L_surf = 0;
-        count_R_surf = 0;
-        count_Atlas = 0;
+        count_HCP_structure = 0;
+        
         for i=1:length(structures)
             structure = structures(i);
-            T1w_file = fullfile(base_path,structure.name,strrep(selected_anatomy.file_location,SubID,structure.name));
-            if(~isfile(T1w_file)); count_T1w = count_T1w + 1; end
-            L_surf = fullfile(base_path,structure.name,strrep(selected_anatomy.L_surface_location,SubID,structure.name));
-            if(~isfile(L_surf)); count_L_surf = count_L_surf + 1; end
-            R_surf = fullfile(base_path,structure.name,strrep(selected_anatomy.R_surface_location,SubID,structure.name));
-            if(~isfile(R_surf)); count_R_surf = count_R_surf + 1; end
-            atlas_file = fullfile(base_path,structure.name,strrep(selected_anatomy.Atlas_seg_location,SubID,structure.name));
-            if(~isfile(atlas_file)); count_Atlas = count_Atlas + 1; end
+            anat_path = fullfile(base_path,structure.name,strrep(selected_anatomy.HCP_anat_path,SubID,structure.name), 'T1w');
+            checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
+            if(~checked) 
+                count_HCP_structure = count_HCP_structure + 1; 
+                reject_subjets = [reject_subjets; structure.name];
+            end
+            
         end
-        if(~isequal(count_T1w,0))
-            if(isequal(count_T1w,length(structures)))
-                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
-                fprintf(2,'We can not find the T1w file in this address:\n');
-                disp(strcat(T1w_file));
+        if(~isequal(count_HCP_structure,0))
+            if(isequal(count_HCP_structure,length(structures)))
+                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');                
                 disp('Please check the HCP individual folder.');
                 status = false;
                 disp('-->> Process stoped!!!');
                 return;
             else
-                warning('The Template folder is not a HCP structure.');
-                warning('We can not find the T1w file in this address:');
-                warning(strcat(selected_anatomy.file_location));
+                warning('Some of the subjects do not have a HCP structure.');
+                warning('Those anatomies will reject from the analysis.');
                 warning('Please check the HCP individual folder.');
             end
         end
-        if(~isequal(count_L_surf,0))
-            if(isequal(count_L_surf,length(structures)))
-                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
-                fprintf(2,'We can not find the Left surf file in this address:\n');
-                disp(strcat(selected_anatomy.L_surface_location));
-                disp('Please check the Left surface config.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('The Template folder is not a HCP structure.');
-                warning('We can not find the Left surf file in this address:');
-                warning(strcat(selected_anatomy.L_surface_location));
-                warning('Please check the Left surface config.');
-            end
-        end
-        if(~isequal(count_R_surf,0))
-            if(isequal(count_R_surf,length(structures)))
-                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
-                fprintf(2,'We can not find the Rigth surf file in this address:\n');
-                fprintf(2,strcat(selected_anatomy.R_surface_location,'\n'));
-                disp('Please check the R surface config.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('The Template folder is not a HCP structure.');
-                warning('We can not find the Rigth surf file in this address:');
-                warning(strcat(selected_anatomy.R_surface_location));
-                warning('Please check the R surface config.');
-            end
-        end
-        if(~isequal(count_Atlas,0))
-            if(isequal(count_Atlas,length(structures)))
-                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
-                fprintf(2,'We can not find the Atlas file in this address:\n');
-                fprintf(2,strcat(selected_anatomy.Atlas_seg_location,'\n'));
-                disp('Please check the atlas file config.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('The Template folder is not a HCP structure.');
-                warning('We can not find the Atlas file in this address:');
-                warning(strcat(selected_anatomy.Atlas_seg_location));
-                warning('Please check the atlas file config.');
-            end
-        end
+        
         % Check non brain surfaces configuration
         if(isequal(selected_anatomy.subID_prefix,'none') || isempty(selected_anatomy.subID_prefix))
             SubID = 'SubID';

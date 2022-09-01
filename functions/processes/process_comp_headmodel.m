@@ -198,7 +198,7 @@ db_save();
 %%
 %% Quality control of Head model
 %%
-% qc_headmodel(headmodel_options, properties, subID);
+qc_headmodel(headmodel_options, properties, subID);
 
 end
 

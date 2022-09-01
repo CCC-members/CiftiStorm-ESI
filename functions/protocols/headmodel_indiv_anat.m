@@ -16,7 +16,7 @@ process_error = [];
 ProtocolName            = properties.general_params.bst_config.protocol_name;
 subjects_process_error  = [];
 subjects_processed      = [];
-bst_output_path      = properties.general_params.bst_export.output_path;
+bst_output_path         = properties.general_params.bst_export.output_path;
 general_params          = properties.general_params;
 anatomy_type            = properties.anatomy_params.anatomy_type.type_list{3};
 
@@ -24,8 +24,7 @@ disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
 [base_path,name,ext] = fileparts(anatomy_type.base_path);
 subjects = dir(base_path);
 subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
-subjects_process_error = [];
-subjects_processed =[];
+
 for j=1:length(subjects)
     subject_name = subjects(j).name;
     if(isequal(anatomy_type.subID_prefix,'none') || isempty(anatomy_type.subID_prefix))
