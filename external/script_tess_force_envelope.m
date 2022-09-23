@@ -1,4 +1,4 @@
-function [NewTessFile, iSurface] = script_tess_force_envelope(TessFile, EnvFile)
+function [NewTessFile, iSurface] = script_tess_force_envelope(TessFile, EnvFile, subject_report_path)
 % TESS_FORCE_ENVELOPE: Forces the vertices of a surface to fit entirely in an envelope.
 %
 % USAGE:  [NewTessFile, iSurface] = tess_force_envelope(TessFile, EnvFile)
@@ -43,7 +43,7 @@ EnvMat = in_tess_bst(EnvFile);
 EnvMat.Faces    = double(EnvMat.Faces);
 EnvMat.Vertices = double(EnvMat.Vertices);
 % Compute best fitting sphere from envelope
-[bfs_center, bfs_radius] = bst_bfs(EnvMat.Vertices);
+bfs_center = bst_bfs(EnvMat.Vertices);
 
 
 % ===== DEFORM SURFACE TO FIT IN ENVELOPE =====
@@ -67,6 +67,8 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
     if isempty(iVertOut)
         %     bst_progress('stop');
         %     java_dialog('msgbox', 'All cortex vertices are already inside the inner skull.', 'Fix cortex surface');
+        NewTessFile = [];
+        iSurface = [];
         return;
     end
     % Display where the outside points are
@@ -76,6 +78,29 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
     view_surface(EnvFile, [], [], hFig_before);
     figure_3d('SetStandardView', hFig_before, 'bottom');
     
+    %% Original    
+    % Fix point by point
+    iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
+    for i = 1:length(iVertOut)
+        bst_progress('start', 'Fix cortex surface', sprintf('Fixing vertex %d/%d...', i, length(iVertOut)));
+        % While point is still outside: loop
+        while ~inpolyhd(vCortex(iVertOut(i),:), vInner, EnvMat.Faces)
+            % Find the other cortex points close to the outlier
+            dist = sqrt(sum(bst_bsxfun(@minus, vCortex, vCortex(iVertOut(i),:)).^2, 2));
+            maxDist = 0.01;
+            iv = find(dist < maxDist);
+            % Decrease the radius for the points in the neighborhood of the outliers
+            correction = .00001 .* (maxDist-dist(iv)) ./ maxDist;
+            rCortex(iv) = rCortex(iv) - correction;
+            % Recompute cartesian coordinates of the vertices
+            [vCortex(iv,1), vCortex(iv,2), vCortex(iv,3)] = sph2cart(thCortex(iv), phiCortex(iv), rCortex(iv));
+        end
+    end    
+    %%
+    %%  Distance correction
+    [nearVertInnSk,distance, mins_dist] = get_points_within_limit(EnvMat.Vertices, TessMat.Vertices,0.003);
+    iVertOut = [iVertOut; nearVertInnSk];
+    iVertOut = unique(iVertOut);
     
     % Fix point by point
     for i = 1:length(iVertOut)
@@ -137,10 +162,27 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
     figure_3d('SetStandardView', hFig_after, 'bottom');
     
     if(~isempty(iVertOut))
-        bst_report('Snapshot',hFig_before,[],'Cortex view before force the vertices inside of InnerSkull.', [200,200,750,475]);
-        bst_report('Snapshot',hFig_after,[],'Cortex view. All cortex vertices are already inside the inner skull.', [200,200,750,475]);
-    end
-    close ([hFig_before,hFig_after]);
+        figures     = {hFig_before, hFig_before, hFig_before, hFig_before};
+        desc = split(TessMat.Comment,"_");
+        fig_text    =  strcat("Distance correction - ",desc{2});
+        fig_out     = merge_figures(fig_text, fig_text, figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],'Cortex view before force the vertices inside of InnerSkull.', [200,200,900,700]);  
+        savefig( hFig_before,fullfile(subject_report_path,fig_text));
+        close(fig_out);
+        fig_text    =  strcat("Distance corrected - ",desc{2});
+        figures     = {hFig_after, hFig_after, hFig_after, hFig_after};
+        fig_out     = merge_figures(fig_text, fig_text, figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],'Cortex view. All cortex vertices are already inside the inner skull.', [200,200,900,700]);
+        savefig( hFig_after,fullfile(subject_report_path,fig_text));
+        close(fig_out);
+    end    
+    close([hFig_before,hFig_after]);
     % Close progress bar
     bst_progress('stop');
     

@@ -1,4 +1,4 @@
-function [process_error] = headmodel_process_interface(properties)
+function [process_error] = headmodel_process_interface(properties, reject_subjects)
 process_error = [];
 
 if(properties.general_params.bst_config.after_MaQC.run)
@@ -11,7 +11,7 @@ else
         case 2
             process_error = headmodel_template_anat(properties);
         case 3
-            process_error = headmodel_indiv_anat(properties);
+            process_error = headmodel_indiv_anat(properties, reject_subjects);
     end
 end
 

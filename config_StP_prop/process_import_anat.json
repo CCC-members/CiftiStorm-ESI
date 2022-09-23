@@ -6,43 +6,54 @@
             "type":3,
             "type_list":[
                 {
+                    "id":1,
                     "name":"default_anatomy",            
                     "description":"Select the group and name of the sensor layout. See app/bst_default_anatomy.json file and select all params from there",
-                    "template_name":"ICBM152",
-                    "default_atlas":"Desikan-Killiany"
+                    "template_name":"FsAverage_2020",
+                    "default_atlas":"Desikan-Killiany",
+                    "layer_desc":{
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
+                        "desc":"fs_LR"
+                    }
                 },
                 {
+                    "id":2,
                     "name":"hcp_anat_template",
                     "description":"Use this configuration as anatomy template",
-                    "template_name":"ICBM152_2019",
-                    "base_path":"E:/Data/Template/Ciftify",
-                    "file_location":"T1w/T1w.nii.gz",
-                    "L_surface_location":"T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
-                    "R_surface_location":"T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
-                    "Atlas_seg_location":"T1w/aparc.a2009s+aseg.nii.gz"
+                    "template_name":"100307",
+                    "base_path":"/mnt/Store/Data/Conectome/Sample",
+                    "HCP_anat_path":"preproc/SubID",
+                    "T1w_file_name":"T1w_acpc_dc_restore.nii.gz",
+                    "layer_desc":{
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
+                        "desc":"midthickness"
+                    },                    
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
                 },
                 {
+                    "id":"3",
                     "name":"hcp_anat_individual",
                     "description":"",
                     "subID_prefix":"",
-                    "base_path":"/mnt/Store/Data/Conectome/Sample/SubID",
-                    "file_location":"preproc/SubID/T1w/T1w_acpc_dc_restore.nii.gz",
-                    "L_surface_location":"preproc/SubID/T1w/fsaverage_LR32k/SubID.L.midthickness.32k_fs_LR.surf.gii",
-                    "R_surface_location":"preproc/SubID/T1w/fsaverage_LR32k/SubID.R.midthickness.32k_fs_LR.surf.gii",
-                    "Atlas_seg_location":"preproc/SubID/T1w/aparc.a2009s+aseg.nii.gz"
+                    "base_path":"/mnt/Store/Data/CHBM_QC/Ciftify",
+                    "HCP_anat_path":"",
+                    "T1w_file_name":"T1w.nii.gz",
+                    "layer_desc":{
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
+                        "desc":"midthickness"
+                    },                    
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
                 }
             ]
         },
         "mri_transformation":{
-            "use_transformation":true,
-            "base_path":"/mnt/Store/Data/Conectome/Sample/SubID",
+            "use_transformation":false,
+            "base_path":"/mnt/Store/Data/Conectome/Sample",
             "file_location":"meg/SubID/MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
-            "base_path":"/mnt/Store/Data/Conectome/non-brain/SubID",
-            "head_file_location":"SubID_outskin_mesh.nii.gz",
-            "outerfile_file_location":"SubID_outskull_mesh.nii.gz",
-            "innerfile_file_location":"SubID_inskull_mesh.nii.gz"
+            "description":"FSL Bet command output",
+            "base_path":"/mnt/Store/Data/CHBM_QC/Non_brain"            
         },
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample each surface: default <<8000>>",

@@ -8,7 +8,7 @@
         "BemSelect":[true,true,true],
         "Method":{
             "description":"Recomended options EEG=<<openmeeg>> MEG=<<os_meg>>. Others options <<meg_sphere>> <<eeg_3sphereberg>> <<duneuro>> ",
-            "value":"os_meg"
+            "value":"openmeeg"
         },        
         "method_type":[
             {

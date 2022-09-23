@@ -18,7 +18,8 @@ if(isempty(iStudy))
 end
 BSTCortexFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);
 cortex = load(BSTCortexFile);
-
+desc   = split(cortex.Comment,'_');
+desc   = desc{2};
 BSTScalpFile = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.HeadFile);
 head = load(BSTScalpFile);
 
@@ -46,36 +47,30 @@ if(isequal(modality,'EEG'))
     %%
     %% Ploting sensors and sources on the scalp and cortex
     %%
-    [hFig25] = view3D_K(Kn,cortex,head,Channels,17);
-    bst_report('Snapshot',hFig25,[],'Field top view', [200,200,750,475]);
-    view(0,360)
-    savefig( hFig25,fullfile(subject_report_path,'Field view.fig'));
+    fig_title = strcat('Realistic field view (',desc,')');
+    [hFig25] = view3D_K(fig_title, Kn, cortex, head, Channels,2);
     
-    bst_report('Snapshot',hFig25,[],'Field right view', [200,200,750,475]);
-    view(1,180)
-    bst_report('Snapshot',hFig25,[],'Field left view', [200,200,750,475]);
-    view(90,360)
-    bst_report('Snapshot',hFig25,[],'Field front view', [200,200,750,475]);
-    view(270,360)
-    bst_report('Snapshot',hFig25,[],'Field back view', [200,200,750,475]);
+    figures     = {hFig25, hFig25, hFig25, hFig25};
+    fig_out     = merge_figures(fig_title, fig_title, figures,...
+        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+        'colorbars',{'off','off','off','off'},...
+        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]);    
+    savefig( hFig25,fullfile(subject_report_path,strcat(fig_title,'.fig')));     
     % Closing figure
-    close(hFig25);
+    close(hFig25, fig_out);
     
-    
-    [hFig26]    = view3D_K(Khom,cortex,head,Channels,17);
-    bst_report('Snapshot',hFig26,[],'Homogenous field top view', [200,200,750,475]);
-    view(0,360)
-    savefig( hFig26,fullfile(subject_report_path,'Homogenous field view.fig'));
-    
-    bst_report('Snapshot',hFig26,[],'Homogenous field right view', [200,200,750,475]);
-    view(1,180)
-    bst_report('Snapshot',hFig26,[],'Homogenous field left view', [200,200,750,475]);
-    view(90,360)
-    bst_report('Snapshot',hFig26,[],'Homogenous field front view', [200,200,750,475]);
-    view(270,360)
-    bst_report('Snapshot',hFig26,[],'Homogenous field back view', [200,200,750,475]);
+    fig_title   = strcat('Homogenous field view (',desc,')');
+    [hFig26]    = view3D_K(fig_title, Khom,cortex,head,Channels,2);
+    figures     = {hFig26, hFig26, hFig26, hFig26};
+    fig_out     = merge_figures(fig_title, fig_title, figures,...
+        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+        'colorbars',{'off','off','off','off'},...
+        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]);    
+    savefig( hFig26,fullfile(subject_report_path,strcat(fig_title,'.fig')));    
     % Closing figure
-    close(hFig26);
+    close(hFig26, fig_out);
     
     VertNorms   = reshape(VertNorms,[1,Nv,3]);
     VertNorms   = repmat(VertNorms,[Ne,1,1]);
@@ -86,11 +81,11 @@ if(isequal(modality,'EEG'))
     %Homogenous Lead Field vs. Tester Lead Field Plot
     hFig27 = figure;
     scatter(Khom(:),Kn(:));
-    title('Homogenous Lead Field vs. Tester Lead Field');
+    title(strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,')'));
     xlabel('Homogenous Lead Field');
     ylabel('Tester Lead Field');
-    bst_report('Snapshot',hFig27,[],'Homogenous Lead Field vs. Tester Lead Field', [200,200,750,475]);
-    savefig( hFig27,fullfile(subject_report_path,'Homogenous Lead Field vs. Tester Lead Field.fig'));
+    bst_report('Snapshot',hFig27,[],strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,')'), [200,200,900,700]);
+    savefig( hFig27,fullfile(subject_report_path,strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,').fig')));
     % Closing figure
     close(hFig27);
     
@@ -104,9 +99,9 @@ if(isequal(modality,'EEG'))
     plot([1:size(Kn,1)],corelch,[1:size(Kn,1)],0.7,'r-');
     xlabel('Channels');
     ylabel('Correlation');
-    title('Correlation between both lead fields channel-wise');
-    bst_report('Snapshot',hFig28,[],'Correlation between both lead fields channel-wise', [200,200,750,475]);
-    savefig( hFig28,fullfile(subject_report_path,'Correlation channel-wise.fig'));
+    title(strcat('Correlation between both lead fields channel-wise (',desc,')'));
+    bst_report('Snapshot',hFig28,[],strcat('Correlation between both lead fields channel-wise (',desc,')'), [200,200,900,700]);
+    savefig( hFig28,fullfile(subject_report_path,strcat('Correlation channel-wise(',desc,').fig')));
     % Closing figure
     close(hFig28);
     
@@ -122,10 +117,10 @@ if(isequal(modality,'EEG'))
     %plotting voxel wise correlation
     hFig29 = figure;
     plot([1:Nv],corelv);
-    title('Correlation both lead fields Voxel wise');
-    % Including to report
-    bst_report('Snapshot',hFig29,[],'Correlation both lead fields Voxel wise', [200,200,750,475]);
-    savefig( hFig29,fullfile(subject_report_path,'Correlation Voxel wise.fig'));
+    title(strcat('Correlation both lead fields Voxel wise (',desc,')'));
+    % Including to report    
+    bst_report('Snapshot',hFig29,[],strcat('Correlation both lead fields Voxel wise (',desc,')'), [200,200,900,700]);
+    savefig( hFig29,fullfile(subject_report_path,strcat('Correlation Voxel wise (',desc,').fig')));
     close(hFig29);
     
     %%
@@ -143,9 +138,15 @@ if(isequal(modality,'EEG'))
     
     line(cortex.Vertices(low_cor_inds,1), cortex.Vertices(low_cor_inds,2), cortex.Vertices(low_cor_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
     figure_3d('SetStandardView', hFig_low_cor, 'bottom');
-    bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
-    savefig( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
-    close(hFig_low_cor);
+    fig_text    =  strcat('Low correlation Voxel (',desc,')');
+    figures     = {hFig_low_cor, hFig_low_cor, hFig_low_cor, hFig_low_cor};
+    fig_out     = merge_figures(fig_text, fig_text, figures,...
+        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+        'colorbars',{'off','off','off','off'},...
+        'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+    bst_report('Snapshot',fig_out,[],strcat('Low correlation Voxel (',desc,')'), [200,200,900,700]);
+    savefig( hFig_low_cor,fullfile(subject_report_path,strcat('Low correlation Voxel (',desc,').fig')));
+    close(hFig_low_cor, fig_out);
     
     figure_cor = figure;
     %colormap(gca,cmap);
@@ -153,10 +154,16 @@ if(isequal(modality,'EEG'))
     view(90,270);
     axis off;
     colorbar;
-    title('Distance correlation map');
-    bst_report('Snapshot',figure_cor,[],'Low correlation map', [200,200,750,475]);
-    savefig( figure_cor,fullfile(subject_report_path,'Low correlation Voxel interpolation.fig'));
-    close(figure_cor);
+    fig_text    =  strcat('Distance correlation map (',desc,')');
+    title(fig_text);    
+    figures     = {figure_cor, figure_cor, figure_cor, figure_cor};
+    fig_out     = merge_figures(fig_text, fig_text, figures,...
+        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+        'colorbars',{'on','on','on','on'}, 'position', 'relative',...
+        'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+    bst_report('Snapshot',fig_out,[],strcat('Low correlation map (',desc,')'), [200,200,900,700]);
+    savefig( figure_cor,fullfile(subject_report_path,strcat('Low correlation Voxel interpolation (',desc,').fig')));
+    close(figure_cor,fig_out);
 else
     %%
     %% Uploading Channels Loc

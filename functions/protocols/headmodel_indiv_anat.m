@@ -1,4 +1,4 @@
-function process_error = headmodel_indiv_anat(properties)
+function process_error = headmodel_indiv_anat(properties, reject_subjects)
 % Description here
 %
 %
@@ -11,21 +11,22 @@ function process_error = headmodel_indiv_anat(properties)
 %%
 %% Preparing selected protocol
 %%
-process_error = [];
-
-ProtocolName            = properties.general_params.bst_config.protocol_name;
+process_error           = [];
 subjects_process_error  = [];
 subjects_processed      = [];
-bst_output_path      = properties.general_params.bst_export.output_path;
+ProtocolName            = properties.general_params.bst_config.protocol_name;
+bst_output_path         = properties.general_params.bst_export.output_path;
 general_params          = properties.general_params;
 anatomy_type            = properties.anatomy_params.anatomy_type.type_list{3};
 
 disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
-[base_path,name,ext] = fileparts(anatomy_type.base_path);
-subjects = dir(base_path);
+base_path = anatomy_type.base_path;
+subjects  = dir(base_path);
 subjects(ismember( {subjects.name}, {'.', '..'})) = [];  %remove . and ..
-subjects_process_error = [];
-subjects_processed =[];
+if(~isempty(reject_subjects))
+   subjects(ismember({subjects.name}, reject_subjects)) = []; 
+end
+
 for j=1:length(subjects)
     subject_name = subjects(j).name;
     if(isequal(anatomy_type.subID_prefix,'none') || isempty(anatomy_type.subID_prefix))
@@ -60,14 +61,13 @@ for j=1:length(subjects)
             gui_brainstorm('CreateProtocol',ProtocolName , 0, 0);
         else
             gui_brainstorm('SetCurrentProtocol', iProtocol);
-            sSubjects = bst_get('ProtocolSubjects');
-            if(~isempty(find(ismember({sSubjects.Subject.Name},subID), 1)))
-                db_delete_subjects( find(ismember({sSubjects.Subject.Name},subID)) );
+            ProtocolSubjects = bst_get('ProtocolSubjects');
+            if(~isempty(find(ismember({ProtocolSubjects.Subject.Name},subID), 1)))
+                db_delete_subjects( find(ismember({ProtocolSubjects.Subject.Name},subID)) );
             end
         end
     end
-    
-    %     try
+
     %%
     %% Creating subject in Protocol
     %%
@@ -87,18 +87,26 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
-    anat_error = process_import_anat(properties,'individual',iSubject,subID);
+    [anat_error, CSurfaces, sub_to_FSAve] = process_import_anat(properties,'individual',iSubject,subID);
     if(~isempty(fieldnames(anat_error)))
         continue;
     end
+    
+    %%
+    %% Process: Import Atlas
+    %%
+    disp("--------------------------------------------------------------------------");
+    disp("-->> Process Import Atlas");
+    disp("--------------------------------------------------------------------------");
+    atlas_error = process_import_atlas(properties, 'individual', subID, CSurfaces);
     
     %%
     %% Process: Generate BEM surfaces
     %%
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Generate BEM surfaces");
-    disp("--------------------------------------------------------------------------");
-    [errMessage]    = process_gen_bem_surfaces(properties, subID);
+    disp("--------------------------------------------------------------------------");    
+    [errMessage]    = process_gen_bem_surfaces(properties, subID, CSurfaces);
     sSubject        = bst_get('Subject', subID);
     iScalp          = sSubject.iScalp;
     iOuterSkull     = sSubject.iOuterSkull;
@@ -129,7 +137,7 @@ for j=1:length(subjects)
     
     %
     hFigMri15 = view_mri(MriFile, ScalpFile);
-    bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
+    bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,900,700]);
     savefig( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
     % Close figures
     close(hFigMri15);
@@ -152,22 +160,14 @@ for j=1:length(subjects)
     if(~isempty(channel_error))
         continue;
     end
-    
+        
     %%
-    %% Process: Import Atlas
-    %%
-    disp("--------------------------------------------------------------------------");
-    disp("-->> Process Import Atlas");
-    disp("--------------------------------------------------------------------------");
-    atlas_error = process_import_atlas(properties, 'individual', subID);
-    
-    %%
-    %% Getting Headmodeler options
+    %% Process: Compute Headmodel
     %%
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
-    [headmodel_options, errMessage] = process_comp_headmodel(properties, subID);
+    errMessage = process_comp_headmodel(properties, subID, CSurfaces);
     
     %%
     %% Export subject from protocol
@@ -178,8 +178,8 @@ for j=1:length(subjects)
     if(~isfolder(fullfile(bst_output_path,'Subjects',ProtocolName)))
         mkdir(fullfile(bst_output_path,'Subjects',ProtocolName));
     end
-    iProtocol = bst_get('iProtocol');
-    [sSubject, iSubject] = bst_get('Subject', subID);
+    iProtocol       = bst_get('iProtocol');
+    [~, iSubject]   = bst_get('Subject', subID);
     export_protocol(iProtocol, iSubject, fullfile(bst_output_path,'Subjects',ProtocolName,strcat(subID,'.zip')));
     
     %%
@@ -188,20 +188,13 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Export BST Report");
     disp("--------------------------------------------------------------------------");
-    [subject_report_path, report_name] = get_report_path(properties, subID);
-    ReportFile = bst_report('Save', []);
+    [~, report_name]    = get_report_path(properties, subID);
+    ReportFile          = bst_report('Save', []);
     bst_report('Export',  ReportFile, report_name);
     %     bst_report('Open', ReportFile);
     %     bst_report('Close');
     disp(strcat("-->> Process finished for subject: ",subID));
-    
-    %     catch
-    %         subjects_process_error = [subjects_process_error; subID];
-    %         [~, iSubject] = bst_get('Subject', subID);
-    %         db_delete_subjects( iSubject );
-    %         processed = false;
-    %         continue;
-    %     end
+        
     %%
     %% Export Subject to BC-VARETA
     %%
@@ -210,12 +203,11 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     if(isempty(errMessage))
         disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
-        if(properties.general_params.bcv_config.export)
-            export_error = export_subject_BCV_structure(properties,subID);
+        if(general_params.bcv_config.export)
+            export_error = export_subject_BCV_structure(properties,subID,CSurfaces,sub_to_FSAve);
         end
     end
-    %%
-    
+    %%    
     % Genering Manual QC file (need to check)
     %                     generate_MaQC_file();
     
