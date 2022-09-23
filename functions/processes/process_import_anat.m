@@ -7,7 +7,6 @@ anat_error = struct;
 %%
 anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
 
-
 %%
 %% Process: Import Anatomy
 %%
