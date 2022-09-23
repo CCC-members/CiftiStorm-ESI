@@ -86,7 +86,7 @@ ScalpFile   = sSubject.Surface(sSubject.iScalp).FileName;
 
 %
 hFigMri15 = view_mri(MriFile, ScalpFile);
-bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,750,475]);
+bst_report('Snapshot',hFigMri15,[],'SPM Scalp Envelope - MRI registration', [200,200,900,700]);
 savefig( hFigMri15,fullfile(subject_report_path,'SPM Scalp Envelope - MRI registration.fig'));
 % Close figures
 close(hFigMri15);

@@ -77,7 +77,7 @@ properties  = get_properties();
 if(isequal(properties,'canceled'))
     return;
 end
-[status, reject_subjets]     = check_properties(properties);
+[status, reject_subjects]     = check_properties(properties);
 if(~status)
     fprintf(2,strcat('\nBC-V-->> Error: The current configuration files are wrong \n'));
     disp('Please check the configuration files.');
@@ -104,7 +104,7 @@ addpath(genpath(bst_path));
 addpath(spm_path);
 
 %%
-%% Starting BrainStorm 
+%% Starting BrainStorm
 %%
 brainstorm reset
 brainstorm nogui local
@@ -162,11 +162,54 @@ if(~isequal(bst_db_path,'local'))
     bst_set('BrainstormDbDir', app_properties.bst_db_path);
 end
 
+%%
+%% Checking templates
+%%
+if(isequal(properties.anatomy_params.anatomy_type.type,1))
+    anatomy_type    = properties.anatomy_params.anatomy_type.type_list{1};
+    sTemplates      = bst_get('AnatomyDefaults');
+    Name            = anatomy_type.template_name;
+    sTemplate       = sTemplates(find(strcmpi(Name, {sTemplates.Name}),1));
+    if(isempty(sTemplate))
+        fprintf(2,'\n ->> Error: The selected anatomy template is wrong.');
+        disp(Name);
+        disp("Please, type a correct anatomy template in configuration file.");
+        disp("The process will be stoped!!!");
+        return;
+    end
+end
+if(isequal(properties.channel_params.channel_type.type,2))
+    % ===== GET DEFAULT =====
+    % Get registered Brainstorm EEG defaults
+    channel_params          = properties.channel_params.chann_config;
+    bstDefaults             = bst_get('EegDefaults');
+    nameGroup               = channel_params.group_layout_name;
+    nameLayout              = channel_params.channel_layout_name;
+    copyfile("templates/channel_GSN_129.mat",fullfile(bst_get('BrainstormHomeDir'),"defaults","eeg",nameGroup));
+    copyfile("templates/channel_GSN_HydroCel_129_E001.mat",fullfile(bst_get('BrainstormHomeDir'),"defaults","eeg",nameGroup));
+    iGroup                  = find(strcmpi(nameGroup, {bstDefaults.name}));
+    if(isempty(iGroup))
+        fprintf(2,'\n ->> Error: The selected channel template group name is wrong.');
+        disp(nameGroup);
+        disp("Please, type a correct  Channel group name");
+        disp("The process will be stoped!!!");
+        return;
+    end
+    iLayout                 = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
+    if(isempty(find(iLayout,1)))
+        fprintf(2,'\n ->> Error: The selected channel layout is wrong.');
+        disp(nameLayout);
+        disp("Please, type a correct Channel layout name");
+        disp("The process will be stoped!!!");
+        return;
+    end
+end
+
 %% Process selected dataset and compute the leadfield subjects
 %%
 %% Calling dataset function to analysis
 %%
-process_error = headmodel_process_interface(properties);
+process_error = headmodel_process_interface(properties,reject_subjects);
 
 %% Stoping BrainStorm
 disp('==========================================================================');

@@ -1,8 +1,8 @@
-function [status, reject_subjets] = check_properties(properties)
+function [status, reject_subjects] = check_properties(properties)
 %CHECK_PROPERTIES Summary of this function goes here
 %   Detailed explanation goes here
 status = true;
-reject_subjets = [];
+reject_subjects = {};
 disp("-->> Checking properties");
 
 %%
@@ -66,12 +66,12 @@ if(~isfolder(general_params.spm_config.spm_path)...
     return;
 end
 
-
 %%
 %% Checking anatomy params
 %%
 if(~general_params.bst_config.after_MaQC.run)
     % Anatomy type configuration
+    disp("--------------------------------------------------------------------------");
     disp('-->> Checking anatomy params');
     anat_params = properties.anatomy_params.params;
     if(isempty(anat_params.anatomy_type.type)...
@@ -88,6 +88,8 @@ if(~general_params.bst_config.after_MaQC.run)
     end
     % Check default template configuration
     if(isequal(anat_params.anatomy_type.type,1))
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking template configuration');
         selected_anatomy = anat_params.anatomy_type.type_list{1};
         template_name = selected_anatomy.template_name;
         defaults = jsondecode(fileread(fullfile('bst_templates','bst_default_anatomy.json')));
@@ -100,8 +102,10 @@ if(~general_params.bst_config.after_MaQC.run)
             return;
         end
     end
-    % Check HCP template configuration
+    % Check HCP template configuration    
     if(isequal(anat_params.anatomy_type.type,2))
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking template configuration');
         selected_anatomy = anat_params.anatomy_type.type_list{2};
         template_name = selected_anatomy.template_name;
         if(isempty(template_name))
@@ -121,55 +125,25 @@ if(~general_params.bst_config.after_MaQC.run)
         end
         if(~isfolder(fullfile(base_path,template_name)))
             fprintf(2,strcat("There is no folder with <<",template_name,">> in the selected HCP Template folder.\n"));
-            disp('Please selcct a correct HCP Template folder or check the Template name filed.');
+            disp('Please select a correct HCP Template folder or check the Template name filed.');
             status = false;
             disp('-->> Process stoped!!!');
             return;
         end
-        T1w_file = fullfile(base_path,template_name,selected_anatomy.file_location);
-        if(~isfile(T1w_file))
-            fprintf(2,'The Template folder is not a HCP structure.\n');
-            fprintf(2,'We can not find the T1w file in this address:\n');
-            fprintf(2,strcat(T1w_file,'\n'));
-            disp('Please check the HCP Template folder.');
-            status = false;
-            disp('-->> Process stoped!!!');
-            return;
-        end
-        L_surf = fullfile(base_path,template_name,strrep(selected_anatomy.L_surface_location,'SubID',template_name));
-        if(~isfile(L_surf))
-            fprintf(2,'The Template folder is not a HCP structure.\n');
-            fprintf(2,'We can not find the Left surf file in this address:\n');
-            fprintf(2,strcat(L_surf,'\n'));
-            disp('Please check the HCP Template folder.');
-            status = false;
-            disp('-->> Process stoped!!!');
-            return;
-        end
-        R_surf = fullfile(base_path,template_name,strrep(selected_anatomy.R_surface_location,'SubID',template_name));
-        if(~isfile(R_surf))
-            fprintf(2,'The Template folder is not a HCP structure.\n');
-            fprintf(2,'We can not find the Rigth surf file in this address:\n');
-            fprinprep_paramstf(2,strcat(R_surf,'\n'));
-            disp('Please check the HCP Template folder.');
-            status = false;
-            disp('-->> Process stoped!!!');
-            return;
-        end
-        atlas_file = fullfile(base_path,template_name,strrep(selected_anatomy.Atlas_seg_location,'SubID',template_name));
-        if(~isfile(atlas_file))
-            fprintf(2,'The Template folder is not a HCP structure.\n');
-            fprintf(2,'We can not find the Atlas file in this address:\n');
-            fprintf(2,strcat(atlas_file,'\n'));
-            disp('Please check the HCP Template folder.');
+        anat_path = fullfile(base_path,template_name,strrep(selected_anatomy.HCP_anat_path,'SubID',template_name), 'T1w');
+        checked = check_HCP_anat_structure(anat_path, template_name, selected_anatomy);
+        if(~checked)            
+            fprintf(2,strcat("The folder <<",template_name,">> is not an HCP Template folder.\n"));
+            disp('Please select a correct HCP Template folder or check the Template name filed.');
             status = false;
             disp('-->> Process stoped!!!');
             return;
         end
         % Check non brain surfaces configuration
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking non brain surfaces configuration');
         non_brain = anat_params.non_brain_surfaces;
-        base_path = strrep(non_brain.base_path,'SubID','');
-        base_path = strrep(base_path,template_name,'');
+        base_path = non_brain.base_path;
         if(~isfolder(fullfile(base_path)))
             fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
             disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
@@ -177,27 +151,20 @@ if(~general_params.bst_config.after_MaQC.run)
             disp('-->> Process stoped!!!');
             return;
         end
-        skin_file = fullfile(base_path,template_name,strrep(non_brain.head_file_location,'SubID',template_name));
-        if(~isfile(skin_file))
-            fprintf(2,'We can not find the Head file in this address:\n');
-            warning(skin_file);
-            fprintf(2,'Please check the skin configuration.');
-        end
-        outer_file = fullfile(base_path,template_name,strrep(non_brain.outerfile_file_location,'SubID',template_name));
-        if(~isfile(outer_file))
-            fprintf(2,'We can not find the Head file in this address:\n');
-            warning(outer_file);
-            fprintf(2,'Please check the outerskull configuration.');
-        end
-        inner_file = fullfile(base_path,template_name,strrep(non_brain.innerfile_file_location,'SubID',template_name));
-        if(~isfile(inner_file))
-            fprintf(2,'We can not find the innerskull file in this address:\n');
-            warning(inner_file);
-            fprintf(2,'Please check the innerskull configuration.');
+        checked = check_non_brain_surfaces(base_path,template_name);
+        if(~checked)            
+            fprintf(2,'The Non-brain selected folder is not a FSL Bet command output.\n');
+            disp('Please correct the Non-brain surfaces folder in the process_import_anat.json configuration file.');
+            status = false;
+            disp('-->> Process stoped!!!');
+            return;
         end
     end
     % Check HCP individual configuration
+    disp("--------------------------------------------------------------------------");
     if(isequal(anat_params.anatomy_type.type,3))
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking HCP anatomy configuration');
         selected_anatomy = anat_params.anatomy_type.type_list{3};
         if(isequal(selected_anatomy.subID_prefix,'none') || isempty(selected_anatomy.subID_prefix))
             SubID = 'SubID';
@@ -222,10 +189,9 @@ if(~general_params.bst_config.after_MaQC.run)
             anat_path = fullfile(base_path,structure.name,strrep(selected_anatomy.HCP_anat_path,SubID,structure.name), 'T1w');
             checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
             if(~checked) 
-                count_HCP_structure = count_HCP_structure + 1; 
-                reject_subjets = [reject_subjets; structure.name];
-            end
-            
+                count_HCP_structure = count_HCP_structure + 1;                 
+                reject_subjects{length(reject_subjects)} = structure.name;
+            end            
         end
         if(~isequal(count_HCP_structure,0))
             if(isequal(count_HCP_structure,length(structures)))
@@ -242,6 +208,8 @@ if(~general_params.bst_config.after_MaQC.run)
         end
         
         % Check non brain surfaces configuration
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking non brain surfaces configuration');
         if(isequal(selected_anatomy.subID_prefix,'none') || isempty(selected_anatomy.subID_prefix))
             SubID = 'SubID';
         else
@@ -249,7 +217,7 @@ if(~general_params.bst_config.after_MaQC.run)
             SubID = strcat(subID_prefix,'SubID');
         end
         non_brain = anat_params.non_brain_surfaces;
-        base_path = strrep(non_brain.base_path,SubID,'');
+        base_path = non_brain.base_path;
         if(~isfolder(fullfile(base_path)))
             fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
             disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
@@ -259,74 +227,35 @@ if(~general_params.bst_config.after_MaQC.run)
         end
         structures = dir(base_path);
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
-        count_skin = 0;
-        count_outer = 0;
-        count_inner = 0;
+        count_non_brain = 0;
         for i=1:length(structures)
             structure = structures(i);
-            skin_file = fullfile(base_path,structure.name,strrep(non_brain.head_file_location,SubID,structure.name));
-            if(~isfile(skin_file)); count_skin = count_skin + 1; end
-            outer_file = fullfile(base_path,structure.name,strrep(non_brain.outerfile_file_location,SubID,structure.name));
-            if(~isfile(outer_file)); count_outer = count_outer + 1; end
-            inner_file = fullfile(base_path,structure.name,strrep(non_brain.innerfile_file_location,SubID,structure.name));
-            if(~isfile(inner_file)); count_inner = count_inner + 1; end
-        end
-        % Check the skin surface configuration
-        if(~isequal(count_skin,0))
-            if(isequal(count_skin,length(structures)))
+            checked = check_non_brain_surfaces(base_path,structure.name);
+            if(~checked)
+                count_non_brain = count_non_brain + 1;                
+                reject_subjects{length(reject_subjects)+1} = structure.name;                
+            end            
+        end       
+        if(~isequal(count_non_brain,0))
+            if(isequal(count_non_brain,length(structures)))
                 fprintf(2,'Any folder in the Non-brain surfaces path have a specific file location.\n');
-                fprintf(2,'We can not find the skin file in this address:\n');
-                fprintf(2,strcat(non_brain.head_file_location,'\n'));
-                disp('Please check the skin configuration.');
+                disp('Please check the non brain configuration.');
                 status = false;
                 disp('-->> Process stoped!!!');
                 return;
             else
                 warning('One or more of the Non-brain surfaces file is not correct.\n');
-                warning('We can not find at least one of the Head file in this address:\n');
-                warning(strcat(non_brain.head_file_location,'\n'));
-                warning('Please check the skin configuration.');
+                warning('Please check the Non-brain surfaces configuration.');
             end
-        end
-        % Check the outerskull surface configuration
-        if(~isequal(count_outer,0))
-            if(isequal(count_outer,length(structures)))
-                fprintf(2,'Any folder in the Non-brain surfaces path have a specific file location.\n');
-                fprintf(2,'We can not find the outerskull file in this address:\n');
-                fprintf(2,strcat(non_brain.outerfile_file_location,'\n'));
-                disp('Please check the outerskull configuration.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('One or more of the Non-brain surfaces file is not correct.\n');
-                warning('We can not find at least one of the Head file in this address:\n');
-                warning(strcat(non_brain.outerfile_file_location,'\n'));
-                warning('Please check the outerskull configuration.');
-            end
-        end
-        % Check the outerskull surface configuration
-        if(~isequal(count_inner,0))
-            if(isequal(count_inner,length(structures)))
-                fprintf(2,'Any folder in the Non-brain surfaces path have a specific file location.\n');
-                fprintf(2,'We can not find the innerskull file in this address:\n');
-                fprintf(2,strcat(non_brain.innerfile_file_location,'\n'));
-                disp('Please check the innerskull configuration.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('One or more of the Non-brain surfaces file is not correct.\n');
-                warning('We can not find at least one of the innerskull file in this address:\n');
-                warning(strcat(non_brain.innerfile_file_location,'\n'));
-                warning('Please check the innerskull configuration.');
-            end
-        end
+        end  
     end
     % Check MRI transform configuration
+    disp("--------------------------------------------------------------------------");
     mri_transform = anat_params.mri_transformation;
     if(mri_transform.use_transformation)
-        base_path = strrep(mri_transform.base_path,'SubID','');
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking MRI transformation');
+        base_path = mri_transform.base_path;
         if(~isfolder(fullfile(base_path)))
             fprintf(2,'The MRI transformation base_path is not a folder.\n');
             disp('Please select a correct MRI transformation folder in the process_import_anat.json configuration file.');
@@ -334,33 +263,45 @@ if(~general_params.bst_config.after_MaQC.run)
             disp('-->> Process stoped!!!');
             return;
         end
-        structures = dir(base_path);
-        structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
-        count_transf = 0;
-        for i=1:length(structures)
-            structure = structures(i);
-            transf_file = fullfile(base_path,structure.name,strrep(mri_transform.file_location,'SubID',structure.name));
-            if(~isfile(transf_file)); count_transf = count_transf + 1; end
-        end
-        if(~isequal(count_transf,0))
-            if(isequal(count_transf,length(structures)))
-                fprintf(2,'Any folder in the MRI Transformation base path have a specific file location.\n');
-                fprintf(2,'We can not find the MRI file transformation in this address:\n');
-                fprintf(2,strcat(mri_transform.file_location,'\n'));
+        if(isequal(anat_params.anatomy_type.type,2))
+            transf_file = fullfile(base_path,template_name,strrep(mri_transform.file_location,'SubID',template_name));
+            if(~isfile(transf_file))
+                fprintf(2,'We can not find the MRI file transformation for the HCP anat template:\n');
+                fprintf(2,strcat(strrep(mri_transform.file_location,'SubID',template_name),'\n'));
                 disp('Please check the transformation config.');
-                status = false;
-                disp('-->> Process stoped!!!');
-                return;
-            else
-                warning('One or more of the MRI transformation file is not correct.\n');
-                warning('We can not find at least one of the MRI transformation file in this address:\n');
-                warning(strcat(mri_transform.file_location,'\n'));
-                warning('Please check the transformation config.');
+            end
+        end
+        if(isequal(anat_params.anatomy_type.type,3))
+            structures = dir(base_path);
+            structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
+            count_transf = 0;
+            for i=1:length(structures)
+                structure = structures(i);
+                transf_file = fullfile(base_path,structure.name,strrep(mri_transform.file_location,'SubID',structure.name));
+                if(~isfile(transf_file)); count_transf = count_transf + 1; end
+            end
+            if(~isequal(count_transf,0))
+                if(isequal(count_transf,length(structures)))
+                    fprintf(2,'Any folder in the MRI Transformation base path have a specific file location.\n');
+                    fprintf(2,'We can not find the MRI file transformation in this address:\n');
+                    fprintf(2,strcat(mri_transform.file_location,'\n'));
+                    disp('Please check the transformation config.');
+                    status = false;
+                    disp('-->> Process stoped!!!');
+                    return;
+                else
+                    warning('One or more of the MRI transformation file is not correct.\n');
+                    warning('We can not find at least one of the MRI transformation file in this address:\n');
+                    warning(strcat(mri_transform.file_location,'\n'));
+                    warning('Please check the transformation config.');
+                end
             end
         end
     end
     
     % Check surface resolution
+    disp("--------------------------------------------------------------------------");
+        disp('-->> Checking surface resolution');
     surf_resol = anat_params.surfaces_resolution;
     if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 2000 || surf_resol.nverthead > 15000)
         fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
@@ -387,6 +328,7 @@ if(~general_params.bst_config.after_MaQC.run)
     %%
     %% Checking import channel params
     %%
+    disp("--------------------------------------------------------------------------");
     disp('-->> Checking channel params');
     channel_params = properties.channel_params.params;
     if(isempty(channel_params.channel_type.type)...
@@ -481,6 +423,34 @@ else
         end
     end
 end
+%%
+%% Checking subject number in each folder
+%%
+if(isequal(anat_params.anatomy_type.type,3))
+    hcp_base_path = selected_anatomy.base_path;
+    hcp_subjects = dir(hcp_base_path);
+    hcp_subjects(ismember( {hcp_subjects.name}, {'.', '..'})) = [];  %remove . and ..
+    hcp_names = {hcp_subjects.name};
+    
+    non_brain_path = non_brain.base_path;
+    nb_subjects = dir(non_brain_path);
+    nb_subjects(ismember( {nb_subjects.name}, {'.', '..'})) = [];  %remove . and ..
+    nb_names = {nb_subjects.name};
+    
+    index1 = ismember(hcp_names,nb_names);
+    index2 = ismember(nb_names,hcp_names);    
+    hcp_names(index1) = [];
+    nb_names(index2) = [];
+    reject_subjects = [reject_subjects , hcp_names, nb_names];     
+end
+
+reject_subjects = unique(reject_subjects);
+disp("--------------------------------------------------------------------------");
+disp("-->> Subjects to reject");
+warning('-->> Some subject do not have the correct structure');
+warning('-->> The following subjects will be rejected for analysis');
+disp(reject_subjects);
+warning('Please check the folder structure.');
 
 disp('-->> All preoperties checked.');
 

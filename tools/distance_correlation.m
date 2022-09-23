@@ -15,7 +15,7 @@
             corela_low = corelv(vert_inds);
             low_distance = min_distances(vert_inds);
             plot(low_distance,corela_low,'o');
-            bst_report('Snapshot',hFig30,[],'Voxel correlation and Cortex-InnarSkull distance', [200,200,750,475]);
+            bst_report('Snapshot',hFig30,[],'Voxel correlation and Cortex-InnarSkull distance', [200,200,900,700]);
             saveas( hFig30,fullfile(subject_report_path,'Correlation Voxel correlaton-vert_distance.fig'));
             % Closing figure
             close(hFig30);
@@ -37,7 +37,7 @@
             
             line(cortex.Vertices(vert_inds,1), cortex.Vertices(vert_inds,2), cortex.Vertices(vert_inds,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
             figure_3d('SetStandardView', hFig_low_cor, 'top');
-            bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,750,475]);
+            bst_report('Snapshot',hFig_low_cor,[],'Low correlation Voxel', [200,200,900,700]);
             saveas( hFig_low_cor,fullfile(subject_report_path,'Low correlation Voxel.fig'));
             close(hFig_low_cor);
             
