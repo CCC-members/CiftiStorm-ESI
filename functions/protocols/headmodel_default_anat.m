@@ -2,7 +2,6 @@ function subj_error = headmodel_default_anat(properties)
 % Description here
 %
 %
-%
 % Author:
 % - Ariosky Areces Gonzalez
 % - Deirel Paz Linares

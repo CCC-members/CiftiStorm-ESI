@@ -21,8 +21,7 @@ for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
     if(~isempty(CSurface.name))
         [options, errMessage]       = bst_headmodeler;
-%         
-%                
+               
         options.HeadModelType       = 'surface';
         
         % Uploading Channels
