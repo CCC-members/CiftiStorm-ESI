@@ -74,14 +74,16 @@ current_report = [];
 reports = dir(tmp_path);
 reports(ismember( {reports.name}, {'.', '..'})) = [];  %remove . and ..
 for i=1:length(reports)
-    load(fullfile(reports(i).folder,reports(i).name));
-    if(report.iscurrent)
-        current_report = report;
-        break;
+    try
+        load(fullfile(reports(i).folder,reports(i).name));
+        if(exist('report','var') && report.iscurrent)
+            current_report = report;
+            break;
+        end
+    catch
+        continue;
     end
 end
-
-
 switch lower(action)
     case 'new'
         if(~isfolder(tmp_path))
