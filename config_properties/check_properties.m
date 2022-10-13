@@ -3,8 +3,10 @@ function [status, reject_subjects] = check_properties(properties)
 %   Detailed explanation goes here
 status = true;
 reject_subjects = {};
-disp("-->> Checking properties");
 
+disp('==========================================================================');
+disp("-->> Checking properties");
+disp('==========================================================================');
 %%
 %% Checking general params
 %%
@@ -102,7 +104,7 @@ if(~general_params.bst_config.after_MaQC.run)
             return;
         end
     end
-    % Check HCP template configuration    
+    % Check HCP template configuration
     if(isequal(anat_params.anatomy_type.type,2))
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking template configuration');
@@ -132,7 +134,7 @@ if(~general_params.bst_config.after_MaQC.run)
         end
         anat_path = fullfile(base_path,template_name,strrep(selected_anatomy.HCP_anat_path,'SubID',template_name), 'T1w');
         checked = check_HCP_anat_structure(anat_path, template_name, selected_anatomy);
-        if(~checked)            
+        if(~checked)
             fprintf(2,strcat("The folder <<",template_name,">> is not an HCP Template folder.\n"));
             disp('Please select a correct HCP Template folder or check the Template name filed.');
             status = false;
@@ -152,7 +154,7 @@ if(~general_params.bst_config.after_MaQC.run)
             return;
         end
         checked = check_non_brain_surfaces(base_path,template_name);
-        if(~checked)            
+        if(~checked)
             fprintf(2,'The Non-brain selected folder is not a FSL Bet command output.\n');
             disp('Please correct the Non-brain surfaces folder in the process_import_anat.json configuration file.');
             status = false;
@@ -161,7 +163,6 @@ if(~general_params.bst_config.after_MaQC.run)
         end
     end
     % Check HCP individual configuration
-    disp("--------------------------------------------------------------------------");
     if(isequal(anat_params.anatomy_type.type,3))
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking HCP anatomy configuration');
@@ -183,19 +184,18 @@ if(~general_params.bst_config.after_MaQC.run)
         structures = dir(base_path);
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
         count_HCP_structure = 0;
-        
         for i=1:length(structures)
             structure = structures(i);
             anat_path = fullfile(base_path,structure.name,strrep(selected_anatomy.HCP_anat_path,SubID,structure.name), 'T1w');
             checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
-            if(~checked) 
-                count_HCP_structure = count_HCP_structure + 1;                 
+            if(~checked)
+                count_HCP_structure = count_HCP_structure + 1;
                 reject_subjects{length(reject_subjects)} = structure.name;
-            end            
+            end
         end
         if(~isequal(count_HCP_structure,0))
             if(isequal(count_HCP_structure,length(structures)))
-                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');                
+                fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
                 disp('Please check the HCP individual folder.');
                 status = false;
                 disp('-->> Process stoped!!!');
@@ -232,10 +232,10 @@ if(~general_params.bst_config.after_MaQC.run)
             structure = structures(i);
             checked = check_non_brain_surfaces(base_path,structure.name);
             if(~checked)
-                count_non_brain = count_non_brain + 1;                
-                reject_subjects{length(reject_subjects)+1} = structure.name;                
-            end            
-        end       
+                count_non_brain = count_non_brain + 1;
+                reject_subjects{length(reject_subjects)+1} = structure.name;
+            end
+        end
         if(~isequal(count_non_brain,0))
             if(isequal(count_non_brain,length(structures)))
                 fprintf(2,'Any folder in the Non-brain surfaces path have a specific file location.\n');
@@ -247,10 +247,9 @@ if(~general_params.bst_config.after_MaQC.run)
                 warning('One or more of the Non-brain surfaces file is not correct.\n');
                 warning('Please check the Non-brain surfaces configuration.');
             end
-        end  
+        end
     end
     % Check MRI transform configuration
-    disp("--------------------------------------------------------------------------");
     mri_transform = anat_params.mri_transformation;
     if(mri_transform.use_transformation)
         disp("--------------------------------------------------------------------------");
@@ -301,7 +300,7 @@ if(~general_params.bst_config.after_MaQC.run)
     
     % Check surface resolution
     disp("--------------------------------------------------------------------------");
-        disp('-->> Checking surface resolution');
+    disp('-->> Checking surface resolution');
     surf_resol = anat_params.surfaces_resolution;
     if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 2000 || surf_resol.nverthead > 15000)
         fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
@@ -409,52 +408,40 @@ if(~general_params.bst_config.after_MaQC.run)
             end
         end
     end
-else
-    if(~isfile(fullfile('config_MaQC',general_params.bst_config.after_MaQC.cases_file)))
-        status = false;
-        return;
-    end
-    if(isequal(general_params.bst_config.db_path,lower('local')))
+    %%
+    %% Checking subject number in each folder
+    %%
+    anat_params = properties.anatomy_params.params;
+    if(isequal(anat_params.anatomy_type.type,3))
+        hcp_base_path = selected_anatomy.base_path;
+        hcp_subjects = dir(hcp_base_path);
+        hcp_subjects(ismember( {hcp_subjects.name}, {'.', '..'})) = [];  %remove . and ..
+        hcp_names = {hcp_subjects.name};
         
-    else
-        if(~isfolder(general_params.bst_config.db_path))
-            status = false;
-            return;
-        end
+        non_brain_path = non_brain.base_path;
+        nb_subjects = dir(non_brain_path);
+        nb_subjects(ismember( {nb_subjects.name}, {'.', '..'})) = [];  %remove . and ..
+        nb_names = {nb_subjects.name};
+        
+        index1 = ismember(hcp_names,nb_names);
+        index2 = ismember(nb_names,hcp_names);
+        hcp_names(index1) = [];
+        nb_names(index2) = [];
+        reject_subjects = [reject_subjects , hcp_names, nb_names];
     end
-end
-%%
-%% Checking subject number in each folder
-%%
-if(isequal(anat_params.anatomy_type.type,3))
-    hcp_base_path = selected_anatomy.base_path;
-    hcp_subjects = dir(hcp_base_path);
-    hcp_subjects(ismember( {hcp_subjects.name}, {'.', '..'})) = [];  %remove . and ..
-    hcp_names = {hcp_subjects.name};
+    reject_subjects = unique(reject_subjects);
+    if(~isempty(reject_subjects))
+        disp("-->> Subjects to reject");
+        disp("--------------------------------------------------------------------------");
+        warning('-->> Some subject do not have the correct structure');
+        warning('-->> The following subjects will be rejected for analysis');
+        disp(reject_subjects);
+        warning('Please check the folder structure.');
+    end
+else
     
-    non_brain_path = non_brain.base_path;
-    nb_subjects = dir(non_brain_path);
-    nb_subjects(ismember( {nb_subjects.name}, {'.', '..'})) = [];  %remove . and ..
-    nb_names = {nb_subjects.name};
-    
-    index1 = ismember(hcp_names,nb_names);
-    index2 = ismember(nb_names,hcp_names);    
-    hcp_names(index1) = [];
-    nb_names(index2) = [];
-    reject_subjects = [reject_subjects , hcp_names, nb_names];     
 end
-
-reject_subjects = unique(reject_subjects);
 disp("--------------------------------------------------------------------------");
-disp("-->> Subjects to reject");
-warning('-->> Some subject do not have the correct structure');
-warning('-->> The following subjects will be rejected for analysis');
-disp(reject_subjects);
-warning('Please check the folder structure.');
-
 disp('-->> All preoperties checked.');
-
-
-end
-
-                                                                                                                                                            
+disp('==========================================================================');
+end                                                                                                                                                            

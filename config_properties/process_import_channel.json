@@ -6,6 +6,7 @@
             "type":2,
             "type_list":[
                 {
+                    "id":1,
                     "name":"raw_data",
                     "description":"",
                     "subID_prefix":"",
@@ -17,12 +18,14 @@
                     "channel_layout_name":""  
                 },
                 {
+                    "id":2,
                     "name":"import_channel",
                     "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
                     "group_layout_name":"ICBM152",
                     "channel_layout_name":"ASA 10-05 343"                    
                 },
                 {
+                    "id":3,
                     "name":"template_data",
                     "description":"",
                     "template_name":"100307",
@@ -31,7 +34,6 @@
                     "data_format":"4D",
                     "isfile":true                    
                 }
-
             ]
         },
         "channel_label_file":""

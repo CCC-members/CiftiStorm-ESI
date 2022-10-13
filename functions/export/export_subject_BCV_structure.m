@@ -3,8 +3,7 @@ function export_error = export_subject_BCV_structure(properties,subID,CSurfaces,
 %%
 %% Get Protocol information
 %%
-% try
- export_error = [];
+export_error = [];
 
 % Get subject directory
 ProtocolInfo    = bst_get('ProtocolInfo');
@@ -13,14 +12,13 @@ bcv_path        = properties.general_params.bcv_config.export_path;
 if(~isfolder(bcv_path))
     mkdir(bcv_path);
 end
-    
+
 % Get the current Study
-[sStudies, iStudies] = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+[sStudies, ~]   = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 if(length(sStudies)>1)
-    conditions = [sStudies.Condition];
-    sStudy = sStudies(find(contains(conditions,strcat('@raw')),1));
-else
-    sStudy = sStudies;
+    conditions  = [sStudies.Condition];
+    sStudy      = sStudies(find(contains(conditions,strcat('@raw')),1));else
+    sStudy      = sStudies;
 end
 if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) || isempty(sSubject.iInnerSkull) || isempty(sSubject.iOuterSkull) || isempty(sSubject.iScalp))
     return;
