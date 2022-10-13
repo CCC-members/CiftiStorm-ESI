@@ -14,7 +14,6 @@ sSubject        = bst_get('Subject', subID);
 %%
 report_path     = get_report_path(properties, subID);
 
-
 if(~mq_control)
     %%
     %% Getting channel type
@@ -29,8 +28,7 @@ if(~mq_control)
     
     %%
     %% ===== IMPORT CHANNEL =====
-    %%
-    
+    %%    
     switch channel_type
         case 'default'
             % ===== GET DEFAULT =====
@@ -41,7 +39,7 @@ if(~mq_control)
             iGroup                  = find(strcmpi(nameGroup, {bstDefaults.name}));
             iLayout                 = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
             ChannelFile             = bstDefaults(iGroup).contents(iLayout).fullpath;
-            [ChannelFile,~,~,~,~]   = db_set_channel( iStudy, ChannelFile, 1, 2 );
+            db_set_channel( iStudy, ChannelFile, 1, 2 );
         case 'individual'
             format = channel_params.data_format;
             if(isequal(lower(format),'mff'))
@@ -56,12 +54,11 @@ if(~mq_control)
             base_path               = strrep(channel_params.base_path,'SubID',subID);
             raw_ref                 = strrep(channel_params.file_location,'SubID',subID);
             raw_file                = fullfile(base_path,raw_ref);
-            sFiles = bst_process('CallProcess', 'process_import_data_raw', [], [], ...
+            bst_process('CallProcess', 'process_import_data_raw', [], [], ...
                 'subjectname',    subID, ...
                 'datafile',       {raw_file, bst_format}, ...
                 'channelreplace', 0, ...
                 'channelalign',   1);
-            ChannelFile             = sFiles.ChannelFile;
         case 'template'
             if(isequal(properties.general_params.modality,'EEG'))
             else
@@ -74,12 +71,11 @@ if(~mq_control)
                 filepath            = strrep(channel_type.file_location, 'SubID', temp_sub_ID);
                 raw_file            = fullfile(base_path, temp_sub_ID, filepath);
                 format = channel_params.data_format;
-                sFiles = bst_process('CallProcess', 'process_import_data_raw', [], [], ...
+                bst_process('CallProcess', 'process_import_data_raw', [], [], ...
                     'subjectname',    subID, ...
                     'datafile',       {raw_file, format}, ...
                     'channelreplace', 0, ...
                     'channelalign',   1);
-                ChannelFile         = sFiles.ChannelFile;
             end
     end
     
@@ -143,7 +139,7 @@ MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 
 if(isequal(properties.general_params.modality,'EEG'))
     hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
-    hFigMri16   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);    
+    hFigMri16   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
     figures     = {hFigMri16, hFigMri16, hFigMri16, hFigMri16};
     fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
         'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
@@ -194,6 +190,4 @@ else
     % Closing figure
     close(fig_out,hFigScalp20);
 end
-
 end
-
