@@ -1,11 +1,6 @@
 function [properties] = get_properties()
 try
-%     pred_options = jsondecode(fileread(strcat('bcv_predefinition/pred_properties.json')));
-%     if(~isequal(pred_options.params.predefinition.option,'default'))
-%         properties = jsondecode(fileread(strcat('bcv_predefinition/',pred_options.params.predefinition.option,'/properties.json')));
-%     else
-        properties = jsondecode(fileread(strcat('app/properties.json')));
-%     end
+    properties = jsondecode(fileread(strcat('app/properties.json')));
 catch ME
     fprintf(2,strcat('\nBC-V-->> Error: Loading the property files: \n'));
     fprintf(2,strcat(ME.message,'\n'));
@@ -30,9 +25,7 @@ for i=1:length(process_files)
 end
 anat_type = properties.anatomy_params.params.anatomy_type.type;
 properties.anatomy_params.params.anat_config = properties.anatomy_params.params.anatomy_type.type_list{anat_type};
-
 channel_type = properties.channel_params.params.channel_type.type;
 properties.channel_params.params.chann_config = properties.channel_params.params.channel_type.type_list{channel_type};
-
 end
 

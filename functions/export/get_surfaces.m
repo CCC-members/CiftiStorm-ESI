@@ -26,37 +26,30 @@ Sinn                = load(InnerSkullFile);
 %% Genering surf file
 %%
 disp ("-->> Genering surf file");
-Sc      = struct([]);
-Surfaces    = sSubject.Surface;
+Surfaces                            = sSubject.Surface;
 count = 1;
 for i=1:length(CSurfaces)
-    CSurface = CSurfaces(i);
-    if(~isempty(CSurface.name))
-        BSTSurface = Surfaces(CSurface.iSurface);
+    CSurface                        = CSurfaces(i);
+    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
+        BSTSurface                  = Surfaces(CSurface.iSurface);
         CortexFile                  = fullfile(anat_path, BSTSurface.FileName);
         Cortex                      = load(CortexFile);
-        Sc(count).Comment           = Cortex.Comment;
-        Sc(count).Vertices          = Cortex.Vertices;
-        Sc(count).Faces             = Cortex.Faces;
-        Sc(count).VertConn          = Cortex.VertConn;
-        Sc(count).VertNormals       = Cortex.VertNormals;
-        Sc(count).Curvature         = Cortex.Curvature;
-        Sc(count).SulciMap          = Cortex.SulciMap;
+        if(isfield(Cortex,'tess2mri_interp'))
+            Cortex                  = rmfield(Cortex,'tess2mri_interp');
+        end
+        Sc(count)                   = Cortex;
         if(isequal(Cortex.Atlas(Cortex.iAtlas).Name,'Structures') || isempty(Cortex.Atlas(Cortex.iAtlas).Scouts))
             Sc(count).Atlas.Name    = 'User scouts';
             Sc(count).Atlas.Scouts  = generate_scouts(Cortex);
-        else
-            Sc(count).Atlas         = Cortex.Atlas;
         end
-        Sc(count).iAtlas            = Cortex.iAtlas;
+        if(CSurface.iCSurface)
+            Scortex.iCortex         = count;
+        end
         count                       = count + 1;
     end
 end
-
 % Loadding subject surfaces
 Scortex.Sc             = Sc;
 Scortex.sub_to_FSAve   = sub_to_FSAve;
-Scortex.iCortex        = sSubject.iCortex;
-
 end
 

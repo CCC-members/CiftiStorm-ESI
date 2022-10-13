@@ -12,37 +12,37 @@
                     "template_name":"FsAverage_2020",
                     "default_atlas":"Desikan-Killiany",
                     "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
                         "desc":"fs_LR"
                     }
                 },
                 {
                     "id":2,
                     "name":"hcp_anat_template",
-                    "description":"Use this configuration as anatomy template",
-                    "template_name":"100307",
-                    "base_path":"/mnt/Store/Data/Conectome/Sample",
-                    "HCP_anat_path":"preproc/SubID",
-                    "T1w_file_name":"T1w_acpc_dc_restore.nii.gz",
+                    "description":"Use this configuration as anatomy template",                    
+                    "base_path":"/mnt/Store/Data/CHBM_QC/Ciftify",
+                    "template_name":"sub-CBM00011",
+                    "HCP_anat_path":"",
+                    "T1w_file_name":"T1w.nii.gz",
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz",
                     "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
                         "desc":"midthickness"
-                    },                    
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
+                    }
                 },
                 {
-                    "id":"3",
+                    "id":3,
                     "name":"hcp_anat_individual",
                     "description":"",
                     "subID_prefix":"",
                     "base_path":"/mnt/Store/Data/CHBM_QC/Ciftify",
                     "HCP_anat_path":"",
                     "T1w_file_name":"T1w.nii.gz",
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz",
                     "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers). ",
-                        "desc":"midthickness"
-                    },                    
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
+                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
+                        "desc":"fs_LR"
+                    }
                 }
             ]
         },

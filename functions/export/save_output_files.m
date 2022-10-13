@@ -4,11 +4,9 @@ save_error = [];
 %%
 %% Creating structure 
 %%
-
 for i=1:length(varargin)
     eval([inputname(i) '= varargin{i};']);
 end
-
 % Creating subject folder structure
 disp(strcat("-->> Creating subject output structure"));
 action                      = 'anat';
@@ -29,7 +27,6 @@ subject_info.innerskull_dir = dirref;
 dirref                      = replace(fullfile('scalp','outerskull.mat'),'\','/');
 subject_info.outerskull_dir = dirref;
 subject_info.completed      = false;
-
 % Saving subject files
 disp ("-->> Saving scalp file");
 save(fullfile(output_subject_dir,'scalp','scalp.mat'),'-struct','Shead');
@@ -45,7 +42,6 @@ disp ("-->> Saving surf file");
 save(fullfile(output_subject_dir,'surf','surf.mat'),'-struct','Scortex');
 disp ("-->> Saving subject file");
 save(fullfile(output_subject_dir,'subject.mat'),'-struct','subject_info');
-
 disp("--------------------------------------------------------------------------");
 end
 

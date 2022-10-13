@@ -27,12 +27,10 @@ disp('-->> Starting process');
 addpath(fullfile('app'));
 addpath('bst_templates');
 addpath(fullfile('config_labels'));
-addpath(fullfile('config_MaQC'));
-addpath(fullfile('config_StP_prop'));
+addpath(fullfile('config_properties'));
 addpath(fullfile('external'));
 addpath(genpath(fullfile('functions')));
 addpath('guide');
-addpath(genpath('plugins'));
 addpath(fullfile('templates'));
 addpath(fullfile('tools'));
 
@@ -88,7 +86,6 @@ properties.general_params       = properties.general_params.params;
 properties.anatomy_params       = properties.anatomy_params.params;
 properties.channel_params       = properties.channel_params.params;
 properties.headmodel_params     = properties.headmodel_params.params;
-properties.qc_params            = properties.qc_params.params;
 
 if(isfile(properties.general_params.colormap))
     load(properties.general_params.colormap);
@@ -97,6 +94,7 @@ else
 end
 %%
 disp('-->> Preparing BrainStorm properties.');
+disp('==========================================================================');
 bst_path        = properties.general_params.bst_config.bst_path;
 bst_db_path     = properties.general_params.bst_config.db_path;
 spm_path        = properties.general_params.spm_config.spm_path;
@@ -109,9 +107,10 @@ addpath(spm_path);
 brainstorm reset
 brainstorm nogui local
 BrainstormUserDir = bst_get('BrainstormUserDir');
-if(isempty(properties.general_params.bst_config.db_path) || isequal(properties.general_params.bst_config.db_path,'local'))
-    db_import(fullfile(BrainstormUserDir,'local_db'));
+if(isempty(properties.general_params.bst_config.db_path) || isequal(properties.general_params.bst_config.db_path,'local'))       
+    db_import(bst_get('BrainstormDbDir'));
 else
+    bst_set('BrainstormDbDir', app_properties.bst_db_path);
     db_import(properties.general_params.bst_config.db_path);
 end
 
@@ -119,6 +118,7 @@ end
 %% Loading BST modules
 %%
 disp("-->> Installing external plugins.");
+disp('==========================================================================');
 if(~isempty(bst_plugin('GetInstalled', 'spm12')))
     [isOk, errMsg, PlugDesc] = bst_plugin('Unload', 'spm12');
 end
@@ -132,7 +132,6 @@ else
     disp('-->> Process stoped!!!');
     return;
 end
-
 if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
     [isOk, errMsg, PlugDesc] = bst_plugin('Install', 'openmeeg', 0, []);
     if(isOk)
@@ -156,10 +155,6 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
         disp('-->> Process stoped!!!');
         return;
     end
-end
-
-if(~isequal(bst_db_path,'local'))
-    bst_set('BrainstormDbDir', app_properties.bst_db_path);
 end
 
 %%
