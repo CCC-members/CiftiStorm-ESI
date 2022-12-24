@@ -188,19 +188,18 @@ for i=1:length(CSurfaces)
         %%
         %% Computing Headmodel
         %%
-        [OPTIONS, errMessage] = bst_headmodeler(options);
-        
-        if ~isempty(OPTIONS)
+        [OPTIONS, errMessage] = bst_headmodeler(options);        
+        if ~isempty(OPTIONS)                       
             % If a new head model is available
-            newHeadModel = db_template('HeadModel');
-            newHeadModel.FileName      = file_win2unix(strrep(OPTIONS.HeadModelFile, ProtocolInfo.STUDIES, ''));
-            newHeadModel.Comment       = OPTIONS.Comment;
-            newHeadModel.HeadModelType = OPTIONS.HeadModelType;
-            newHeadModel.MEGMethod     = OPTIONS.MEGMethod;
-            newHeadModel.EEGMethod     = OPTIONS.EEGMethod;
-            newHeadModel.ECOGMethod    = OPTIONS.ECOGMethod;
-            newHeadModel.SEEGMethod    = OPTIONS.SEEGMethod;
-            % Update Study structure            
+            newHeadModel                = db_template('HeadModel');
+            newHeadModel.FileName       = file_win2unix(strrep(OPTIONS.HeadModelFile, ProtocolInfo.STUDIES, ''));
+            newHeadModel.Comment        = OPTIONS.Comment;
+            newHeadModel.HeadModelType  = OPTIONS.HeadModelType;
+            newHeadModel.MEGMethod      = OPTIONS.MEGMethod;
+            newHeadModel.EEGMethod      = OPTIONS.EEGMethod;
+            newHeadModel.ECOGMethod     = OPTIONS.ECOGMethod;
+            newHeadModel.SEEGMethod     = OPTIONS.SEEGMethod;             
+             % Update Study structure  
             sStudy.HeadModel(iHeadModel) = newHeadModel;   
             if(~isempty(CSurface.iCSurface) && CSurface.iCSurface)
                 sStudy.iHeadModel = iHeadModel;
@@ -211,12 +210,11 @@ for i=1:length(CSurfaces)
             panel_protocols('UpdateNode', 'Study', iStudy);            
         end
         db_save();
+        
         %%
         %% Quality control of Head model
         %%
-        qc_headmodel(OPTIONS, properties, subID);
-        
+        qc_headmodel(OPTIONS, properties, subID);        
     end
 end
 end
-

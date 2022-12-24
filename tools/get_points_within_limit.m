@@ -12,16 +12,4 @@ distance    = sqrt(sum((iSkull_rm-Cortex_rm).^2,3));
 mins        = min(distance,[],2);
 vert_inds   = find(mins<limit);
 dist        = mins(vert_inds);
-% for i=1:length(Cortex)
-%     distances = zeros(length(iSkull),1);
-%     for j=1:length(iSkull)
-%         c_vert = Cortex(i,:);
-%         iS_vert = iSkull(j,:);
-%         distances (j) = norm(iS_vert - c_vert);       
-%     end
-%     if(min(distances) < limit)
-%         vert_inds = [vert_inds ; i];
-%     end
-% end
-
 end

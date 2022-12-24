@@ -7,12 +7,12 @@
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"MQ_Control",
+            "protocol_name":"CHBM_Check",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
             "after_MaQC":{
-                "run":true
+                "run":false
             }
         },        
         "spm_config":{

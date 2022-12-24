@@ -1,8 +1,6 @@
 function [process_error] = headmodel_process_interface(properties, reject_subjects)
-process_error = [];
-
-% Description here
-%
+% HeadModel Process Interface
+%   
 %
 %
 % Author:
@@ -186,6 +184,4 @@ disp(strcat('-->> Process finished....'));
 disp('==============================================================================');
 disp('==============================================================================');
 save report.mat subjects_processed subjects_process_error;
-
 end
-

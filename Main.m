@@ -205,6 +205,7 @@ end
 %% Calling dataset function to analysis
 %%
 process_error = headmodel_process_interface(properties,reject_subjects);
+save("process_output.mat","process_error","reject_subjects");
 
 %% Stoping BrainStorm
 disp('==========================================================================');
