@@ -60,7 +60,8 @@ switch mq_control
             disp(strcat('-->> Data Source:  ', anatomy_config.base_path ));
         end
 end
-for j=1:length(subjects)
+for j=18:18
+% for j=1:length(subjects)
     if(mq_control)
         subID        = subjects(j).Name;
     else
@@ -69,10 +70,10 @@ for j=1:length(subjects)
     if(isfield(anatomy_config,'subID_prefix') && ~isequal(anatomy_config.subID_prefix,'none') && ~isempty(anatomy_config.subID_prefix))
         subID_prefix    = anatomy_config.subID_prefix;
         subID           = strrep(subject_name, subID_prefix,'');
-    end
+    end    
     disp('==========================================================================');
     disp(strcat('-->> Processing subject: ', subID));
-    disp('==========================================================================');
+    disp('==========================================================================');    
     
     %%
     %%  Process: Create BST Protocol and add subject
@@ -93,10 +94,26 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
-    [anat_error, CSurfaces, sub_to_FSAve] = process_import_anat(properties,subID);
+    [anat_error, CSurfaces] = process_import_anat(properties,subID);
     if(~isempty(fieldnames(anat_error)))
         continue;
     end
+       
+    %%
+    %% Process: Generate BEM surfaces
+    %%
+    disp("--------------------------------------------------------------------------");
+    disp("-->> Process Generate BEM surfaces");
+    disp("--------------------------------------------------------------------------");    
+    [errMessage, CSurfaces] = process_gen_bem_surfaces(properties, subID, CSurfaces);   
+    
+    %%
+    %% Process: Transform surfaces
+    %%
+    disp("--------------------------------------------------------------------------");
+    disp("-->> Transform surfaces");
+    disp("--------------------------------------------------------------------------");    
+    [errMessage, CSurfaces, sub_to_FSAve] = process_compute_surfaces(properties, subID, CSurfaces);
     
     %%
     %% Process: Import Atlas
@@ -105,14 +122,6 @@ for j=1:length(subjects)
     disp("-->> Process Import Atlas");
     disp("--------------------------------------------------------------------------");
     atlas_error     = process_import_atlas(properties, subID, CSurfaces);
-    
-    %%
-    %% Process: Generate BEM surfaces
-    %%
-    disp("--------------------------------------------------------------------------");
-    disp("-->> Process Generate BEM surfaces");
-    disp("--------------------------------------------------------------------------");    
-    [errMessage, CSurfaces] = process_gen_bem_surfaces(properties, subID, CSurfaces);   
     
     %%
     %% Process: Generate SPM canonical surfaces

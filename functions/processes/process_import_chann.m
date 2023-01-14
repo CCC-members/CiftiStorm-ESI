@@ -151,7 +151,10 @@ if(isequal(properties.general_params.modality,'EEG'))
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri16);
     
@@ -165,7 +168,10 @@ if(isequal(properties.general_params.modality,'EEG'))
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri20);
 else
@@ -178,7 +184,10 @@ else
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri16);
     
@@ -191,7 +200,10 @@ else
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigScalp20);
 end

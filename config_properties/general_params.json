@@ -2,12 +2,12 @@
     "description":"",
     "params":{
         "modality":"EEG",
-        "name":"HeadModel_EEG",
+        "name":"HeadModel_CHBM_Multilayer",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"CHBM_Check",
+            "protocol_name":"HeadModel_CHBM_Multilayer",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
@@ -21,11 +21,11 @@
         },
         "bcv_config":{
             "export":true,
-            "export_path":"/mnt/Store/Data/CHBM_QC/BC-V_Structure"
+            "export_path":"/mnt/Store/Data/CHBM/Multilayer/BC-V_Structure"
         },
         "bst_export":{
             "description":"Folder to export the Brainstorm outputs",
-            "output_path":"/mnt/Store/Data/CHBM_QC/BST_Output"
+            "output_path":"/mnt/Store/Data/CHBM/Multilayer/BST_Output"
         },
         "tmp_path":{
             "description":"",

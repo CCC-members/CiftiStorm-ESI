@@ -35,15 +35,15 @@ if(~isequal(properties.anatomy_params.anatomy_type.type,1))
     %%
     %%  Get High and Low Cortex
     %%
-    CortexFile8K            = sSubject.Surface(iLow).FileName;
-    BSTCortexFile8K         = fullfile(anat_path, CortexFile8K);
-    Sc8k                    = load(BSTCortexFile8K);
+    CortexFileLow           = sSubject.Surface(iLow).FileName;
+    BSTCortexFileLow        = fullfile(anat_path, CortexFileLow);
+    ScLow                   = load(BSTCortexFileLow);
     disp ("-->> Getting FSAve surface corregistration");
     fsave_inds_template     = load('templates/FSAve_64K_8K_coregister_indms.mat');
-    CortexFile64K           = sSubject.Surface(iHigh).FileName;
-    BSTCortexFile64K        = fullfile(anat_path, CortexFile64K);
-    Sc64k                   = load(BSTCortexFile64K);
+    CortexFileHigh          = sSubject.Surface(iHigh).FileName;
+    BSTCortexFileHigh       = fullfile(anat_path, CortexFileHigh);
+    ScHigh                  = load(BSTCortexFileHigh);
     % Finding near FSAve vertices on subject surface
-    sub_to_FSAve            = find_interpolation_vertices(Sc64k,Sc8k, fsave_inds_template);
+    sub_to_FSAve            = find_interpolation_vertices(ScHigh,ScLow, fsave_inds_template);
 end
 end

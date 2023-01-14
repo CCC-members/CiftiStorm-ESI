@@ -32,5 +32,6 @@ db_reload_database('current');
 %% Creating subject in Protocol
 %%
 db_add_subject(subID);
+create_report_path(properties, subID);
 
 end

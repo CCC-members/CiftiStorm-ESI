@@ -190,7 +190,7 @@ if(~general_params.bst_config.after_MaQC.run)
             checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
             if(~checked)
                 count_HCP_structure = count_HCP_structure + 1;
-                reject_subjects{length(reject_subjects)} = structure.name;
+                reject_subjects{length(reject_subjects)+1} = structure.name;
             end
         end
         if(~isequal(count_HCP_structure,0))
