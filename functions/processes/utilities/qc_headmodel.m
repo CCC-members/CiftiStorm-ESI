@@ -55,8 +55,11 @@ if(isequal(modality,'EEG'))
         'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]);    
-    savefig( hFig25,fullfile(report_path,strcat(fig_title,'.fig')));     
+    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]); 
+    try
+        savefig( hFig25,fullfile(report_path,strcat(fig_title,'.fig')));
+    catch
+    end
     % Closing figure
     close(hFig25, fig_out);
     
@@ -70,8 +73,11 @@ if(isequal(modality,'EEG'))
         'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]);    
-    savefig( hFig26,fullfile(report_path,strcat(fig_title,'.fig')));    
+    bst_report('Snapshot',fig_out,[],fig_title, [200,200,900,700]);  
+    try
+        savefig( hFig26,fullfile(report_path,strcat(fig_title,'.fig')));
+    catch
+    end
     % Closing figure
     close(hFig26, fig_out);
     
@@ -91,7 +97,10 @@ if(isequal(modality,'EEG'))
     xlabel('Homogenous Lead Field');
     ylabel('Tester Lead Field');
     bst_report('Snapshot',hFig27,[],strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,')'), [200,200,900,700]);
-    savefig( hFig27,fullfile(report_path,strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,').fig')));
+    try
+        savefig( hFig27,fullfile(report_path,strcat('Homogenous Lead Field vs. Tester Lead Field (',desc,').fig')));
+    catch
+    end
     % Closing figure
     close(hFig27);
     
@@ -109,7 +118,10 @@ if(isequal(modality,'EEG'))
     ylabel('Correlation');
     title(strcat('Correlation between both lead fields channel-wise (',desc,')'));
     bst_report('Snapshot',hFig28,[],strcat('Correlation between both lead fields channel-wise (',desc,')'), [200,200,900,700]);
-    savefig( hFig28,fullfile(report_path,strcat('Correlation channel-wise(',desc,').fig')));
+    try
+        savefig( hFig28,fullfile(report_path,strcat('Correlation channel-wise(',desc,').fig')));
+    catch
+    end
     % Closing figure
     close(hFig28);
     
@@ -130,7 +142,10 @@ if(isequal(modality,'EEG'))
     title(strcat('Correlation both lead fields Voxel wise (',desc,')'));
     % Including to report    
     bst_report('Snapshot',hFig29,[],strcat('Correlation both lead fields Voxel wise (',desc,')'), [200,200,900,700]);
-    savefig( hFig29,fullfile(report_path,strcat('Correlation Voxel wise (',desc,').fig')));
+    try
+        savefig( hFig29,fullfile(report_path,strcat('Correlation Voxel wise (',desc,').fig')));
+    catch
+    end
     close(hFig29);
     
     %%
@@ -154,7 +169,10 @@ if(isequal(modality,'EEG'))
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[1,270],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Low correlation Voxel (',desc,')'), [200,200,900,700]);
-    savefig( hFig_low_cor,fullfile(report_path,strcat('Low correlation Voxel (',desc,').fig')));
+    try
+        savefig( hFig_low_cor,fullfile(report_path,strcat('Low correlation Voxel (',desc,').fig')));
+    catch
+    end
     close(hFig_low_cor, fig_out);
     
     %%
@@ -174,17 +192,17 @@ if(isequal(modality,'EEG'))
         'colorbars',{'on','on','on','on'}, 'position', 'relative',...
         'view_orient',{[0,90],[1,270],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Low correlation map (',desc,')'), [200,200,900,700]);
-    savefig( figure_cor,fullfile(report_path,strcat('Low correlation Voxel interpolation (',desc,').fig')));
+    try
+        savefig( figure_cor,fullfile(report_path,strcat('Low correlation Voxel interpolation (',desc,').fig')));
+    catch
+    end
     close(figure_cor,fig_out);
 else
     %%
     %% Uploading Channels Loc
     %%
     BSTChannelsFile     = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-    BSTChannels         = load(BSTChannelsFile);
-    
-    [BSTChannels,Ke]    = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
-    
+    BSTChannels         = load(BSTChannelsFile);    
     Channels            = [];
     ChannelsOrient      = [];
     for i = 1: length(BSTChannels.Channel)

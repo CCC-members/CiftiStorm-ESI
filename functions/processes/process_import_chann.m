@@ -7,25 +7,24 @@ channel_error   = [];
 channel_params  = properties.channel_params.chann_config;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 sSubject        = bst_get('Subject', subID);
-[~, iStudy]     = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+%%
+%% Getting channel type
+%%
+if(isequal(properties.channel_params.channel_type.type,3))
+    channel_type = 'template';
+elseif(isequal(properties.channel_params.channel_type.type,1))
+    channel_type = 'individual';
+else
+    channel_type = 'default';    
+end
+
 
 %%
 %% Getting report path
 %%
 report_path     = get_report_path(properties, subID);
 
-if(~mq_control)
-    %%
-    %% Getting channel type
-    %%
-    if(isequal(properties.channel_params.channel_type.type,3))
-        channel_type = 'template';
-    elseif(isequal(properties.channel_params.channel_type.type,1))
-        channel_type = 'individual';
-    else
-        channel_type = 'default';
-    end
-    
+if(~mq_control)    
     %%
     %% ===== IMPORT CHANNEL =====
     %%    
@@ -39,6 +38,7 @@ if(~mq_control)
             iGroup                  = find(strcmpi(nameGroup, {bstDefaults.name}));
             iLayout                 = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
             ChannelFile             = bstDefaults(iGroup).contents(iLayout).fullpath;
+            [~, iStudy]             = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
             db_set_channel( iStudy, ChannelFile, 1, 2 );
         case 'individual'
             format = channel_params.data_format;
@@ -131,7 +131,12 @@ end
 %% Quality control
 %%
 % View sources on MRI (3D orthogonal slices)
-[sSubject, ~]   = bst_get('Subject', subID);
+
+if(isequal( channel_type, 'individual'))
+     [~, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName);
+else    
+    [~, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+end
 [sStudy, ~]     = bst_get('Study', iStudy);
 ChannelFile     = sStudy.Channel.FileName;
 ScalpFile       = sSubject.Surface(sSubject.iScalp).FileName;
@@ -146,7 +151,10 @@ if(isequal(properties.general_params.modality,'EEG'))
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri16);
     
@@ -160,7 +168,10 @@ if(isequal(properties.general_params.modality,'EEG'))
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri20);
 else
@@ -173,7 +184,10 @@ else
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigMri16);
     
@@ -186,7 +200,10 @@ else
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[90,360],[1,180],[0,360]});
     bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    try
+        savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+    catch
+    end
     % Closing figure
     close(fig_out,hFigScalp20);
 end

@@ -26,12 +26,11 @@ disp('-->> Starting process');
 %%
 addpath(fullfile('app'));
 addpath('bst_templates');
-addpath(fullfile('config_labels'));
 addpath(fullfile('config_properties'));
 addpath(fullfile('external'));
 addpath(genpath(fullfile('functions')));
 addpath('guide');
-addpath(fullfile('templates'));
+addpath(genpath(fullfile('templates')));
 addpath(fullfile('tools'));
 
 try
@@ -205,6 +204,7 @@ end
 %% Calling dataset function to analysis
 %%
 process_error = headmodel_process_interface(properties,reject_subjects);
+save("process_output.mat","process_error","reject_subjects");
 
 %% Stoping BrainStorm
 disp('==========================================================================');

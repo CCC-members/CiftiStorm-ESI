@@ -190,7 +190,7 @@ if(~general_params.bst_config.after_MaQC.run)
             checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
             if(~checked)
                 count_HCP_structure = count_HCP_structure + 1;
-                reject_subjects{length(reject_subjects)} = structure.name;
+                reject_subjects{length(reject_subjects)+1} = structure.name;
             end
         end
         if(~isequal(count_HCP_structure,0))
@@ -225,12 +225,13 @@ if(~general_params.bst_config.after_MaQC.run)
             disp('-->> Process stoped!!!');
             return;
         end
+        file_location = non_brain.file_location;
         structures = dir(base_path);
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
         count_non_brain = 0;
         for i=1:length(structures)
             structure = structures(i);
-            checked = check_non_brain_surfaces(base_path,structure.name);
+            checked = check_non_brain_surfaces(base_path,file_location,structure.name);
             if(~checked)
                 count_non_brain = count_non_brain + 1;
                 reject_subjects{length(reject_subjects)+1} = structure.name;
@@ -316,13 +317,13 @@ if(~general_params.bst_config.after_MaQC.run)
         disp('-->> Process stoped!!!');
         return;
     end
-    if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
-        fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
-        disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
-        status = false;
-        disp('-->> Process stoped!!!');
-        return;
-    end
+%     if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
+%         fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
+%         disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
+%         status = false;
+%         disp('-->> Process stoped!!!');
+%         return;
+%     end
     
     %%
     %% Checking import channel params
@@ -333,7 +334,7 @@ if(~general_params.bst_config.after_MaQC.run)
     if(isempty(channel_params.channel_type.type)...
             && ~isequal(channel_params.channel_type.type,1)...
             && ~isequal(channel_params.channel_type.type,2))
-        fprintf(2,"\n ->> Error: The anatomy type have to be <<1>> or <<2>>. \n");
+        fprintf(2,"\n ->> Error: The channel type have to be <<1>> or <<2>>. \n");
         disp('1: Use raw data channel.');
         disp('2: Use BST default channel.');
         status = false;
@@ -363,8 +364,17 @@ if(~general_params.bst_config.after_MaQC.run)
         for i=1:length(structures)
             structure = structures(i);
             raw_file = fullfile(base_path,structure.name,strrep(raw_data.file_location,'SubID',structure.name));
-            if(raw_data.isfile);if(~isfile(raw_file)); count_raw = count_raw + 1; end
-            else; if(~isfolder(raw_file)); count_raw = count_raw + 1; end; end
+            if(raw_data.isfile)
+                if(~isfile(raw_file))
+                    count_raw = count_raw + 1;
+                    reject_subjects{length(reject_subjects)+1} = structure.name;
+                end
+            else
+                if(~isfolder(raw_file))
+                    count_raw = count_raw + 1;
+                    reject_subjects{length(reject_subjects)+1} = structure.name;
+                end
+            end
         end
         if(~isequal(count_raw,0))
             if(isequal(count_raw,length(structures)))
@@ -444,4 +454,4 @@ end
 disp("--------------------------------------------------------------------------");
 disp('-->> All preoperties checked.');
 disp('==========================================================================');
-end                                                                                                                                                            
+end

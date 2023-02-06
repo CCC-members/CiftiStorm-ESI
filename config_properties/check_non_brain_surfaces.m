@@ -1,4 +1,4 @@
-function checked = check_non_brain_surfaces(base_path,SubID)
+function checked = check_non_brain_surfaces(base_path,file_location,SubID)
 
 checked = true;
 head_file = fullfile(base_path,SubID,strcat(SubID,"_outskin_mesh.nii.gz"));

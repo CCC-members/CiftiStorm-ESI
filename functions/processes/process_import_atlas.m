@@ -66,7 +66,10 @@ for i=1:length(CSurfaces)
             'colorbars',{'off','off','off','off'},...
             'view_orient',{[0,90],[1,270],[1,180],[0,360]});
         bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' atlas seg'), [200,200,900,700]);
-        savefig(hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' atlas seg.fig')));
+        try
+            savefig(hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' atlas seg.fig')));
+        catch
+        end
         % Closing figure
         close(fig_out,hFigSurf);
     end

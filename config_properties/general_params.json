@@ -1,18 +1,18 @@
 {
     "description":"",
     "params":{
-        "modality":"EEG",
-        "name":"HeadModel_EEG",
+        "modality":"MEG",
+        "name":"HeadModel_HCP_hgLASSO",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"MQ_Control",
+            "protocol_name":"HeadModel_HCP_hgLASSO",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
             "after_MaQC":{
-                "run":true
+                "run":false
             }
         },        
         "spm_config":{
@@ -21,11 +21,11 @@
         },
         "bcv_config":{
             "export":true,
-            "export_path":"/mnt/Store/Data/CHBM_QC/BC-V_Structure"
+            "export_path":"/mnt/Store/Data/Conectome/hg_LASSO/BC-V_Structure"
         },
         "bst_export":{
             "description":"Folder to export the Brainstorm outputs",
-            "output_path":"/mnt/Store/Data/CHBM_QC/BST_Output"
+            "output_path":"/mnt/Store/Data/Conectome/hg_LASSO/BST_Output"
         },
         "tmp_path":{
             "description":"",

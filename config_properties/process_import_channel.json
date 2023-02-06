@@ -3,7 +3,7 @@
     "params":{
         "channel_type":{
             "description":"Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template ",
-            "type":2,
+            "type":1,
             "type_list":[
                 {
                     "id":1,

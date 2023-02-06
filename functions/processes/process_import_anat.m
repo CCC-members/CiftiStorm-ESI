@@ -1,4 +1,4 @@
-function [anat_error, CSurfaces, sub_to_FSAve] = process_import_anat(properties, subID)
+function [anat_error, CSurfaces] = process_import_anat(properties, subID)
 % === ANATOMY ===
 anat_error = struct;
 
@@ -50,7 +50,7 @@ else
         surfaces            = {head_file, outerskull_file, innerskull_file, pial_L, pial_R, midthickness_L, midthickness_R, white_L, white_R};
         
         %%
-        %% Process: Import MRI
+        %% Process: Applaying MRI transformation 
         %%
         if(properties.anatomy_params.mri_transformation.use_transformation)
             [BstMriFile, sMri]  = import_mri(iSubject, T1w_file, 'ALL-MNI', 0);
@@ -72,14 +72,8 @@ else
     %%
     %% Process: Import Surfaces
     %%
-    [CSurfaces, sub_to_FSAve] = import_HCP_surfaces(properties, subID, surfaces);
+    CSurfaces = import_HCP_surfaces(properties, subID, surfaces);    
     
-    %%
-    %% Compute surfaces like BigBrain
-    %%
-    if(isequal(lower(layer_desc),'bigbrain'))
-        compute_BigBrain_surfaces(properties, subID, BB_surfaces);
-    end
 end
 
 %%
@@ -94,17 +88,26 @@ report_path = get_report_path(properties, subID);
 MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 hFigMri1        = view_mri_slices(MriFile, 'x', 20);
 bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,900,700]);
-savefig( hFigMri1,fullfile(report_path,'MRI Axial view.fig'));
+try
+    savefig( hFigMri1,fullfile(report_path,'MRI Axial view.fig'));
+catch
+end
 close(hFigMri1);
 
 hFigMri2        = view_mri_slices(MriFile, 'y', 20);
 bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,900,700]);
-savefig( hFigMri2,fullfile(report_path,'MRI Coronal view.fig'));
+try
+    savefig( hFigMri2,fullfile(report_path,'MRI Coronal view.fig'));
+catch
+end
 close(hFigMri2);
 
 hFigMri3        = view_mri_slices(MriFile, 'z', 20);
 bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,900,700]);
-savefig( hFigMri3,fullfile(report_path,'MRI Sagital view.fig'));
+try
+    savefig( hFigMri3,fullfile(report_path,'MRI Sagital view.fig'));
+catch
+end
 close(hFigMri3);
 
 if(isequal(type,'template') || isequal(type,'individual'))
@@ -122,81 +125,53 @@ if(isequal(type,'template') || isequal(type,'individual'))
     hFigMriSurf = view_mri(MriFile, CortexFile);
     hFigMri4    = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
     bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,900,700]);
-    savefig( hFigMri4,fullfile(report_path,'Cortex - MRI registration Axial view.fig'));
+    try
+        savefig( hFigMri4,fullfile(report_path,'Cortex - MRI registration Axial view.fig'));
+    catch
+    end
     close(hFigMri4);
     %
     hFigMri5    = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
     bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,900,700]);
-    savefig( hFigMri5,fullfile(report_path,'Cortex - MRI registration Coronal view.fig'));
+    try
+        savefig( hFigMri5,fullfile(report_path,'Cortex - MRI registration Coronal view.fig'));
+    catch
+    end
     close(hFigMri5);
     %
     hFigMri6    = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
     bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,900,700]);
-    savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagital view.fig'));
+    try
+        savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagital view.fig'));
+    catch
+    end
     % Closing figures
     close([hFigMri6,hFigMriSurf]);    
     %
     hFigMri7    = view_mri(MriFile, ScalpFile);
     bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,900,700]);
-    savefig( hFigMri7,fullfile(report_path,'Scalp registration.fig'));
+    try
+        savefig( hFigMri7,fullfile(report_path,'Scalp registration.fig'));
+    catch
+    end
     close(hFigMri7);
     %
     hFigMri8    = view_mri(MriFile, OuterSkullFile);
     bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,900,700]);
-    savefig( hFigMri8,fullfile(report_path,'Outer Skull - MRI registration.fig'));
+    try
+        savefig( hFigMri8,fullfile(report_path,'Outer Skull - MRI registration.fig'));
+    catch
+    end
     close(hFigMri8);
     %
     hFigMri9    = view_mri(MriFile, InnerSkullFile);
     bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,900,700]);
-    savefig( hFigMri9,fullfile(report_path,'Inner Skull - MRI registration.fig'));
+    try
+        savefig( hFigMri9,fullfile(report_path,'Inner Skull - MRI registration.fig'));
+    catch
+    end
     % Closing figures
     close(hFigMri9);
 end
-Surfaces            = sSubject.Surface;
-for i=1:length(CSurfaces)
-    CSurface        = CSurfaces(i);
-    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
-        Cortex      = Surfaces(CSurface.iSurface);
-        hFigSurf    = view_surface(Cortex.FileName);
-        delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutPatch'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
-        figures     = {hFigSurf, hFigSurf, hFigSurf, hFigSurf};
-        fig_out     = merge_figures(Cortex.Comment, strrep(Cortex.Comment,'_','-'), figures,...
-            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-            'colorbars',{'off','off','off','off'},...
-            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-        bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' 3D view'), [200,200,900,700]);
-        savefig( hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' 3D view.fig')));
-        % Closing figure
-        close(fig_out,hFigSurf);
-    end
-end
-if(isequal(lower(layer_desc),'fs_lr') || isequal(lower(layer_desc),'bigbrain'))
-    for i=length(CSurfaces):-1:1
-        CSurface    = CSurfaces(i);
-        if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
-            Cortex  = Surfaces(CSurface.iSurface);
-            if(~exist('hFigSurfaces','var'))
-                hFigSurfaces = script_view_surface(Cortex.FileName, [], [], [],'top');
-            else
-                hFigSurfaces = script_view_surface(Cortex.FileName, [], [], hFigSurfaces);
-            end            
-        end
-    end
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutLabel'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutMarker'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutPatch'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutContour'));
-    figures     = {hFigSurfaces, hFigSurfaces, hFigSurfaces, hFigSurfaces};
-    fig_out     = merge_figures("Surfaces cortex 3D view", "Surfaces cortex 3D view", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Surfaces cortex 3D view'), [200,200,900,700]);
-    savefig( hFigSurfaces,fullfile(report_path,strcat('Surfaces cortex 3D view.fig')));
-    % Closing figure
-    close(fig_out,hFigSurfaces);
-end
+
 end
