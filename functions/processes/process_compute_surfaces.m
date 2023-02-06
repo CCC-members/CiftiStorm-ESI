@@ -7,12 +7,14 @@ errMessage = [];
 %%
 ProtocolInfo    = bst_get('ProtocolInfo');
 anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-if(isequal(anatomy_type.id,1)); type = 'default';end
-if(isequal(anatomy_type.id,2)); type = 'template';end
-if(isequal(anatomy_type.id,3)); type = 'individual';end
 layer_desc      = anatomy_type.layer_desc.desc;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 nVertCortex     = properties.anatomy_params.surfaces_resolution.nvertcortex;
+
+%%
+%% Getting report path
+%%
+report_path = get_report_path(properties, subID);
 
 %%
 %% Compute surfaces like BigBrain
@@ -25,26 +27,32 @@ end
 %%
 %% Downsampling Surfaces
 %%
+% [NewTessFile, iSurface]             = tess_force_envelope_batch(CSurfaces(7).filename, CSurfaces(1).filename);
+% [NewTessFile, iSurface]             = tess_force_envelope_batch(CSurfaces(4).filename, CSurfaces(1).filename);
+% [NewTessFile, iSurface]             = tess_force_envelope_batch(CSurfaces(7).filename, CSurfaces(4).filename);
+
 [sSubject, iSubject]        = bst_get('Subject', subID);
 for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
     if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
         comment                 = split(CSurface.comment,'_');
-        [NewFile,iSurface,I,J]  = tess_downsize(CSurface.filename, nVertCortex, 'reducepatch');              
-        if(isequal(comment{2},'pial'))
-            SurfaceDir          = bst_fullfile(ProtocolInfo.SUBJECTS, NewFile);
-            Spial               = load(SurfaceDir);  
-            Vcommon             = I;
-            Fcommon             = Spial.Faces;
-        else
-            SurfaceDir          = bst_fullfile(ProtocolInfo.SUBJECTS, CSurface.filename);
-            SurfaceHigh         = load(SurfaceDir);
-            CortexMat.Faces     = Fcommon;
-            CortexMat.Vertices  = SurfaceHigh.Vertices(Vcommon,:);            
+        [NewFile,iSurface,I,J]  = tess_downsize(CSurface.filename, nVertCortex, 'reducepatch');
+        CortexMat.Comment       = strcat('Cortex_',comment{2},'_low');
+        if(isequal(layer_desc,lower('bigbrain')) || isequal(layer_desc,lower('fs_lr')))
+            if(isequal(comment{2},'pial'))
+                SurfaceDir          = bst_fullfile(ProtocolInfo.SUBJECTS, NewFile);
+                Spial               = load(SurfaceDir);
+                Vcommon             = I;
+                Fcommon             = Spial.Faces;
+            else
+                SurfaceDir          = bst_fullfile(ProtocolInfo.SUBJECTS, CSurface.filename);
+                SurfaceHigh         = load(SurfaceDir);
+                CortexMat.Faces     = Fcommon;
+                CortexMat.Vertices  = SurfaceHigh.Vertices(Vcommon,:);
+            end   
         end
-        CortexMat.Comment       = strcat('Cortex_',comment{2},'_low');        
         bst_save(file_fullpath(NewFile), CortexMat, 'v7', 1);
-        bst_memory('UnloadSurface', file_fullpath(NewFile));  
+        bst_memory('UnloadSurface', file_fullpath(NewFile));
         in_tess_bst( NewFile, 1);
         CSurfaces(i).iSurface   = iSurface;
         CSurfaces(i).filename   = NewFile;
@@ -59,7 +67,7 @@ db_reload_subjects(iSubject);
 %%
 %% Get CSurfaces from Subject
 %%
-CSurfaces                           = get_CSurfaces_from_sSubject(properties,iSubject);
+CSurfaces                       = get_CSurfaces_from_sSubject(properties,iSubject);
 
 % %%
 % %% Setting the default cortex
@@ -89,55 +97,41 @@ end
 %         end
 %     end
 % end
-disp("-->> Correcting overlapping surfaces");
-[sSubject, iSubject]        = bst_get('Subject', subID);
-Surfaces                    = sSubject.Surface;
-Envelop = Surfaces(sSubject.i);
-EnvFile = CSurfaces(8).filename;
-disp(strcat("----> Correcting Tess: ", CSurface.comment,...
-                " by Envelop: " , Envelop.comment));
-if(~mq_control)
-    for i=1:7
-        CSurface                        = CSurfaces(i);
-        if(~isempty(CSurface.name)  && isequal(CSurface.type,'cortex'))
-            TessFile                    = CSurface.filename;
-            disp(strcat("----> Correcting Tess: ", CSurface.comment,...
-                " by Envelop: " , Envelop.comment));
-            [NewTessFile, iSurface]     = tess_force_envelope_batch(TessFile, EnvFile);
-            if(~isempty(iSurface))
-                CSurfaces(i).comment    = strcat(CSurface.comment,'_fix');
-                CSurfaces(i).iSurface   = iSurface;
-                CSurfaces(i).filename   = NewTessFile;
-                EnvFile = NewTessFile;
-                Envelop = CSurfaces(i);
-            else
-                EnvFile = CSurface.filename;
-                Envelop = CSurfaces(i);
-            end
-        end
-    end
-end
-
-% Load surface file
-TessMat = in_tess_bst(TessFile);
-TessMat.Faces    = double(TessMat.Faces);
-TessMat.Vertices = double(TessMat.Vertices);
-% Load envelope file
-EnvMat = in_tess_bst(EnvFile);
-EnvMat.Faces    = double(EnvMat.Faces);
-EnvMat.Vertices = double(EnvMat.Vertices);
-% Compute best fitting sphere from envelope
-bfs_center = bst_bfs(EnvMat.Vertices);
-% Center the two surfaces on the center of the sphere
-vCortex = bst_bsxfun(@minus, TessMat.Vertices, bfs_center(:)');
-vInner = bst_bsxfun(@minus, EnvMat.Vertices, bfs_center(:)');
-% Convert to spherical coordinates
-[thCortex, phiCortex, rCortex] = cart2sph(vCortex(:,1), vCortex(:,2), vCortex(:,3));
-% Look for points of the cortex inside the innerskull
-iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
-
-%% Reload subject
-db_reload_subjects(iSubject);
+% if(~mq_control)
+%     disp("-->> Correcting overlay with InnerSkull");
+%     [sSubject, iSubject]                = bst_get('Subject', subID);
+%     Surfaces                            = sSubject.Surface;
+%     Envelop                             = Surfaces(sSubject.iInnerSkull);
+%     Tess                                = Surfaces(sSubject.iCortex);
+%     disp(strcat("----> Correcting Tess: ", Tess.Comment, " by Envelop: " , Envelop.Comment));
+%     [NewTessFile, iSurface]             = tess_force_envelope_batch(Tess.FileName, Envelop.FileName);
+%     if(~isempty(iSurface))
+%         for i=1:7
+%             if(CSurfaces(i).iCSurface)
+%                 CSurfaces(i).comment    = strcat(CSurfaces(i).comment,'_fix');
+%                 CSurfaces(i).iSurface   = iSurface;
+%                 CSurfaces(i).filename   = NewTessFile;
+%             end
+%         end
+%     end 
+%     if(isequal(lower(layer_desc),'bigbrain'))
+%         disp("-->> Correcting overlapping vertices between surfaces");
+%         for i=1:6            
+%             Envelop                     = CSurfaces(i);
+%             Tess                        = CSurfaces(i+1);
+%             [NewTessFile, iSurface]     = correct_surfaces_overlaping(Envelop.filename,Tess.filename, report_path);
+%             if(~isempty(iSurface))
+%                 CSurfaces(i+1).comment  = strcat(CSurfaces(i+1).comment,'_fix');
+%                 CSurfaces(i+1).iSurface = iSurface;
+%                 CSurfaces(i+1).filename = NewTessFile;
+%             end
+%             
+%         end
+%     end
+% end
+% 
+% %% Reload subject
+% db_reload_subjects(iSubject);
 
 %%
 %% Get CSurfaces from Subject
@@ -158,7 +152,8 @@ end
 %%
 %% FSAve Surfaces interpolation
 %%
-sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
+sub_to_FSAve        = [];
+% sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
 
 %%
 %% Quality control

@@ -60,8 +60,8 @@ switch mq_control
             disp(strcat('-->> Data Source:  ', anatomy_config.base_path ));
         end
 end
-for j=18:18
-% for j=1:length(subjects)
+% for j=18:18
+for j=1:length(subjects)
     if(mq_control)
         subID        = subjects(j).Name;
     else

@@ -35,33 +35,33 @@
                     "name":"hcp_anat_individual",
                     "description":"",
                     "subID_prefix":"",
-                    "base_path":"/mnt/Store/Data/CHBM/Multilayer/ciftify",
-                    "HCP_anat_path":"",
-                    "T1w_file_name":"T1w.nii.gz",
+                    "base_path":"/mnt/Store/Data/Conectome/Sample",
+                    "HCP_anat_path":"preproc/SubID",
+                    "T1w_file_name":"T1w_acpc_dc_restore.nii.gz",
                     "Atlas_file_name":"aparc.a2009s+aseg.nii.gz",
                     "layer_desc":{
                         "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-                        "desc":"bigbrain"
+                        "desc":"midthickness"
                     }
                 }
             ]
         },
         "mri_transformation":{
-            "use_transformation":false,
+            "use_transformation":true,
             "base_path":"/mnt/Store/Data/Conectome/Sample",
             "file_location":"meg/SubID/MEG/anatomy/SubID_MEG_anatomy_transform.txt"
         },
         "non_brain_surfaces":{
             "description":"FSL Bet command output",
-            "base_path":"/mnt/Store/Data/CHBM/Multilayer/non-brain",
+            "base_path":"/mnt/Store/Data/Conectome/non-brain",
             "file_location":""
         },
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample each surface: default <<8000>>",
             "gener_BEM_surf":true,
-            "nverthead":8000,
-            "nvertcortex":8000,
-            "nvertskull":8000
+            "nverthead":10000,
+            "nvertskull":10000,
+            "nvertcortex":10000            
         }
     }
 }

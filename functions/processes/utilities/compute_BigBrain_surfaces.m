@@ -1,4 +1,4 @@
-function CSurfaces = compute_BigBrain_surfaces(subID, CSurfaces)
+function [CSurfaces, CRadius] = compute_BigBrain_surfaces(subID, CSurfaces)
 %PROCESS_GEN_BB_SURFACES Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -15,6 +15,8 @@ Spial                   = load(fullfile(anat_path,CSurfaces(1).filename));
 Rpial                   = Spial.Vertices;                                   % R(1)
 Npial                   = Spial.VertNormals;                                % N(1)
 Faces                   = Spial.Faces;
+
+% [NewTessFile, iSurface] = correct_surfaces_overlaping(CSurfaces(1).filename, CSurfaces(7).filename, '');
 
 %%
 %%  Compute (r) for FSAverage Surfaces
@@ -87,44 +89,46 @@ RBBSpial        = BBSpial.Vertices;                 % R(1)
 % Finding (r) for layers from six to two
 disp("-->> Computing Surfaces like BigBrain reference");
 fprintf(1,'---->> Finding (r) for layers from six to two: %3d%%\n',0);
-radios = [0:0.001:1];
+radius = 0:0.001:1;
 n_six = []; n_five = []; n_four = []; n_three = []; n_two = [];
-for r=1:length(radios)    
-    RBBSsix_p   = RBBSwhite + radios(r) * (RBBSpial - RBBSwhite);
+for r=1:length(radius)    
+    RBBSsix_p   = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
     Snorm       = norm(RBBSsix_p - RBBSsix, 2);
     n_six       = [n_six Snorm];
     
-    RBBSfive_p  = RBBSwhite + radios(r) * (RBBSpial - RBBSwhite);
+    RBBSfive_p  = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
     Snorm       = norm(RBBSfive_p - RBBSfive, 2);
     n_five      = [n_five Snorm];
     
-    RBBSfour_p  = RBBSwhite + radios(r) * (RBBSpial - RBBSwhite);
+    RBBSfour_p  = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
     Snorm       = norm(RBBSfour_p - RBBSfour, 2);
     n_four      = [n_four Snorm];
     
-    RBBSthree_p = RBBSwhite + radios(r) * (RBBSpial - RBBSwhite);
+    RBBSthree_p = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
     Snorm       = norm(RBBSthree_p - RBBSthree, 2);
     n_three     = [n_three Snorm];
     
-    RBBStwo_p   = RBBSwhite + radios(r) * (RBBSpial - RBBSwhite);
+    RBBStwo_p   = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
     Snorm       = norm(RBBStwo_p - RBBStwo, 2);
     n_two       = [n_two Snorm];    
-    fprintf(1,'\b\b\b\b%3.0f%%',(r)/(length(radios))*100);
+    fprintf(1,'\b\b\b\b%3.0f%%',(r)/(length(radius))*100);
 end
 [~,ind_six] = min(n_six);
-r_six = radios(ind_six);
+r_six = radius(ind_six);
 
 [~,ind_five] = min(n_five);
-r_five = radios(ind_five);
+r_five = radius(ind_five);
 
 [~,ind_four] = min(n_four);
-r_four = radios(ind_four);
+r_four = radius(ind_four);
 
 [~,ind_three] = min(n_three);
-r_three = radios(ind_three);
+r_three = radius(ind_three);
 
 [~,ind_two] = min(n_two);
-r_two = radios(ind_two);
+r_two = radius(ind_two);
+
+CRadius = [ind_two, r_three, ind_four, ind_five, ind_six];
 fprintf(1,'\n');
 %%
 %% ===== CREATE NEW SURFACE STRUCTURE =====
@@ -243,6 +247,5 @@ CSurfaces(2).iSurface   = iStwo;
 CSurfaces(2).iCSurface  = false;
 CSurfaces(2).type       = 'cortex';
 CSurfaces(2).filename   = StwoFileShort;
-
 end
 

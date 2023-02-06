@@ -32,10 +32,10 @@ if(~isequal(anatomy_type.id,1))
         'nvertskull',  nVertSkull);
     
     %% Importing Brain surfaces
-    if(isequal(layer_desc,'white') || isequal(layer_desc,'midthickness') || isequal(layer_desc,'pial'))
+    if(isequal(lower(layer_desc),'white') || isequal(lower(layer_desc),'midthickness') || isequal(lower(layer_desc),'pial'))
         type = 'single';
-    elseif(isequal(layer_desc,'fs_ave'))
-        type = 'fs_ave';
+    elseif(isequal(lower(layer_desc),'fs_lr'))
+        type = 'fs_lr';
     else
         type = 'bigbrain';
     end
@@ -61,8 +61,8 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile           = BstTessRhFile{1};
             [TessFile32K,iSurface]  = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_',layer_desc,'_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst(TessFile32K,1);
-            db_surface_type(TessFile32K,'Cortex');            
+            [~, TessFile32K]        = in_tess_bst(TessFile32K,1);
+            TessFile32K             = db_surface_type(TessFile32K,'Cortex');            
             switch layer_desc
                 case 'pial'
                     CSurfaces(1).name               = 'Pial';
@@ -87,7 +87,7 @@ if(~isequal(anatomy_type.id,1))
                     CSurfaces(7).filename           = TessFile32K;
             end
             
-        case 'fs_ave'
+        case 'fs_lr'
             %% ===== IMPORT SURFACES 32K =====
             [~, iSubject]                   = bst_get('Subject', subID);
             %% Pial
@@ -97,8 +97,8 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile                   = BstTessRhFile{1};
             [TessFile32K, iSurface]         = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_pial_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst( TessFile32K, 1);
-            db_surface_type(TessFile32K, 'Cortex');
+            [~, TessFile32K]                = in_tess_bst( TessFile32K, 1);
+            TessFile32K                     = db_surface_type(TessFile32K, 'Cortex');
             
             CSurfaces(1).name               = 'Pial';
             CSurfaces(1).comment            = 'Cortex_pial_high';
@@ -115,8 +115,8 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile                   = BstTessRhFile{1};
             [TessFile32K, iSurface]         = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_midthickness_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst( TessFile32K, 1);
-            db_surface_type(TessFile32K, 'Cortex');
+            [~, TessFile32K]                = in_tess_bst( TessFile32K, 1);
+            TessFile32K                     = db_surface_type(TessFile32K, 'Cortex');
             
             CSurfaces(4).name               = 'Midthickness';
             CSurfaces(4).comment            = 'Cortex_midthickness_high';
@@ -132,8 +132,8 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile                   = BstTessRhFile{1};
             [TessFile32K, iSurface]         = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_white_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst( TessFile32K, 1);
-            db_surface_type(TessFile32K, 'Cortex');
+            [~, TessFile32K]                = in_tess_bst( TessFile32K, 1);
+            TessFile32K                     = db_surface_type(TessFile32K, 'Cortex');
             
             CSurfaces(7).name               = 'White';
             CSurfaces(7).comment            = 'Cortex_white_high';
@@ -153,7 +153,7 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile                   = BstTessRhFile{1};
             [TessFile32K_white, iSurface]   = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_white_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst( TessFile32K_white, 1);
+            [~, TessFile32K_white]          = in_tess_bst( TessFile32K_white, 1);
             TessFile32K_white               = db_surface_type(TessFile32K_white, 'Cortex');
             
             CSurfaces(7).name               = 'White';
@@ -170,7 +170,7 @@ if(~isequal(anatomy_type.id,1))
             BstTessRhFile                   = BstTessRhFile{1};
             [TessFile32K_pial, iSurface]    = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_pial_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
-            in_tess_bst( TessFile32K_pial, 1);
+            [~, TessFile32K_pial]           = in_tess_bst( TessFile32K_pial, 1);
             TessFile32K_pial                = db_surface_type(TessFile32K_pial, 'Cortex');   
             
             CSurfaces(1).name               = 'Pial';

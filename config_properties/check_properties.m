@@ -317,13 +317,13 @@ if(~general_params.bst_config.after_MaQC.run)
         disp('-->> Process stoped!!!');
         return;
     end
-    if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
-        fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
-        disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
-        status = false;
-        disp('-->> Process stoped!!!');
-        return;
-    end
+%     if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
+%         fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
+%         disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
+%         status = false;
+%         disp('-->> Process stoped!!!');
+%         return;
+%     end
     
     %%
     %% Checking import channel params

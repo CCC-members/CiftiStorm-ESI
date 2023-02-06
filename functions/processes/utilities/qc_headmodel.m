@@ -202,10 +202,7 @@ else
     %% Uploading Channels Loc
     %%
     BSTChannelsFile     = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-    BSTChannels         = load(BSTChannelsFile);
-    
-    [BSTChannels,Ke]    = remove_channels_and_leadfield_from_layout([],BSTChannels,Ke,true);
-    
+    BSTChannels         = load(BSTChannelsFile);    
     Channels            = [];
     ChannelsOrient      = [];
     for i = 1: length(BSTChannels.Channel)

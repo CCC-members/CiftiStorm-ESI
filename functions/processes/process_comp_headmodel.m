@@ -213,7 +213,7 @@ for i=1:length(CSurfaces)
         
         %%
         %% Quality control of Head model
-        %%
+        %%        
         qc_headmodel(OPTIONS, properties, subID);        
     end
 end

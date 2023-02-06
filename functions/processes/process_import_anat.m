@@ -50,7 +50,7 @@ else
         surfaces            = {head_file, outerskull_file, innerskull_file, pial_L, pial_R, midthickness_L, midthickness_R, white_L, white_R};
         
         %%
-        %% Process: Import MRI
+        %% Process: Applaying MRI transformation 
         %%
         if(properties.anatomy_params.mri_transformation.use_transformation)
             [BstMriFile, sMri]  = import_mri(iSubject, T1w_file, 'ALL-MNI', 0);
