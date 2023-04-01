@@ -3,7 +3,7 @@
     "params":{
         "channel_type":{
             "description":"Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template ",
-            "type":1,
+            "type":2,
             "type_list":[
                 {
                     "id":1,
@@ -23,16 +23,6 @@
                     "description":"Select the group and name of the sensor layout. See app/bst_layout_default.json file and select all params from there",
                     "group_layout_name":"ICBM152",
                     "channel_layout_name":"ASA 10-05 343"                    
-                },
-                {
-                    "id":3,
-                    "name":"template_data",
-                    "description":"",
-                    "template_name":"100307",
-                    "base_path":"E:/Data/Conectome/HCP_data/SubID",
-                    "file_location":"unprocessed/MEG/5-Restin/4D/c,rfDC",
-                    "data_format":"4D",
-                    "isfile":true                    
                 }
             ]
         },

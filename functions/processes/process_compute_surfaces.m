@@ -7,9 +7,9 @@ errMessage = [];
 %%
 ProtocolInfo    = bst_get('ProtocolInfo');
 anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-layer_desc      = anatomy_type.layer_desc.desc;
+layer_desc      = properties.anatomy_params.common_params.layer_desc.desc;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
-nVertCortex     = properties.anatomy_params.surfaces_resolution.nvertcortex;
+nVertCortex     = properties.anatomy_params.common_params.surfaces_resolution.nvertcortex;
 
 %%
 %% Getting report path

@@ -18,6 +18,7 @@ if(isempty(general_params.modality) && ~isequal(general_params.modality,'EEG') &
     disp('-->> Process stoped!!!');
     return;
 end
+protocol_name = general_params.bst_config.protocol_name;
 if(isempty(general_params.bst_config.protocol_name))
     status = false;
     fprintf(2,'\n-->> Error: The protocol name can not be empty.\n');
@@ -59,11 +60,29 @@ if(isfolder(general_params.bst_config.db_path))
         return;
     end
 end
-if(~isfolder(general_params.spm_config.spm_path)...
-        || ~isfile(fullfile(general_params.spm_config.spm_path,'spm.m')))
-    fprintf(2,"\n ->> Error: The selected SPM path is wrong. \n");
-    disp(general_params.spm_config.spm_path);
-    disp('-->> Process stoped!!!');
+%% Checking output param
+if(isfolder(general_params.output_path))
+    [~,values] = fileattrib(general_params.output_path);
+    if(~values.UserWrite)
+        fprintf(2,strcat("The current user do not have write permissions on the selected forder for Output path."));
+        disp(general_params.output_path)
+        disp(' Please check the folder permission or select another output folder.');
+        status = false;
+        return;
+    end
+    if(~isfolder(fullfile(general_params.output_path,'BC-V_Structure',protocol_name)))
+        mkdir(fullfile(general_params.output_path,'BC-V_Structure',protocol_name));        
+    end
+    if(~isfolder(fullfile(general_params.output_path,'BST','Subjects',protocol_name)))
+        mkdir(fullfile(general_params.output_path,'BST','Subjects',protocol_name));        
+    end
+    if(~isfolder(fullfile(general_params.output_path,'BST','Reports',protocol_name)))
+        mkdir(fullfile(general_params.output_path,'BST','Reports',protocol_name));        
+    end
+else
+    fprintf(2,strcat("The Output path do not exist."));
+    disp(general_params.output_path)
+    disp(' Please type a correct output folder.');
     status = false;
     return;
 end
@@ -166,13 +185,8 @@ if(~general_params.bst_config.after_MaQC.run)
     if(isequal(anat_params.anatomy_type.type,3))
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking HCP anatomy configuration');
-        selected_anatomy = anat_params.anatomy_type.type_list{3};
-        if(isequal(selected_anatomy.subID_prefix,'none') || isempty(selected_anatomy.subID_prefix))
-            SubID = 'SubID';
-        else
-            subID_prefix = selected_anatomy.subID_prefix;
-            SubID = strcat(subID_prefix,'SubID');
-        end
+        selected_anatomy = anat_params.anatomy_type.type_list{3};        
+        SubID = 'SubID';
         base_path = strrep(selected_anatomy.base_path,SubID,'');
         if(~isfolder(fullfile(base_path)))
             fprinprep_paramstf(2,'The HCP individual base_path is not a folder.\n');
@@ -185,9 +199,8 @@ if(~general_params.bst_config.after_MaQC.run)
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
         count_HCP_structure = 0;
         for i=1:length(structures)
-            structure = structures(i);
-            anat_path = fullfile(base_path,structure.name,strrep(selected_anatomy.HCP_anat_path,SubID,structure.name), 'T1w');
-            checked = check_HCP_anat_structure(anat_path, structure.name, selected_anatomy);
+            structure = structures(i);            
+            checked = check_HCP_anat_structure(structure, selected_anatomy);
             if(~checked)
                 count_HCP_structure = count_HCP_structure + 1;
                 reject_subjects{length(reject_subjects)+1} = structure.name;
@@ -210,13 +223,7 @@ if(~general_params.bst_config.after_MaQC.run)
         % Check non brain surfaces configuration
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking non brain surfaces configuration');
-        if(isequal(selected_anatomy.subID_prefix,'none') || isempty(selected_anatomy.subID_prefix))
-            SubID = 'SubID';
-        else
-            subID_prefix = selected_anatomy.subID_prefix;
-            SubID = strcat(subID_prefix,'SubID');
-        end
-        non_brain = anat_params.non_brain_surfaces;
+        non_brain = anat_params.common_params.non_brain_surfaces;
         base_path = non_brain.base_path;
         if(~isfolder(fullfile(base_path)))
             fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
@@ -225,13 +232,12 @@ if(~general_params.bst_config.after_MaQC.run)
             disp('-->> Process stoped!!!');
             return;
         end
-        file_location = non_brain.file_location;
         structures = dir(base_path);
         structures(ismember( {structures.name}, {'.', '..'})) = [];  %remove . and ..
         count_non_brain = 0;
         for i=1:length(structures)
             structure = structures(i);
-            checked = check_non_brain_surfaces(base_path,file_location,structure.name);
+            checked = check_non_brain_surfaces(structure);
             if(~checked)
                 count_non_brain = count_non_brain + 1;
                 reject_subjects{length(reject_subjects)+1} = structure.name;
@@ -251,7 +257,7 @@ if(~general_params.bst_config.after_MaQC.run)
         end
     end
     % Check MRI transform configuration
-    mri_transform = anat_params.mri_transformation;
+    mri_transform = anat_params.common_params.mri_transformation;
     if(mri_transform.use_transformation)
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking MRI transformation');
@@ -302,7 +308,7 @@ if(~general_params.bst_config.after_MaQC.run)
     % Check surface resolution
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking surface resolution');
-    surf_resol = anat_params.surfaces_resolution;
+    surf_resol = anat_params.common_params.surfaces_resolution;
     if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 2000 || surf_resol.nverthead > 15000)
         fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
         disp('Please check the nverthead configuration in the process_import_anat.json file.');

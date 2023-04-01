@@ -1,4 +1,4 @@
-function [anat_error, CSurfaces] = process_import_anat(properties, subID)
+function [anat_error, CSurfaces, properties] = process_import_anat(properties, subID)
 % === ANATOMY ===
 anat_error = struct;
 
@@ -9,7 +9,6 @@ anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.an
 if(isequal(anatomy_type.id,1)); type = 'default';end
 if(isequal(anatomy_type.id,2)); type = 'template';end
 if(isequal(anatomy_type.id,3)); type = 'individual';end
-layer_desc      = anatomy_type.layer_desc.desc;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 
 % Get subject definition
@@ -31,15 +30,25 @@ else
         db_set_template( iSubject, sTemplate, false );
         set_Surfaces_Comment(properties,iSubject);
     else
-        non_brain_surfaces  = properties.anatomy_params.non_brain_surfaces;
+        non_brain_surfaces  = properties.anatomy_params.common_params.non_brain_surfaces;
         % MRI File
-        anat_path           = fullfile(anatomy_type.base_path, subID, strrep(anatomy_type.HCP_anat_path, 'SubID', subID), 'T1w');
+        folderlist          = dir(fullfile(anatomy_type.base_path,subID, '**'));  %get list of files and folders in any subfolder
+        folderlist          = folderlist([folderlist.isdir]);  %remove folders from list
+        C                   = {folderlist.name};
+        idx                 = find(~cellfun('isempty',regexp(C,'T1w')),1);        
+        anat_path           = fullfile(folderlist(idx).folder, 'T1w');
         T1w_file            = fullfile(anat_path,anatomy_type.T1w_file_name);
         % Non-Brain surface files
-        base_path           = non_brain_surfaces.base_path;
-        head_file           = fullfile(base_path,subID,strcat(subID,"_outskin_mesh.nii.gz"));
-        outerskull_file     = fullfile(base_path,subID,strcat(subID,"_outskull_mesh.nii.gz"));
-        innerskull_file     = fullfile(base_path,subID,strcat(subID,"_inskull_mesh.nii.gz"));
+        non_brain_path      = non_brain_surfaces.base_path;
+        filelist = dir(fullfile(non_brain_path,subID, '**'));  %get list of files and folders in any subfolder
+        filelist = filelist(~[filelist.isdir]);  %remove folders from list
+        C = {filelist.name};
+        idx = find(~cellfun('isempty',regexp(C,strcat(subID,"_outskin_mesh.nii.gz"))),1);
+        head_file = fullfile(filelist(idx).folder,filelist(idx).name);
+        idx = find(~cellfun('isempty',regexp(C,strcat(subID,"_outskull_mesh.nii.gz"))),1);
+        outerskull_file = fullfile(filelist(idx).folder,filelist(idx).name);
+        idx = find(~cellfun('isempty',regexp(C,strcat(subID,"_inskull_mesh.nii.gz"))),1);
+        innerskull_file = fullfile(filelist(idx).folder,filelist(idx).name);        
         % Cortex Surfaces
         white_L             = fullfile(anat_path,'fsaverage_LR32k',strcat(subID,'.L.white.32k_fs_LR.surf.gii'));
         white_R             = fullfile(anat_path,'fsaverage_LR32k',strcat(subID,'.R.white.32k_fs_LR.surf.gii'));
@@ -47,18 +56,21 @@ else
         midthickness_R      = fullfile(anat_path,'fsaverage_LR32k',strcat(subID,'.R.midthickness.32k_fs_LR.surf.gii'));
         pial_L              = fullfile(anat_path,'fsaverage_LR32k',strcat(subID,'.L.pial.32k_fs_LR.surf.gii'));
         pial_R              = fullfile(anat_path,'fsaverage_LR32k',strcat(subID,'.R.pial.32k_fs_LR.surf.gii'));
-        surfaces            = {head_file, outerskull_file, innerskull_file, pial_L, pial_R, midthickness_L, midthickness_R, white_L, white_R};
+        
+        atlas_file          = fullfile(anat_path,anatomy_type.Atlas_file_name);
+        surfaces            = {head_file, outerskull_file, innerskull_file, pial_L, pial_R, midthickness_L, midthickness_R, white_L, white_R, atlas_file};
+        properties.anatomy_params.surfaces = surfaces;
         
         %%
         %% Process: Applaying MRI transformation 
         %%
-        if(properties.anatomy_params.mri_transformation.use_transformation)
+        if(properties.anatomy_params.common_params.mri_transformation.use_transformation)
             [BstMriFile, sMri]  = import_mri(iSubject, T1w_file, 'ALL-MNI', 0);
             %%
             %% Read Transformation
             %%
-            base_path           = properties.anatomy_params.mri_transformation.base_path;
-            transformation_ref  = strrep(properties.anatomy_params.mri_transformation.file_location,'SubID',subID);
+            base_path           = properties.anatomy_params.common_params.mri_transformation.base_path;
+            transformation_ref  = strrep(properties.anatomy_params.common_params.mri_transformation.file_location,'SubID',subID);
             transformation_file = fullfile(base_path,subID,transformation_ref);
             if(isfile(transformation_file))
                 apply_mri_transf(BstMriFile, sMri,transformation_file);

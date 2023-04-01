@@ -11,7 +11,7 @@ report_path = get_report_path(properties, subID);
 %% Compute BEM Surfaces
 %%
 if(~mq_control)
-    if(properties.anatomy_params.surfaces_resolution.gener_BEM_surf)
+    if(properties.anatomy_params.common_params.surfaces_resolution.gener_BEM_surf)
         bst_process('CallProcess', 'process_generate_bem', [], [], ...
             'subjectname', subID, ...
             'nscalp',      4322, ...%3242

@@ -17,7 +17,7 @@ subjects_processed              = [];
 general_params                  = properties.general_params;
 anatomy_params                  = properties.anatomy_params;
 ProtocolName                    = general_params.bst_config.protocol_name;
-bst_output_path                 = general_params.bst_export.output_path;
+output_path                     = general_params.output_path;
 anatomy_type                    = anatomy_params.anatomy_type.type;
 anatomy_config                  = anatomy_params.anatomy_type.type_list{anatomy_type};
 mq_control                      = general_params.bst_config.after_MaQC.run;
@@ -66,11 +66,7 @@ for j=1:length(subjects)
         subID        = subjects(j).Name;
     else
         subID        = subjects(j).name;
-    end
-    if(isfield(anatomy_config,'subID_prefix') && ~isequal(anatomy_config.subID_prefix,'none') && ~isempty(anatomy_config.subID_prefix))
-        subID_prefix    = anatomy_config.subID_prefix;
-        subID           = strrep(subject_name, subID_prefix,'');
-    end    
+    end     
     disp('==========================================================================');
     disp(strcat('-->> Processing subject: ', subID));
     disp('==========================================================================');    
@@ -94,7 +90,7 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
-    [anat_error, CSurfaces] = process_import_anat(properties,subID);
+    [anat_error, CSurfaces, properties] = process_import_anat(properties,subID);
     if(~isempty(fieldnames(anat_error)))
         continue;
     end
@@ -156,12 +152,12 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Export Subject from BST Protocol");
     disp("--------------------------------------------------------------------------");
-    if(~isfolder(fullfile(bst_output_path,'Subjects',ProtocolName)))
-        mkdir(fullfile(bst_output_path,'Subjects',ProtocolName));
+    if(~isfolder(fullfile(output_path,'BST','Subjects',ProtocolName)))
+        mkdir(fullfile(output_path,'BST','Subjects',ProtocolName));
     end
     iProtocol       = bst_get('iProtocol');
     [~, iSubject]   = bst_get('Subject', subID);
-    export_protocol(iProtocol, iSubject, fullfile(bst_output_path,'Subjects',ProtocolName,strcat(subID,'.zip')));
+    export_protocol(iProtocol, iSubject, fullfile(output_path,'BST','Subjects',ProtocolName,strcat(subID,'.zip')));
     
     %%
     %% Save and display report
@@ -182,9 +178,7 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     if(isempty(errMessage))
         disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
-        if(general_params.bcv_config.export)
-            export_error = export_subject_BCV_structure(properties, subID, CSurfaces, sub_to_FSAve);
-        end
+        export_error = export_subject_BCV_structure(properties, subID, CSurfaces, sub_to_FSAve);        
     end
     disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    

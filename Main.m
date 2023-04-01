@@ -95,10 +95,8 @@ end
 disp('-->> Preparing BrainStorm properties.');
 disp('==========================================================================');
 bst_path        = properties.general_params.bst_config.bst_path;
-bst_db_path     = properties.general_params.bst_config.db_path;
-spm_path        = properties.general_params.spm_config.spm_path;
 addpath(genpath(bst_path));
-addpath(spm_path);
+bst_db_path     = properties.general_params.bst_config.db_path;
 
 %%
 %% Starting BrainStorm
