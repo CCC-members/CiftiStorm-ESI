@@ -124,6 +124,20 @@ if(~mq_control)
         end
         % Save modifications in channel file
         bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
+        if(~isempty(properties.channel_params.channel_label_file))
+            user_channel = jsondecode(fileread(properties.channel_params.channel_label_file));
+            [sStudies, ~]       = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
+            BSTChannels         = load(BSTChannelsFile);
+            Channels = BSTChannels.Channel;
+            for i=1:length(user_channel)
+                label = user_channel(i);
+                idx  = find(ismember({Channels.Name},label),1);
+                New_Channels(i) = Channels(idx);
+            end
+            BSTChannels.Channel = New_Channels;
+            % Save modifications in channel file
+            bst_save(file_fullpath(BSTChannelsFile), BSTChannels, 'v7');
+        end
     end
 end
 

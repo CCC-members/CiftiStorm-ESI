@@ -29,6 +29,9 @@ else
         surfaces        = {};
         db_set_template( iSubject, sTemplate, false );
         set_Surfaces_Comment(properties,iSubject);
+        
+        CSurfaces = get_Surfaces_from_template(subID);
+        
     else
         non_brain_surfaces  = properties.anatomy_params.common_params.non_brain_surfaces;
         % MRI File
@@ -80,12 +83,11 @@ else
                 'subjectname', subID, ...
                 'mrifile',     {T1w_file, 'ALL-MNI'});
         end
-    end
-    %%
-    %% Process: Import Surfaces
-    %%
-    CSurfaces = import_HCP_surfaces(properties, subID, surfaces);    
-    
+        %%
+        %% Process: Import Surfaces
+        %%
+        CSurfaces = import_HCP_surfaces(properties, subID, surfaces);
+    end   
 end
 
 %%
