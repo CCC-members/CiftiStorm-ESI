@@ -21,115 +21,64 @@ Faces                   = Spial.Faces;
 %%
 %%  Compute (r) for FSAverage Surfaces
 %% 
-%   A = R(0); B = N(0)  r = 0 
-%   A + B + C + D = R(1); B + 2C + 3C = N(1)
+%  v0 = sum(abs(R(1) - R(0)).^2,2).^(1/2);
+%  v1 = sum(abs(R(1) - R(0)).^2,2).^(1/2);
+%   A = R(0); B = v0.*N(0)  r = 0 
+%   A + B + C + D = R(1); B + 2C + 3C = v1.*N(1)
 %   --------------------------------------------------
-%   C + D = R(1) - R(0) - N(0)
-%   2C + 3D = N(1) - N(0)
+%   C + D = R(1) - R(0) - v0.*N(0)
+%   2C + 3D = v1.*N(1) - v0.*N(0)
 %   --------------------------------------------------
-%   3C + 3D = 3R(1) - 3R(0) - 3N(0)   x 3
-%   2C + 3D = N(1) - N(0)
+%   3C + 3D = 3R(1) - 3R(0) - 3*v0.*N(0)   x 3
+%   2C + 3D = v1.*N(1) - v0.*N(0)
 %   --------------------------------------------------
-%   3C - 2C = 3R(1) - 3R(0) - 3N(0) - ( N(1) - N(0) )
-%         C = 3R(1) - 3R(0) - 3N(0) - N(1) + N(0)
+%   3C - 2C = 3R(1) - 3R(0) - 3*v0.*N(0) - ( v1.*N(1) - v0.*N(0) )
+%         C = 3R(1) - 3R(0) - 3*v0.*N(0) - v1.*N(1) + v0.*N(0)
 %   --------------------------------------------------
-%   C + D = R(1) - R(0) - N(0)
-%       D = R(1) - R(0) - N(0) - C
+%   C + D = R(1) - R(0) - v0.*N(0)
+%       D = R(1) - R(0) - v0.*N(0) - C
 
 %%
 %% BigBrain surfaces
 %%
 % White
 BBSwhite        = load('cortex_layer6_high.mat');
-RBBSwhite       = BBSwhite.Vertices;                % R(0)
+BBRwhite       = BBSwhite.Vertices;                % R(0)
+BBNwhite       = BBSwhite.VertNormals;             % N(0)
 % Six
 BBSsix          = load('cortex_layer5_high.mat');
-RBBSsix         = BBSsix.Vertices;  
+BBRsix         = BBSsix.Vertices;  
 % Five
 BBSfive         = load('cortex_layer4_high.mat');
-RBBSfive        = BBSfive.Vertices;  
+BBRfive        = BBSfive.Vertices;  
 % Four
 BBSfour         = load('cortex_layer3_high.mat');
-RBBSfour        = BBSfour.Vertices;  
+BBRfour        = BBSfour.Vertices;  
 % Three
 BBSthree        = load('cortex_layer2_high.mat');
-RBBSthree       = BBSthree.Vertices;  
+BBRthree       = BBSthree.Vertices;  
 % Two
 BBStwo          = load('cortex_layer1_high.mat');
-RBBStwo         = BBStwo.Vertices;  
+BBRtwo         = BBStwo.Vertices;  
 % Pial
 BBSpial         = load('cortex_layer0_high.mat');
-RBBSpial        = BBSpial.Vertices;                 % R(1)
+BBRpial        = BBSpial.Vertices;                 % R(1)
+BBNpial        = BBSpial.VertNormals;             % N(0)
 
-%%
-%%  Compute (r) for BigBrain Surfaces
-%% 
-%   A = R(0); B = N(0)  r = 0 
-%   A + B + C + D = R(1); B + 2C + 3C = N(1)
-%   --------------------------------------------------
-%   C + D = R(1) - R(0) - N(0)
-%   2C + 3D = N(1) - N(0)
-%   --------------------------------------------------
-%   3C + 3D = 3R(1) - 3R(0) - 3N(0)   x 3
-%   2C + 3D = N(1) - N(0)
-%   --------------------------------------------------
-%   3C - 2C = 3R(1) - 3R(0) - 3N(0) - ( N(1) - N(0) )
-%         C = 3R(1) - 3R(0) - 3N(0) - N(1) + N(0)
-%         C = 3R(1) - 3R(0) - 2N(0) - N(1)
-%   --------------------------------------------------
-%   C + D = R(1) - R(0) - N(0)
-%       D = R(1) - R(0) - N(0) - C
-%
-%  ---------------------------------------------------
-%  Linear reconstruction
-%  R'(r) = R(0) + r * (R(1) - R(0))
-%
-
-
-% Finding (r) for layers from six to two
+%% Finding (r) for layers from six to two
 disp("-->> Computing Surfaces like BigBrain reference");
 fprintf(1,'---->> Finding (r) for layers from six to two: %3d%%\n',0);
-radius = 0:0.001:1;
-n_six = []; n_five = []; n_four = []; n_three = []; n_two = [];
-for r=1:length(radius)    
-    RBBSsix_p   = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
-    Snorm       = norm(RBBSsix_p - RBBSsix, 2);
-    n_six       = [n_six Snorm];
-    
-    RBBSfive_p  = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
-    Snorm       = norm(RBBSfive_p - RBBSfive, 2);
-    n_five      = [n_five Snorm];
-    
-    RBBSfour_p  = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
-    Snorm       = norm(RBBSfour_p - RBBSfour, 2);
-    n_four      = [n_four Snorm];
-    
-    RBBSthree_p = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
-    Snorm       = norm(RBBSthree_p - RBBSthree, 2);
-    n_three     = [n_three Snorm];
-    
-    RBBStwo_p   = RBBSwhite + radius(r) * (RBBSpial - RBBSwhite);
-    Snorm       = norm(RBBStwo_p - RBBStwo, 2);
-    n_two       = [n_two Snorm];    
-    fprintf(1,'\b\b\b\b%3.0f%%',(r)/(length(radius))*100);
-end
-[~,ind_six] = min(n_six);
-r_six = radius(ind_six);
+m_radius       = 100;
+radius         = 0:(1/m_radius):1;
+v_white        = sum(abs(BBRpial - BBRwhite).^2,2).^(1/2);
+v_pial         = sum(abs(BBRpial - BBRwhite).^2,2).^(1/2);
+[BBR]          = chp(BBRwhite,BBNwhite,BBRpial,BBNpial,m_radius,radius,v_white,v_pial);
+[radius_six]   = opt(BBR,BBRsix,radius); 
+[radius_five]  = opt(BBR,BBRfive,radius); 
+[radius_four]  = opt(BBR,BBRfour,radius); 
+[radius_three] = opt(BBR,BBRthree,radius);
+[radius_two]   = opt(BBR,BBRtwo,radius); 
 
-[~,ind_five] = min(n_five);
-r_five = radius(ind_five);
-
-[~,ind_four] = min(n_four);
-r_four = radius(ind_four);
-
-[~,ind_three] = min(n_three);
-r_three = radius(ind_three);
-
-[~,ind_two] = min(n_two);
-r_two = radius(ind_two);
-
-CRadius = [ind_two, r_three, ind_four, ind_five, ind_six];
-fprintf(1,'\n');
 %%
 %% ===== CREATE NEW SURFACE STRUCTURE =====
 %%
@@ -152,10 +101,12 @@ fprintf(1,'\n');
 %  R'(r) = R(0) + r * (R(1) - R(0))
 %
 [~, iSubject]           = bst_get('Subject', subID);
+v_white                 = sum(abs(Rpial - Rwhite).^2,2).^(1/2);
+v_pial                  = sum(abs(Rpial - Rwhite).^2,2).^(1/2);
 
 % Creating surface 6
 disp("-->> Getting layer six in FSAverage space");
-Rsix                    = Rwhite + r_six * (Rpial - Rwhite);
+[Rsix]                  = chp(Rwhite,Nwhite,Rpial,Npial,0,radius_six,v_white,v_pial);
 Ssix                    = db_template('surfacemat');
 Ssix.Vertices           = Rsix;
 Ssix.Faces              = Faces;
@@ -174,7 +125,7 @@ CSurfaces(6).filename   = SsixFileShort;
 
 % Creating surface 5
 disp("-->> Getting layer five in FSAverage space");
-Rfive                   = Rwhite + r_five * (Rpial - Rwhite);
+[Rfive]                  = chp(Rwhite,Nwhite,Rpial,Npial,0,radius_five,v_white,v_pial);
 Sfive                   = db_template('surfacemat');
 Sfive.Vertices          = Rfive;
 Sfive.Faces             = Faces;
@@ -193,7 +144,7 @@ CSurfaces(5).filename   = SfiveFileShort;
 
 % Creating surface 4
 disp("-->> Getting layer four in FSAverage space");
-Rfour                   = Rwhite + r_four * (Rpial - Rwhite);
+[Rfour]                  = chp(Rwhite,Nwhite,Rpial,Npial,0,radius_four,v_white,v_pial);
 Sfour                   = db_template('surfacemat');
 Sfour.Vertices          = Rfour;
 Sfour.Faces             = Faces;
@@ -212,7 +163,7 @@ CSurfaces(4).filename   = SfourFileShort;
 
 % Creating surface 3
 disp("-->> Getting layer three in FSAverage space");
-Rthree                   = Rwhite + r_three * (Rpial - Rwhite);
+[Rthree]                  = chp(Rwhite,Nwhite,Rpial,Npial,0,radius_three,v_white,v_pial);
 Sthree                  = db_template('surfacemat');
 Sthree.Vertices         = Rthree;
 Sthree.Faces            = Faces;
@@ -231,7 +182,7 @@ CSurfaces(3).filename   = SthreeFileShort;
 
 % Creating surface 2
 disp("-->> Getting layer two in FSAverage space");
-Rtwo                    = Rwhite + r_two * (Rpial - Rwhite);
+[Rtwo]                  = chp(Rwhite,Nwhite,Rpial,Npial,0,radius_two,v_white,v_pial);
 Stwo                    = db_template('surfacemat');
 Stwo.Vertices           = Rtwo;
 Stwo.Faces              = Faces;
@@ -249,3 +200,16 @@ CSurfaces(2).type       = 'cortex';
 CSurfaces(2).filename   = StwoFileShort;
 end
 
+%% Computes positions of the Cubic Hermite Polynomial (CHP) within the time interval [0,1]
+function [R] = chp(R0,N0,R1,N1,m,radius,v0,v1)
+radius = reshape(radius,1,1,m + 1);
+R = (2*radius.^3 - 3*radius.^2 + 1).*R0 + ...
+    (radius.^3 - 2*radius.^2 + radius).*v0.*N0 + ...
+    (-2*radius.^3 + 3*radius.^2).*R1 + ...
+    (radius.^3 - radius.^2).*v1.*N1;
+end
+%% Computes optimal position of the Cubic Hermite Polynomial (CHP)
+function [radius_opt] = opt(R,Ropt,radius)
+[~,ind_opt] = min(sum(abs(R - Ropt).^2,2).^(1/2));
+radius_opt = radius(ind_opt);
+end
