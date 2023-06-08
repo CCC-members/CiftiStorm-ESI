@@ -2,12 +2,12 @@
     "description":"",
     "params":{
         "modality":"EEG",
-        "name":"HeadModel_EEG_DEAP",
+        "name":"HeadModel_EEG_CHBM_Multilayer",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_EEG_DEAP",
+            "protocol_name":"HeadModel_EEG_CHBM_Multilayer",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
@@ -15,7 +15,7 @@
                 "run":false
             }
         },        
-        "output_path":"/mnt/Store/Data/DEAP",        
+        "output_path":"/mnt/Store/Data/CHBM/Processing",        
         "tmp_path":"local"          
     }
 }

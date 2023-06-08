@@ -210,6 +210,6 @@ R = (2*radius.^3 - 3*radius.^2 + 1).*R0 + ...
 end
 %% Computes optimal position of the Cubic Hermite Polynomial (CHP)
 function [radius_opt] = opt(R,Ropt,radius)
-[~,ind_opt] = min(sum(abs(R - Ropt).^2,2).^(1/2));
+[~,ind_opt] = min(squeeze(sum(sum(abs(R - Ropt).^2,2),1).^(1/2)));
 radius_opt = radius(ind_opt);
 end

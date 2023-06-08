@@ -3,7 +3,7 @@
     "params":{
         "anatomy_type":{
             "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-            "type":1,
+            "type":3,
             "type_list":[
                 {
                     "id":1,
@@ -25,7 +25,7 @@
                     "id":3,
                     "name":"hcp_anat_individual",
                     "description":"",
-                    "base_path":"/mnt/Store/Data/CHBM/ciftify",
+                    "base_path":"/mnt/Store/Data/CHBM/Processing/Ciftify",
                     "T1w_file_name":"T1w.nii.gz",
                     "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
                 }
@@ -39,11 +39,11 @@
             },
             "non_brain_surfaces":{
                 "description":"FSL Bet command output",
-                "base_path":"/mnt/Store/Data/CHBM/non-brain"
+                "base_path":"/mnt/Store/Data/CHBM/Processing/Non-brain"
             },
             "layer_desc":{
                 "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-                "desc":"midthickness"
+                "desc":"bigbrain"
             },
             "surfaces_resolution":{
                 "description":"Numbers of vertices for downsample each surface: default <<8000>>",
