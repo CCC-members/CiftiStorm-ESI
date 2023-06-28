@@ -2,12 +2,12 @@
     "description":"",
     "params":{
         "modality":"EEG",
-        "name":"HeadModel_EEG_CHBM_Multilayer",
+        "name":"HeadModel_EEG_CHBM_Dataset_DC",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_EEG_CHBM_Multilayer",
+            "protocol_name":"HeadModel_EEG_CHBM_Dataset_DC",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
