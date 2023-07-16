@@ -26,7 +26,7 @@ disp("=====================================================================");
 %%
 %% Preparing properties
 %%
-addpath(fullfile('app'));
+addpath(genpath('app'));
 addpath('bst_templates');
 addpath(genpath('config_properties'));
 addpath('external');
