@@ -37,9 +37,7 @@ for i=1:length(CSurfaces)
                         bst_memory('UnloadSurface', BSTCortexFile);
                     end
                 otherwise
-                    anat_path           = fullfile(anatomy_type.base_path, subID, strrep(anatomy_type.HCP_anat_path, 'SubID', subID), 'T1w');
-                    file_name           = anatomy_type.Atlas_file_name;
-                    Atlas_seg_location  = fullfile(anat_path,file_name);
+                    Atlas_seg_location  = properties.anatomy_params.surfaces{end};
                     % Add this sentence in import_label function in line 80
                     %  case '.gz',     FileFormat = 'MRI-MASK-MNI';
                     % modify import_label function in line 341

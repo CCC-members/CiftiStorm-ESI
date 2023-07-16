@@ -8,10 +8,8 @@ export_error = [];
 % Get subject directory
 ProtocolInfo    = bst_get('ProtocolInfo');
 sSubject        = bst_get('Subject', subID);
-bcv_path        = properties.general_params.bcv_config.export_path;
-if(~isfolder(bcv_path))
-    mkdir(bcv_path);
-end
+output_path     = properties.general_params.output_path;
+
 
 % Get the current Study
 [sStudies, ~]   = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
@@ -52,10 +50,7 @@ Cdata           = load(BSTChannelsFile);
 %%
 %% Saving files in BC-VARETA Structure
 %%
-base_path = fullfile(properties.general_params.bcv_config.export_path,ProtocolInfo.Comment);
-if(~isfolder(base_path))
-    mkdir(base_path);
-end
+base_path = fullfile(output_path,'BC-V_Structure',ProtocolInfo.Comment);
 save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex);
 
 end

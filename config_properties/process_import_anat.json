@@ -3,18 +3,14 @@
     "params":{
         "anatomy_type":{
             "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-            "type":3,
+            "type":1,
             "type_list":[
                 {
                     "id":1,
                     "name":"default_anatomy",            
                     "description":"Select the group and name of the sensor layout. See app/bst_default_anatomy.json file and select all params from there",
-                    "template_name":"FsAverage_2020",
-                    "default_atlas":"Desikan-Killiany",
-                    "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-                        "desc":"fs_LR"
-                    }
+                    "template_name":"ICBM152_2023",
+                    "default_atlas":"Desikan-Killiany"
                 },
                 {
                     "id":2,
@@ -22,46 +18,39 @@
                     "description":"Use this configuration as anatomy template",                    
                     "base_path":"/mnt/Store/Data/CHBM_QC/Ciftify",
                     "template_name":"sub-CBM00011",
-                    "HCP_anat_path":"",
                     "T1w_file_name":"T1w.nii.gz",
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz",
-                    "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-                        "desc":"midthickness"
-                    }
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
                 },
                 {
                     "id":3,
                     "name":"hcp_anat_individual",
                     "description":"",
-                    "subID_prefix":"",
-                    "base_path":"/mnt/Store/Data/Conectome/Sample",
-                    "HCP_anat_path":"preproc/SubID",
-                    "T1w_file_name":"T1w_acpc_dc_restore.nii.gz",
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz",
-                    "layer_desc":{
-                        "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-                        "desc":"midthickness"
-                    }
+                    "base_path":"/mnt/Store/Data/CHBM/Processing/Ciftify",
+                    "T1w_file_name":"T1w.nii.gz",
+                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
                 }
             ]
         },
-        "mri_transformation":{
-            "use_transformation":true,
-            "base_path":"/mnt/Store/Data/Conectome/Sample",
-            "file_location":"meg/SubID/MEG/anatomy/SubID_MEG_anatomy_transform.txt"
-        },
-        "non_brain_surfaces":{
-            "description":"FSL Bet command output",
-            "base_path":"/mnt/Store/Data/Conectome/non-brain",
-            "file_location":""
-        },
-        "surfaces_resolution":{
-            "description":"Numbers of vertices for downsample each surface: default <<8000>>",
-            "gener_BEM_surf":true,
-            "nverthead":10000,
-            "nvertskull":10000,
-            "nvertcortex":10000            
+        "common_params":{
+            "mri_transformation":{
+                "use_transformation":false,
+                "base_path":"/mnt/Store/Data/Conectome/Sample",
+                "file_name":"meg/SubID/MEG/anatomy/SubID_MEG_anatomy_transform.txt"
+            },
+            "non_brain_surfaces":{
+                "description":"FSL Bet command output",
+                "base_path":"/mnt/Store/Data/CHBM/Processing/Non-brain"
+            },
+            "layer_desc":{
+                "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
+                "desc":"midthickness"
+            },
+            "surfaces_resolution":{
+                "description":"Numbers of vertices for downsample each surface: default <<8000>>",
+                "nverthead":8000,
+                "nvertskull":8000,
+                "nvertcortex":8000            
+            }
         }
     }
 }

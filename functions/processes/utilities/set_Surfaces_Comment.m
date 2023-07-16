@@ -1,8 +1,7 @@
 function set_Surfaces_Comment(properties,iSubject)
 %UNTITLED Summary of this function goes here
 
-anatomy_type        = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-layer_desc          = anatomy_type.layer_desc.desc;
+layer_desc          = properties.anatomy_params.common_params.layer_desc.desc;
 
 [sSubject,~]        = bst_get('Subject', iSubject);
 Surfaces            = sSubject.Surface;

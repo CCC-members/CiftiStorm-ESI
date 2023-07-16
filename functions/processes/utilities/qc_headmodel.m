@@ -168,7 +168,7 @@ if(isequal(modality,'EEG'))
         'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
         'colorbars',{'off','off','off','off'},...
         'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Low correlation Voxel (',desc,')'), [200,200,900,700]);
+    bst_report('Snapshot',fig_out,[],strcat('Low correlation Voxel under 0.3 - (',desc,')'), [200,200,900,700]);
     try
         savefig( hFig_low_cor,fullfile(report_path,strcat('Low correlation Voxel (',desc,').fig')));
     catch

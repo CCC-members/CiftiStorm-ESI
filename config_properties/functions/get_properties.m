@@ -23,9 +23,15 @@ for i=1:length(process_files)
         return;
     end
 end
-anat_type = properties.anatomy_params.params.anatomy_type.type;
-properties.anatomy_params.params.anat_config = properties.anatomy_params.params.anatomy_type.type_list{anat_type};
-channel_type = properties.channel_params.params.channel_type.type;
-properties.channel_params.params.chann_config = properties.channel_params.params.channel_type.type_list{channel_type};
+properties.general_params       = properties.general_params.params;
+properties.anatomy_params       = properties.anatomy_params.params;
+properties.channel_params       = properties.channel_params.params;
+properties.headmodel_params     = properties.headmodel_params.params;
+
+anat_type = properties.anatomy_params.anatomy_type.type;
+properties.anatomy_params.anat_config = properties.anatomy_params.anatomy_type.type_list{anat_type};
+channel_type = properties.channel_params.channel_type.type;
+properties.channel_params.chann_config = properties.channel_params.channel_type.type_list{channel_type};
+
 end
 

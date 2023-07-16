@@ -1,13 +1,13 @@
 {
     "description":"",
     "params":{
-        "modality":"MEG",
-        "name":"HeadModel_HCP_hgLASSO",
+        "modality":"EEG",
+        "name":"HeadModel_ICBM_Covid",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_HCP_hgLASSO",
+            "protocol_name":"HeadModel_ICBM_Covid",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
@@ -15,21 +15,7 @@
                 "run":false
             }
         },        
-        "spm_config":{
-            "description":"",
-            "spm_path":"/mnt/Develop/Tools/spm12"
-        },
-        "bcv_config":{
-            "export":true,
-            "export_path":"/mnt/Store/Data/Conectome/hg_LASSO/BC-V_Structure"
-        },
-        "bst_export":{
-            "description":"Folder to export the Brainstorm outputs",
-            "output_path":"/mnt/Store/Data/Conectome/hg_LASSO/BST_Output"
-        },
-        "tmp_path":{
-            "description":"",
-            "value":"local"
-        }                
+        "output_path":"/mnt/Store/Data/Covid",        
+        "tmp_path":"local"          
     }
 }

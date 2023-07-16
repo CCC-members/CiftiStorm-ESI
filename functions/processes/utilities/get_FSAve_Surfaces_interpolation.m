@@ -8,8 +8,7 @@ Surfaces        = sSubject.Surface;
 sub_to_FSAve    = [];
 
 if(~isequal(properties.anatomy_params.anatomy_type.type,1))
-    anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-    layer_desc      = anatomy_type.layer_desc.desc;
+    layer_desc      = properties.anatomy_params.common_params.layer_desc.desc;
     if(isequal(layer_desc,'white') || isequal(layer_desc,'midthickness') || isequal(layer_desc,'pial'))
         type = 'single';
     else

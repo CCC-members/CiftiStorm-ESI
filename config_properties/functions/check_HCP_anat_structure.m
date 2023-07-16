@@ -1,6 +1,16 @@
-function checked = check_HCP_anat_structure(anat_path,SubID, properties)
+function checked = check_HCP_anat_structure(structure,properties)
 
 checked = true;
+SubID = structure.name;
+folderlist = dir(fullfile(structure.folder,SubID, '**'));  %get list of files and folders in any subfolder
+folderlist = folderlist([folderlist.isdir]);  %remove folders from list
+C = {folderlist.name};
+idx = find(~cellfun('isempty',regexp(C,'T1w')),1);
+if(isempty(idx))   
+    checked = false; 
+    return;
+end
+anat_path = fullfile(folderlist(idx).folder, 'T1w');
 t1w             = fullfile(anat_path,properties.T1w_file_name);
 white_L         = fullfile(anat_path,'fsaverage_LR32k',strcat(SubID,'.L.white.32k_fs_LR.surf.gii'));
 white_R         = fullfile(anat_path,'fsaverage_LR32k',strcat(SubID,'.R.white.32k_fs_LR.surf.gii'));

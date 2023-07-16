@@ -1,7 +1,6 @@
 function CSurfaces = get_CSurfaces_from_sSubject(properties,iSubject)
 
-anatomy_type            = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-layer_desc              = anatomy_type.layer_desc.desc;
+layer_desc              = properties.anatomy_params.common_params.layer_desc.desc;
 sSubject                = bst_get('Subject', iSubject);
 CSurfaces(8).name       = 'InnerSkull';
 CSurfaces(8).comment    = sSubject.Surface(sSubject.iInnerSkull).Comment;

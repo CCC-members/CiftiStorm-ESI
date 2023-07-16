@@ -2,9 +2,9 @@ function CSurfaces = import_HCP_surfaces(properties, subID, surfaces)
 %%
 %% Getting params
 %%
-anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-layer_desc      = anatomy_type.layer_desc.desc;
-nVertCortex     = properties.anatomy_params.surfaces_resolution.nvertcortex;
+anatomy_type            = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
+layer_desc              = properties.anatomy_params.common_params.layer_desc.desc;
+surfaces_resolution     = properties.anatomy_params.common_params.surfaces_resolution;
 
 if(~isequal(anatomy_type.id,1))
     %%
@@ -18,9 +18,9 @@ if(~isequal(anatomy_type.id,1))
     midthickness_L      = surfaces{6};
     midthickness_R      = surfaces{7};
     white_L             = surfaces{8};
-    white_R             = surfaces{9};
-    nVertHead           = properties.anatomy_params.surfaces_resolution.nverthead;
-    nVertSkull          = properties.anatomy_params.surfaces_resolution.nvertskull;
+    white_R             = surfaces{9};    
+    nVertHead           = surfaces_resolution.nverthead;
+    nVertSkull          = surfaces_resolution.nvertskull;
     
     %% Importing non-brain surfacs
     bst_process('CallProcess', 'process_import_surfaces', [], [], ...
