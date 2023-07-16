@@ -11,7 +11,7 @@ disp('==========================================================================
 %% Checking general params
 %%
 disp('-->> Checking general params');
-general_params = properties.general_params.params;
+general_params = properties.general_params;
 if(isempty(general_params.modality) && ~isequal(general_params.modality,'EEG') && ~isequal(general_params.modality,'MEG'))
     status = false;
     fprintf(2,'\n-->> Error: The modality have to be EEG or MEG.\n');
@@ -94,7 +94,7 @@ if(~general_params.bst_config.after_MaQC.run)
     % Anatomy type configuration
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking anatomy params');
-    anat_params = properties.anatomy_params.params;
+    anat_params = properties.anatomy_params;
     if(isempty(anat_params.anatomy_type.type)...
             && ~isequal(anat_params.anatomy_type.type,1)...
             && ~isequal(anat_params.anatomy_type.type,2)...
@@ -336,7 +336,7 @@ if(~general_params.bst_config.after_MaQC.run)
     %%
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking channel params');
-    channel_params = properties.channel_params.params;
+    channel_params = properties.channel_params;
     if(isempty(channel_params.channel_type.type)...
             && ~isequal(channel_params.channel_type.type,1)...
             && ~isequal(channel_params.channel_type.type,2))
@@ -427,7 +427,7 @@ if(~general_params.bst_config.after_MaQC.run)
     %%
     %% Checking subject number in each folder
     %%
-    anat_params = properties.anatomy_params.params;
+    anat_params = properties.anatomy_params;
     if(isequal(anat_params.anatomy_type.type,3))
         hcp_base_path = selected_anatomy.base_path;
         hcp_subjects = dir(hcp_base_path);

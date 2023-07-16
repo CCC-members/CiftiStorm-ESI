@@ -83,24 +83,24 @@ end
 %%
 %% Correcting overlapping surfaces
 %%
-% if(~mq_control)
-%     [sSubject, iSubject]                = bst_get('Subject', subID);
-%     Surfaces                            = sSubject.Surface;
-%     InnerSkullFile                      = Surfaces(sSubject.iInnerSkull).FileName;
-%     for i=1:length(CSurfaces)
-%         CSurface                        = CSurfaces(i);
-%         if(~isempty(CSurface.name)  && isequal(CSurface.type,'cortex'))
-%             CortexFile                  = Surfaces(CSurface.iSurface).FileName;
-%             [NewTessFile, iSurface]     = tess_force_envelope(CortexFile, InnerSkullFile);
-% %             [NewTessFile, iSurface]     = script_tess_force_envelope(CortexFile, InnerSkullFile, report_path);
-%             if(~isempty(iSurface)) 
-%                 CSurfaces(i).comment    = strcat(CSurface.comment,'_fix');
-%                 CSurfaces(i).iSurface   = iSurface;
-%                 CSurfaces(i).filename   = NewTessFile;
-%             end
-%         end
-%     end
-% end
+if(~mq_control)
+    [sSubject, iSubject]                = bst_get('Subject', subID);
+    Surfaces                            = sSubject.Surface;
+    InnerSkullFile                      = Surfaces(sSubject.iInnerSkull).FileName;
+    for i=1:length(CSurfaces)
+        CSurface                        = CSurfaces(i);
+        if(~isempty(CSurface.name)  && isequal(CSurface.type,'cortex'))
+            CortexFile                  = Surfaces(CSurface.iSurface).FileName;
+            % [NewTessFile, iSurface]     = tess_force_envelope(CortexFile, InnerSkullFile);
+            [NewTessFile, iSurface]     = script_tess_force_envelope(CortexFile, InnerSkullFile, report_path);
+            if(~isempty(iSurface)) 
+                CSurfaces(i).comment    = strcat(CSurface.comment,'_fix');
+                CSurfaces(i).iSurface   = iSurface;
+                CSurfaces(i).filename   = NewTessFile;
+            end
+        end
+    end
+end
 % if(~mq_control)
 %     disp("-->> Correcting overlay with InnerSkull");
 %     [sSubject, iSubject]                = bst_get('Subject', subID);

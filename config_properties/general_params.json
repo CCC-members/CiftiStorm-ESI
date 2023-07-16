@@ -2,12 +2,12 @@
     "description":"",
     "params":{
         "modality":"EEG",
-        "name":"HeadModel_EEG_CHBM_Dataset_DC",
+        "name":"HeadModel_ICBM_Covid",
         "description":"",
         "colormap":"tools/mycolormap.mat",        
         "bst_config":{
             "description":"",
-            "protocol_name":"HeadModel_EEG_CHBM_Dataset_DC",
+            "protocol_name":"HeadModel_ICBM_Covid",
             "protocol_reset":false,          
             "bst_path":"/mnt/Develop/Tools/brainstorm3",
             "db_path":"local",
@@ -15,7 +15,7 @@
                 "run":false
             }
         },        
-        "output_path":"/mnt/Store/Data/CHBM/Processing",        
+        "output_path":"/mnt/Store/Data/Covid",        
         "tmp_path":"local"          
     }
 }
