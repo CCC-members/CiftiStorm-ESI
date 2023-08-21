@@ -37,7 +37,7 @@ if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
     if(isOk)
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'openmeeg');
     else
-        fprintf(2,"\n ->> Error: We can not install tha openmeeg plugin. Please see the follow error and restart the process. \n");
+        fprintf(2,"\n ->> Error: We can not install the openmeeg plugin. Please see the follow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
         disp('-->> Process stopped!!!');
@@ -50,7 +50,7 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
     if(isOk)
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'duneuro');
     else
-        fprintf(2,"\n ->> Error: We can not install tha duneuro plugin. Please see the follow error and restart the process. \n");
+        fprintf(2,"\n ->> Error: We can not install the duneuro plugin. Please see the follow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
         disp('-->> Process stopped!!!');
