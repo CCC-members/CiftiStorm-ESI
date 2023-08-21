@@ -29,7 +29,7 @@ switch mq_control
             fprintf(2,strcat('\nBC-V-->> Error: The protocol name defined in config_properties/general_params.json is wrong \n'));
             disp(strcat("Name: ",ProtocolName));
             disp(strcat("Please check the Protocol name or the BST db_path in config_properties/general_params.json file"));
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         gui_brainstorm('SetCurrentProtocol', iProtocol);
@@ -43,8 +43,8 @@ switch mq_control
             if(isempty(sTemplate))
                 fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
                 disp(strcat("Name: ",subjects.name));
-                disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
-                disp('-->> Process stoped!!!');
+                disp(strcat("Please check the available anatomy templates in bst_template/bst_default_anatomy.json file"));
+                disp('-->> Process stopped!!!');
                 return;
             end
         elseif(isequal(anatomy_type,2))

@@ -6,7 +6,7 @@ end
 
 % find faces in 8k subject surfaces that include the neigh_indexes
 posible_faces = Sc8k.Faces(matched_rows,:,:);
-% checking in wich face is projected sub_source_ind
+% checking in which face is projected sub_source_ind
 P = Sc64k.Vertices(i,:);
 for j=1:length(posible_faces)
     posible_face    = posible_faces(j,:);

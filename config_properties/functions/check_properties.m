@@ -15,28 +15,28 @@ general_params = properties.general_params;
 if(isempty(general_params.modality) && ~isequal(general_params.modality,'EEG') && ~isequal(general_params.modality,'MEG'))
     status = false;
     fprintf(2,'\n-->> Error: The modality have to be EEG or MEG.\n');
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     return;
 end
 protocol_name = general_params.bst_config.protocol_name;
 if(isempty(general_params.bst_config.protocol_name))
     status = false;
     fprintf(2,'\n-->> Error: The protocol name can not be empty.\n');
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     return;
 end
 if(~isempty(general_params.colormap) && ~isequal(general_params.colormap,'none') && ~isfile(general_params.colormap))
     status = false;
     fprintf(2,'\n-->> Error: Do not exist the colormap file defined in selected dataset configuration file.\n');
     disp(general_params.colormap);
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     return;
 end
 if(~isfolder(general_params.bst_config.bst_path)...
         || ~isfile(fullfile(general_params.bst_config.bst_path,'brainstorm.m')))
     fprintf(2,"\n ->> Error: The selected Brainstorm path is wrong. \n");
     disp(general_params.bst_config.bst_path);
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     status = false;
     return;
 end
@@ -104,7 +104,7 @@ if(~general_params.bst_config.after_MaQC.run)
         disp('2: For use HCP anatomy as template.');
         disp('3: For use HCP individual anatomy.');
         status = false;
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         return;
     end
     % Check default template configuration
@@ -117,9 +117,9 @@ if(~general_params.bst_config.after_MaQC.run)
         if(~contains(template_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
             disp(strcat("Name: ",template_name));
-            disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
+            disp(strcat("Please check the available anatomy templates in bst_template/bst_default_anatomy.json file"));
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
     end
@@ -133,7 +133,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The HCP template name can not be empty.\n');
             disp('Please type a HCP Template name.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         base_path = selected_anatomy.base_path;
@@ -141,14 +141,14 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The HCP template base_path is not a folder.\n');
             disp('Please select a correct HCP Template folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         if(~isfolder(fullfile(base_path,template_name)))
             fprintf(2,strcat("There is no folder with <<",template_name,">> in the selected HCP Template folder.\n"));
             disp('Please select a correct HCP Template folder or check the Template name filed.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         anat_path = fullfile(base_path,template_name,strrep(selected_anatomy.HCP_anat_path,'SubID',template_name), 'T1w');
@@ -157,7 +157,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,strcat("The folder <<",template_name,">> is not an HCP Template folder.\n"));
             disp('Please select a correct HCP Template folder or check the Template name filed.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         % Check non brain surfaces configuration
@@ -169,7 +169,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
             disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         checked = check_non_brain_surfaces(base_path,template_name);
@@ -177,7 +177,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The Non-brain selected folder is not a FSL Bet command output.\n');
             disp('Please correct the Non-brain surfaces folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
     end
@@ -192,7 +192,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprinprep_paramstf(2,'The HCP individual base_path is not a folder.\n');
             disp('Please select a correct HCP Template folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         structures = dir(base_path);
@@ -211,7 +211,7 @@ if(~general_params.bst_config.after_MaQC.run)
                 fprintf(2,'Any folder in the Anatomy base path have a HCP structure.\n');
                 disp('Please check the HCP individual folder.');
                 status = false;
-                disp('-->> Process stoped!!!');
+                disp('-->> Process stopped!!!');
                 return;
             else
                 warning('Some of the subjects do not have a HCP structure.');
@@ -229,7 +229,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
             disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         structures = dir(base_path);
@@ -248,7 +248,7 @@ if(~general_params.bst_config.after_MaQC.run)
                 fprintf(2,'Any folder in the Non-brain surfaces path have a specific file location.\n');
                 disp('Please check the non brain configuration.');
                 status = false;
-                disp('-->> Process stoped!!!');
+                disp('-->> Process stopped!!!');
                 return;
             else
                 warning('One or more of the Non-brain surfaces file is not correct.\n');
@@ -266,7 +266,7 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The MRI transformation base_path is not a folder.\n');
             disp('Please select a correct MRI transformation folder in the process_import_anat.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         if(isequal(anat_params.anatomy_type.type,2))
@@ -293,7 +293,7 @@ if(~general_params.bst_config.after_MaQC.run)
                     fprintf(2,strcat(mri_transform.file_location,'\n'));
                     disp('Please check the transformation config.');
                     status = false;
-                    disp('-->> Process stoped!!!');
+                    disp('-->> Process stopped!!!');
                     return;
                 else
                     warning('One or more of the MRI transformation file is not correct.\n');
@@ -313,21 +313,21 @@ if(~general_params.bst_config.after_MaQC.run)
         fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
         disp('Please check the nverthead configuration in the process_import_anat.json file.');
         status = false;
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         return;
     end
     if(isempty(surf_resol.nvertskull) || surf_resol.nvertskull < 2000 || surf_resol.nvertskull > 15000)
         fprintf(2,'The Skull resolution have be between 2000 and 15000 vertices.\n');
         disp('Please check the nvertskull configuration in the process_import_anat.json file.');
         status = false;
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         return;
     end
 %     if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
 %         fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
 %         disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
 %         status = false;
-%         disp('-->> Process stoped!!!');
+%         disp('-->> Process stopped!!!');
 %         return;
 %     end
     
@@ -344,7 +344,7 @@ if(~general_params.bst_config.after_MaQC.run)
         disp('1: Use raw data channel.');
         disp('2: Use BST default channel.');
         status = false;
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         return;
     end
     if(isequal(channel_params.channel_type.type,1))
@@ -354,14 +354,14 @@ if(~general_params.bst_config.after_MaQC.run)
             fprintf(2,'The raw_data base path is not a folder.\n');
             disp('Please type a correct raw_data folder in the process_raw_data.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         if(isempty(raw_data.data_format))
             fprintf(2,'The raw_data format can not be empty.\n');
             disp('Please type a correct raw_data format in the process_raw_data.json configuration file.');
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         end
         structures = dir(base_path);
@@ -389,7 +389,7 @@ if(~general_params.bst_config.after_MaQC.run)
                 fprintf(2,strcat(raw_data.file_location,'\n'));
                 disp('Please check the raw_data configuration.');
                 status = false;
-                disp('-->> Process stoped!!!');
+                disp('-->> Process stopped!!!');
                 return;
             else
                 warning('One or more of the raw_data file are not correct.\n');
@@ -407,9 +407,9 @@ if(~general_params.bst_config.after_MaQC.run)
         if(~contains(group_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template group in process_import_channel.json is wrong \n'));
             disp(strcat("Name: ",group_name));
-            disp(strcat("Please check the aviable channel templates in bst_template/bst_layout_default.json file"));
+            disp(strcat("Please check the available channel templates in bst_template/bst_layout_default.json file"));
             status = false;
-            disp('-->> Process stoped!!!');
+            disp('-->> Process stopped!!!');
             return;
         else
             index = find(strcmp({defaults.name},group_name),1);
@@ -417,9 +417,9 @@ if(~general_params.bst_config.after_MaQC.run)
             if(~contains(layout_name, {layout_names.name}))
                 fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_channel.json is wrong \n'));
                 disp(strcat("Name: ",layout_name));
-                disp(strcat("Please check the aviable channel templates in bst_template/bst_layout_default.json file"));
+                disp(strcat("Please check the available channel templates in bst_template/bst_layout_default.json file"));
                 status = false;
-                disp('-->> Process stoped!!!');
+                disp('-->> Process stopped!!!');
                 return;
             end
         end

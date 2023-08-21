@@ -117,9 +117,9 @@ end
 close(hFigMri2);
 
 hFigMri3        = view_mri_slices(MriFile, 'z', 20);
-bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,900,700]);
+bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagittal view', [200,200,900,700]);
 try
-    savefig( hFigMri3,fullfile(report_path,'MRI Sagital view.fig'));
+    savefig( hFigMri3,fullfile(report_path,'MRI Sagittal view.fig'));
 catch
 end
 close(hFigMri3);
@@ -154,9 +154,9 @@ if(isequal(type,'template') || isequal(type,'individual'))
     close(hFigMri5);
     %
     hFigMri6    = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
-    bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,900,700]);
+    bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagittal view', [200,200,900,700]);
     try
-        savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagital view.fig'));
+        savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagittal view.fig'));
     catch
     end
     % Closing figures

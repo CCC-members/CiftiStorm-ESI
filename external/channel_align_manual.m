@@ -476,7 +476,7 @@ function ComputeTransformation(val)
         case gChanAlign.hButtonResizeZ
             Rescale = [0, 0, 1 + val];
         case gChanAlign.hButtonMoveChan
-            % Works only iif one channel is selected
+            % Works only if one channel is selected
             if (length(iSelChan) ~= 1)
                 return
             end
