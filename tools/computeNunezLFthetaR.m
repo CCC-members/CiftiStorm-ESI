@@ -1,5 +1,5 @@
 function [Kn,Khomn,Khom,Kr,M,angle] = computeNunezLFthetaR( K,LFisNormal,VertNorms,VoxelCoord,Channels)
-% this function computed homogenous lead field using cortex and channel
+% this function computed homogeneous lead field using cortex and channel
 % information of test lead field
 % Input:
 %       K= lead field gain plot
@@ -9,7 +9,7 @@ function [Kn,Khomn,Khom,Kr,M,angle] = computeNunezLFthetaR( K,LFisNormal,VertNor
 %       Channels= EEG channels coordinate information
 % Output:
 %       Khomn = Normalised Homogeneous LF
-%       Khom = Homogenous LF
+%       Khom = Homogeneous LF
 %       Kr = projected to normal test LF   
 % Authors: Usama Riaz, Fuleah A Razzaq, Pedro A Valdes
 [Ne,Nv]=size(K);
@@ -18,7 +18,7 @@ if (LFisNormal)
 VertNorms=reshape(VertNorms,[1,Nv,3]);VertNorms=repmat(VertNorms,[Ne,1,1]);
 Kn=K;
 else
-%Intialization if LFisNormal = 0 
+%Initialization if LFisNormal = 0 
 Nv=Nv/3;
 K=reshape(K,Ne,3,Nv);
 K=permute(K,[1,3,2]);
@@ -36,7 +36,7 @@ Channels=reshape(Channels,[Ne,1,3]);
 VoxelCoord=permute(VoxelCoord,[2 1]); 
 VoxelCoord=reshape(VoxelCoord,1,Nv,3);
 R=repmat(Channels,1,Nv,1)-repmat(VoxelCoord,Ne,1,1);
-%% Compute Nunez Homogenous Media Leadfield 
+%% Compute Nunez Homogeneous Media Leadfield 
 M = sqrt(sum(R.^2,3));
 M = M./(max(M(:)));
 sc = sum(VertNorms.*R,3);

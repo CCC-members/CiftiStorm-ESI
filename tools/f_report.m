@@ -406,7 +406,7 @@ save(fullfile(base_path,strcat(report.name,'.mat')),'report');
 end
 
 %%
-%% Export the current report to the spesific format
+%% Export the current report to the specific format
 %%
 % USAGE:    html = Export(report,varargin)
 %           html = Export(report)

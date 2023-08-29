@@ -25,10 +25,10 @@ end
 if(isOk)
     [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'spm12');
 else
-    fprintf(2,"\n ->> Error: We can not install the spm12 plugin. Please see the fallow error and restart the process. \n");
+    fprintf(2,"\n ->> Error: We can not install the spm12 plugin. Please see the follow error and restart the process. \n");
     disp("-->> Message error");
     disp(errMsg);
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     status = false;
     return;
 end
@@ -37,10 +37,10 @@ if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
     if(isOk)
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'openmeeg');
     else
-        fprintf(2,"\n ->> Error: We can not install tha openmeeg plugin. Please see the fallow error and restart the process. \n");
+        fprintf(2,"\n ->> Error: We can not install the openmeeg plugin. Please see the follow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         status = false;
         return;
     end
@@ -50,10 +50,10 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
     if(isOk)
         [isOk, errMsg, PlugDesc] = bst_plugin('Load', 'duneuro');
     else
-        fprintf(2,"\n ->> Error: We can not install tha duneuro plugin. Please see the fallow error and restart the process. \n");
+        fprintf(2,"\n ->> Error: We can not install the duneuro plugin. Please see the follow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         status = false;
         return;
     end
@@ -71,7 +71,7 @@ if(isequal(properties.anatomy_params.anatomy_type.type,1))
         fprintf(2,'\n ->> Error: The selected anatomy template is wrong.');
         disp(Name);
         disp("Please, type a correct anatomy template in configuration file.");
-        disp("The process will be stoped!!!");
+        disp("The process will be stopped!!!");
         status = false;
         return;
     end
@@ -90,7 +90,7 @@ if(isequal(properties.channel_params.channel_type.type,2))
         fprintf(2,'\n ->> Error: The selected channel template group name is wrong.');
         disp(nameGroup);
         disp("Please, type a correct  Channel group name");
-        disp("The process will be stoped!!!");
+        disp("The process will be stopped!!!");
         status = false;
         return;
     end
@@ -99,7 +99,7 @@ if(isequal(properties.channel_params.channel_type.type,2))
         fprintf(2,'\n ->> Error: The selected channel layout is wrong.');
         disp(nameLayout);
         disp("Please, type a correct Channel layout name");
-        disp("The process will be stoped!!!");
+        disp("The process will be stopped!!!");
         status = false;
         return;
     end

@@ -1,0 +1,4 @@
+[codespell]
+skip = .git,*.pdf,*.svg
+ignore-regex = \.bord td {.*
+ignore-words-list = ons
