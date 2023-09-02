@@ -43,7 +43,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
         - mri_transformation  --> (Optional)(Transformation file to apply in the MRI)
             - use_transformation  --> (true|false) in case you want to use MRI transformation.
             - base_path           --> Base path directory. Subject's parent directory
-            - file_name           --> Refence file path after Subject's directory
+            - file_name           --> Reference file path after Subject's directory
         - non_brain_surfaces --> FSL Bet command output
               - base_path           --> FSL Bet root directory
         - layer_desc         --> Layer descriptor structure
@@ -58,7 +58,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
         - raw_data    -->  Configuration for Raw data processing
             - base_path     --> Root directory of the raw data
             - file_location --> Reference path for the raw data (after the subject folder)
-            - data_format   --> Standart format for the data
+            - data_format   --> Standard format for the data
             - isfile        --> Define true if the data is a file or false if a folder.
         - import_channel -->    Select the group and name of the sensor layout. See bst_templates/bst_layout_default.json file.
             - group_layout_name    --> 
