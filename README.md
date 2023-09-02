@@ -7,7 +7,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
 
 % November 15, 2019
 
-## Check our wiki
+## Check our [wiki](https://github.com/CCC-members/CiftiStorm/wiki)
 * the [[FAQ]](https://github.com/CCC-members/CiftiStorm/wiki/FAQ) and
 * the [[Installation and Usage Instructions]](https://github.com/CCC-members/CiftiStorm/wiki/Installation-and-Usage-Instructions) guide
 
