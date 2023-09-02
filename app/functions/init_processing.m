@@ -13,7 +13,7 @@ end
 disp(strcat("-->> Name:",app_properties.generals.name));
 disp(strcat("-->> Version:",app_properties.generals.version));
 disp(strcat("-->> Version date:",app_properties.generals.version_date));
-disp("=====================================================================");
+disp("==========================================================================");
 
 %% ------------ Checking MatLab compatibility ----------------
 if(app_properties.check_matlab_version)
