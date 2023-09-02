@@ -7,9 +7,13 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
 
 % November 15, 2019
 
+## Check our wiki
+* the [[FAQ]](https://github.com/CCC-members/CiftiStorm/wiki/FAQ) and
+* the [[Installation and Usage Instructions]](https://github.com/CCC-members/CiftiStorm/wiki/Installation-and-Usage-Instructions) guide
 
-## General process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/general_params.json)
-### Parameters
+
+## Parameters configuration
+### General process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/general_params.json)
     - modality     --> Electrophysiology data modality (EEG or MEG)
     - name         --> Processing name
     - bst_config   --> Configuration structure for Brainstorm processing
