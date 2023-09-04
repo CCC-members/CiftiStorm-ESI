@@ -109,5 +109,10 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
                 - Zneck        --> Input T1/T2: Cut volumes below neck (MNI Z-coordinate)
                     - value    --> Default: -115
 
+## Run CiftiStorm
+* Open CiftiStorm pipeline on Matlab
+* Run the following command in Matlab console
+>    Main nogui
 
+* [Getting and running the example data](https://github.com/CCC-members/CiftiStorm/wiki/Getting-and-running-the-example-data)
 
