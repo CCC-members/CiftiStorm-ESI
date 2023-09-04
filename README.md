@@ -112,7 +112,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
 ## Run CiftiStorm
 * Open CiftiStorm pipeline on Matlab
 * Run the following command in Matlab console
-    Main nogui
+>     Main nogui
 
 * [Getting and running the example data](https://github.com/CCC-members/CiftiStorm/wiki/Getting-and-running-the-example-data)
 
