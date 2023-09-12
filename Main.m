@@ -33,7 +33,7 @@ addpath('external');
 addpath(genpath('functions'));
 addpath('guide');
 addpath(genpath('templates'));
-addpath(fullfile('tools'));
+addpath(genpath('tools'));
 
 %%
 %% Init processing
