@@ -13,7 +13,7 @@ function [cfg] = ft_topoplotCC(cfg, freq)
 %   cfg.alphaparam  = string, parameter to be used to control the opacity (see below)
 %   cfg.colorparam  = string, parameter to be used to control the line color
 %
-% The widthparam should be indicated in pixels, e.g. usefull numbers are 1
+% The widthparam should be indicated in pixels, e.g. useful numbers are 1
 % and larger.
 %
 % The alphaparam should be indicated as opacity between 0 (fully transparent)
