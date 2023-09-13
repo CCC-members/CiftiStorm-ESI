@@ -37,7 +37,7 @@ Complementary Functions
     - xspectrum: computes the spectra of the simulated scalp activity 
     - bcvareta: executes BC-VARETA method
     - bcvareta_initial_values: computes 'bcvareta' initialization
-    - screening_ssbl: extracts the posibly active generators as part of 'bcvareta_initial_values', using the Elastic Net Structured Sparse Bayesian Learning
+    - screening_ssbl: extracts the possibly active generators as part of 'bcvareta_initial_values', using the Elastic Net Structured Sparse Bayesian Learning
     - trascendent_term: nonlinear function for regularization parameters estimation within the function 'screening_ssbl'     
     - screening: applies a smoothing to the outputs of 'screening_ssbl'
 

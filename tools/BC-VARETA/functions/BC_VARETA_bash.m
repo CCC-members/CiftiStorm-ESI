@@ -90,7 +90,7 @@ for i=1:length(subjects)
         BC_VARETA.Participants(i).Status    = "Rejected";
         BC_VARETA.Participants(i).FileInfo  = "";
         fprintf(2,strcat('\nBC-V-->> Error: The folder structure for subject: ',subject.name,' \n'));
-        fprintf(2,strcat('BC-V-->> Have the folows errors.\n'));
+        fprintf(2,strcat('BC-V-->> Have the follows errors.\n'));
         for j=1:length(error_msg_array)
             fprintf(2,strcat('BC-V-->>' ,error_msg_array(j), '.\n'));
             BC_VARETA.Participants(i).Error(j)  = error_msg_array(j);

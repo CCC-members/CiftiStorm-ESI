@@ -3,8 +3,8 @@ result = 1;
 %%
 %% Defining subject folder
 %%
-tittle = "Please select the root subjects folder to analyze.";
-root_path = uigetdir('tittle',tittle);
+title = "Please select the root subjects folder to analyze.";
+root_path = uigetdir('tittle',title);
 if(root_path==0)
     result = 'canceled';
     return;
@@ -15,7 +15,7 @@ saveJSON(properties,fullfile('bcv_properties','bcv_properties.json'));
 subjects = dir(fullfile(root_path,'**','subject.mat'));
 if(~isempty(subjects))
     if(length(subjects)>1)
-        answer = questdlg({'There is many subject on slected folder',' Do you want to process all subjects?'}, ...
+        answer = questdlg({'There is many subject on selected folder',' Do you want to process all subjects?'}, ...
             'Information', ...
             'Yes','No','default');
         % Handle response
@@ -33,7 +33,7 @@ if(~isempty(subjects))
         if(checked)
             break;
         else
-            fprintf(2,strcat('\nBC-V-->> Error: The selected subject:',subject_file.name,' do not have a correcxt structure.\n'));
+            fprintf(2,strcat('\nBC-V-->> Error: The selected subject:',subject_file.name,' do not have a correct structure.\n'));
             fprintf(2,strcat('\nBC-V-->> Error: Finding other subject in folder.\n'));
         end
     end
@@ -61,7 +61,7 @@ else
 end
 
 %%
-%%  Ploting cross-spectra first subject
+%%  Plotting cross-spectra first subject
 %%
 properties = jsondecode(fileread(fullfile('bcv_properties','bcv_properties.json')));
 disp('>> Estimating cross-spectra for M/EEG data...');
