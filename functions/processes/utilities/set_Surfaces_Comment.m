@@ -30,7 +30,7 @@ end
 db_reload_subjects(iSubject);
 
 %%
-%% Removing unneeded surfaces in case single surface processing
+%% Removing uneeded surfaces in case single surface processing
 %%
 if(isequal(layer_desc,'white') || isequal(layer_desc,'midthickness') || isequal(layer_desc,'pial'))
     [sSubject,~]        = bst_get('Subject', iSubject);

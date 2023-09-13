@@ -22,7 +22,7 @@ if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) 
     return;
 end
 
-%% Uploading Subject file into BrainStorm Protocol
+%% Uploding Subject file into BrainStorm Protocol
 disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
 disp('==========================================================================');
 

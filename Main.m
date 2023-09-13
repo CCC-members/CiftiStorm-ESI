@@ -33,7 +33,7 @@ addpath('external');
 addpath(genpath('functions'));
 addpath('guide');
 addpath(genpath('templates'));
-addpath(fullfile('tools'));
+addpath(genpath('tools'));
 
 %%
 %% Init processing
@@ -77,7 +77,7 @@ else
         save("process_output.mat","process_error","reject_subjects");
     end
     
-    %% Stopping BrainStorm
+    %% Stoping BrainStorm
     disp('==========================================================================');
     brainstorm('stop');
     disp('==========================================================================');

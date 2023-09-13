@@ -5,14 +5,14 @@ valided = true;
 if(~isfolder(app_properties.bst_path) || ~isfile(fullfile(app_properties.bst_path,'brainstorm.m')))
     fprintf(2,"\n ->> Error: The selected Brainstorm path is wrong. \n");
     disp(app_properties.bst_path);
-    disp('-->> Process stopped!!!');
+    disp('-->> Process stoped!!!');
     valided = false;
     return;
 end
 if(~isfolder(app_properties.spm_path) || ~isfile(fullfile(app_properties.spm_path,'spm.m')))
     fprintf(2,"\n ->> Error: The selected SPM path is wrong. \n");
     disp(app_properties.bst_path);
-    disp('-->> Process stopped!!!');
+    disp('-->> Process stoped!!!');
     valided = false;
     return;
 end

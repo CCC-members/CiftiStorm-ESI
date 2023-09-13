@@ -8,7 +8,7 @@ fclose(fid);
 eval(strFid);
 
 %%
-%% MRI=>MNI Transformation
+%% MRI=>MNI Tranformation
 %%
 % Convert transformations from "Brainstorm MRI" to "FieldTrip voxel"
 Tbst2ft = [diag([-1, 1, 1] ./ sMri.Voxsize), [size(sMri.Cube,1); 0; 0]; 0 0 0 1];

@@ -1,7 +1,7 @@
 function generate_MaQC_file()
 
 
-% Getting correct protocol
+% Geting correct protocol
 ProtocolInfo = bst_get('ProtocolInfo');
 ProtocolName = ProtocolInfo.Comment;
 
@@ -33,8 +33,8 @@ if(isfolder(protocol_report_path))
     for p = 1 : size(MaQC_params,1)        
          param = string(MaQC_params(p));
          param = strrep(param,' ','_');
-         column = cell(size(Subject_ID,1),1);
-         T = [T table(column, 'VariableNames', {char(param)})];        
+         colum = cell(size(Subject_ID,1),1);
+         T = [T table(colum, 'VariableNames', {char(param)})];        
     end
     %% Deleting rows
 %     subjects_count = size(Subject_ID,1);   

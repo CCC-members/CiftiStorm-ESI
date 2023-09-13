@@ -45,7 +45,7 @@ if(isequal(modality,'EEG'))
     save(fullfile(report_path,'qc_output.mat'),'Ke', 'VoxelCoord', 'VertNorms', 'Channels', 'ChannOri', 'modality', 'Kn', 'Khom');
     
     %%
-    %% Plotting sensors and sources on the scalp and cortex
+    %% Ploting sensors and sources on the scalp and cortex
     %%
     fig_title   = strcat('Realistic field view (',desc,')');
     [hFig25]    = view3D_K(fig_title, Kn, cortex, head, Channels,2);
@@ -64,7 +64,7 @@ if(isequal(modality,'EEG'))
     close(hFig25, fig_out);
     
     %%
-    %% Homogeneous field view
+    %% Homogenous field view
     %%
     fig_title   = strcat('Homogenous field view (',desc,')');
     [hFig26]    = view3D_K(fig_title, Khom,cortex,head,Channels,2);
@@ -89,7 +89,7 @@ if(isequal(modality,'EEG'))
     save(fullfile(report_path,'qc_Khom_vs_Kn.mat'),'VertNorms', 'Kn', 'Khom');
     
     %%
-    %% Homogeneous Lead Field vs. Tester Lead Field Plot
+    %% Homogenous Lead Field vs. Tester Lead Field Plot
     %%
     hFig27      = figure;
     scatter(Khom(:),Kn(:));

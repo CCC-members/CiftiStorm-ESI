@@ -54,7 +54,7 @@ for i=1:length(CSurfaces)
         panel_scout('SetScoutTransparency', 0);
         panel_scout('SetScoutTextVisible', 0, 1);
         hFigSurf    = view_surface(BSTCortexFile,  0, [.6,.6,.6], 'NewFigure', 1);
-        % Deleting the Atlas Labels and Contour from Cortex
+        % Deleting the Atlas Labels and Countour from Cortex
         delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
         delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
         delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
