@@ -32,7 +32,7 @@
                     "BurstCriterion":20,
                     "WindowCriterion":0.25,
                     "BurstRejection":"on",
-                    "Distance":"Euclidian",
+                    "Distance":"Euclidean",
                     "WindowCriterionTolerances":[-Inf,7]
                 }
             },
@@ -59,7 +59,7 @@
             "decompose_ica":{
                 "run":false,
                 "icatype":{
-                    "description":"defaul <<runica>>. Options <<runica>> <<binica>> <<jader>> <<sobi>> <<ng_ol>> <<acsobiro>>",
+                    "description":"default <<runica>>. Options <<runica>> <<binica>> <<jader>> <<sobi>> <<ng_ol>> <<acsobiro>>",
                     "value":"runica"
                 },
                 "extended":1,
