@@ -77,7 +77,7 @@ else
         save("process_output.mat","process_error","reject_subjects");
     end
     
-    %% Stoping BrainStorm
+    %% Stopping BrainStorm
     disp('==========================================================================');
     brainstorm('stop');
     disp('==========================================================================');
