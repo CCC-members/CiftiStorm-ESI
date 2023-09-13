@@ -17,7 +17,7 @@ function [Svv,Nf,Ns,PSD] = xspectrum(data, Fs, Fm, deltaf, varf, Nw, properties)
 %% Inputs:
 %    data     = M/EEG data matrix, in which every row is a channel
 %    Fs       = sampling frequency (in Hz)
-%    Fm       = maximun frequency (in Hz) in the estimated spectrum
+%    Fm       = maximum frequency (in Hz) in the estimated spectrum
 %    deltaf   = frequency resolution
 %    use_gpu  = key:'use_gpu' value: true or false
 %% Outputs:
