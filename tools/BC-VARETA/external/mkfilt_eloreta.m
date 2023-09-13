@@ -1,4 +1,4 @@
-function [A,Wout]=mkfilt_eloreta(L,regu,W)
+function [A,Wout] = mkfilt_eloreta(L,regu,W)
 % makes spatial filter according to eLoreta
 % usage  A=mkfilt_eloreta(L); or  A=mkfilt_eloreta(L,regu);
 %
@@ -16,8 +16,8 @@ function [A,Wout]=mkfilt_eloreta(L,regu,W)
 %
 % code implemented in the same style as mkfilt_eloreta by Guido Nolte
 % please cite
-% “R.D. Pascual-Marqui: Discrete, 3D distributed, linear imaging methods of electric neuronal activity. Part 1: exact, zero
-% error localization. arXiv:0710.3341 [math-ph], 2007-October-17, http://arxiv.org/pdf/0710.3341 ”
+% R.D. Pascual-Marqui: Discrete, 3D distributed, linear imaging methods of electric neuronal activity. Part 1: exact, zero
+% error localization. arXiv:0710.3341 [math-ph], 2007-October-17, http://arxiv.org/pdf/0710.3341 
 
 if nargin<2
     regu =.05;

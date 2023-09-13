@@ -13,7 +13,7 @@ if(isequal(Modality,'EEG'))
     VCr         = repmat(Vertices,Ne,1,1);
     R           = Cr-VCr;
     
-    % Compute Nunez Homogenous Media Leadfield
+    % Compute Nunez Homogeneous Media Leadfield
     Khom        = R./repmat(sqrt(sum(R.^2,3)).^3,1,1,3);
     % Khom(:,:,1) = H*Khom(:,:,1);
     % Khom(:,:,2) = H*Khom(:,:,2);

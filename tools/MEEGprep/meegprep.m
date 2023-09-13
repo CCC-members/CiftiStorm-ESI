@@ -39,7 +39,7 @@ catch EM
     fprintf(2,"\n ->> Error: The app/properties file do not have a correct format \n");
     disp("-->> Message error");
     disp(EM.message);
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     return;
 end
 
