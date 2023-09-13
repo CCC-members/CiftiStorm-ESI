@@ -1,5 +1,5 @@
 function [vert, faces] = tess_sphere(nvert, DEBUG)
-% TESS_SPHERE: Create an apolar sphere based on the refinment of an icosahedron
+% TESS_SPHERE: Create an apolar sphere based on the refinement of an icosahedron
 %
 % USAGE:  [vert, faces] = tess_sphere(nvert);
 %
@@ -83,7 +83,7 @@ end
 if (n1 == 0)
     [th,phi,r] = cart2sph(vert(:,1),vert(:,2),vert(:,3));
     [vert(:,1),vert(:,2),vert(:,3)] = sph2cart(th, phi, ones(size(th)));
-    % Tesselate final sphere
+    % Tessellate final sphere
     faces = convhulln(vert);
 end
 
@@ -105,7 +105,7 @@ function [vert, faces] = refine_sphere(vert, faces)
     % Force radius to be one
     [th,phi,r] = cart2sph(vert(:,1),vert(:,2),vert(:,3));
     [vert(:,1),vert(:,2),vert(:,3)] = sph2cart(th, phi, ones(size(th)));
-    % Tesselate final sphere
+    % Tessellate final sphere
     faces = convhulln(vert);
 end
 
