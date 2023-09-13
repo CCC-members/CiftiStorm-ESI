@@ -29,7 +29,7 @@ function [layout, cfg] = ft_prepare_layout(cfg, data)
 %   cfg.rotate      = number, rotation around the z-axis in degrees (default = [], which means automatic)
 %   cfg.center      = string, center and scale the electrodes in the sphere that represents the head, can be 'yes' or 'no' (default = 'no')
 %   cfg.projection  = string, 2D projection method can be 'stereographic', 'orthographic', 'polar' or 'gnomic' (default = 'polar')
-%                     When 'orthographic', cfg.viewpoint can be used to indicate to specificy projection (keep empty for legacy projection)
+%                     When 'orthographic', cfg.viewpoint can be used to indicate to specific projection (keep empty for legacy projection)
 %   cfg.viewpoint   = string indicating the view point that is used for orthographic projection of 3-D sensor
 %                     positions to the 2-D plane. The possible viewpoints are
 %                     'left'      - left  sagittal view,     L=anterior, R=posterior, top=top, bottom=bottom
@@ -56,7 +56,7 @@ function [layout, cfg] = ft_prepare_layout(cfg, data)
 %                     'no'     - throw an error when overlap is present
 %   cfg.channel     = 'all', or Nx1 cell-array with selection of channels, see FT_CHANNELSELECTION for details
 %   cfg.boxchannel  = 'all', or Nx1 cell-array with selection of channels, see FT_CHANNELSELECTION for details
-%                      specificies channels to use for determining channel box size (default = 'all', recommended for MEG/EEG, a selection is recommended for iEEG)
+%                      specifics channels to use for determining channel box size (default = 'all', recommended for MEG/EEG, a selection is recommended for iEEG)
 %   cfg.skipscale   = 'yes' or 'no', whether the scale should be included in the layout or not (default = 'no')
 %   cfg.skipcomnt   = 'yes' or 'no', whether the comment should be included in the layout or not (default = 'no')
 %
@@ -443,12 +443,12 @@ elseif isequal(cfg.layout, 'ordered')
   if isfield(cfg, 'columns') && ~isempty(cfg.columns)
     ncol = ft_getopt(cfg, 'columns');
   else
-    ncol = nan; % wil be determined further down
+    ncol = nan; % will be determined further down
   end
   if isfield(cfg, 'rows') && ~isempty(cfg.rows)
     nrow = ft_getopt(cfg, 'rows');
   else
-    nrow = nan; % wil be determined further down
+    nrow = nan; % will be determined further down
   end
   if isnan(ncol) && isnan(nrow)
     % the default is a more-or-less square arrangement
