@@ -1,4 +1,4 @@
-function Main(varargin)
+function bcvareta(varargin)
 %% BC-VARETA toolbox v1.0
 %%%%%%%%%%%%%%%%%%%%
 
