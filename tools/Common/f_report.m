@@ -79,6 +79,8 @@ for i=1:length(reports)
         if(exist('report','var') && report.iscurrent)
             current_report = report;
             break;
+        else
+            delete(fullfile(reports(i).folder,reports(i).name));
         end
     catch
         continue;
@@ -466,22 +468,23 @@ if isempty(report.body)
     return;
 end
 % ===== HEADER ====
-% Get interface scaling
-f = 1;
+
 % HTML header
 html = ['<HTML>' 10 ...
     '<STYLE type="text/css">' 10 ...
-    'h2 {font-size: ' num2str(12 * f) 'px; font-weight: bold; padding-top: 12px; padding-bottom: 12px;}' 10 ...
+    'h2 {font-size: 14px; font-weight: bold; padding-top: 12px; padding-bottom: 6px;}' 10 ...
+    'li {font-size: 14px;}' 10 ...
+    'ul {font-size: 14px;}' 10 ...
     'td {padding: 2px 2px 2px 2px; }' 10 ...
-    '.bord td { border-width: 1px; border-style: solid; border-color: #bbbbbb; background-color: #f2f2f2; font: normal ' num2str(8 * f) 'px Verdana, Arial, Helvetica, sans-serif; }' 10 ...
+    '.bord td { border-width: 1px; border-style: solid; border-color: #bbbbbb; background-color: #f2f2f2; font: normal 8px Verdana, Arial, Helvetica, sans-serif; }' 10 ...
     '.link {text-decoration: none; color: #0000a0;}' 10 ...
     'p {}'...
     'table, th, td {border: 0.5px solid black; border-collapse: collapse; border-spacing: 0; padding: 10px; }'...
-    'table {margin-left: auto; margin-right: auto;  border-radius: 0.25em; font: normal ' num2str(12 * f) 'px Verdana, Arial, Helvetica;} '...
+    'table {margin-left: auto; margin-right: auto;  border-radius: 0.25em; font: normal 14px Verdana, Arial, Helvetica;} '...
     'img {margin-left: auto; margin-right: auto;} '...
     '</STYLE>' 10 10 ...
-    '<BODY style="padding:15px; margin: 5px 10px 10px 10px; font: normal ' num2str(12 * f) 'px Verdana, Arial, Helvetica, sans-serif; background-color: #e8e8e8; width: 900px;">' 10 ...
-    '<TITLE style="font: normal ' num2str(12 * f) 'px Verdana, Arial, Helvetica;">' report.header.metadata(2).value '</TITLE>' 10];
+    '<BODY style="padding:15px; margin: 5px 10px 10px 10px; font: normal 14px Verdana, Arial, Helvetica, sans-serif; background-color: #e8e8e8; width: 900px;">' 10 ...
+    '<TITLE style="font: normal 14px Verdana, Arial, Helvetica;">' report.header.metadata(2).value '</TITLE>' 10];
 html = [html '<div >' 10];
 % Time
 
@@ -507,12 +510,12 @@ for i=1:length(report.body)
                 for j=1:length(data_row.value)
                     html = [html '<p> ' convertStringsToChars(data_row.value(j)) ' </p>' 10];
                 end
-                 html = [html '<div>'];
+                 html = [html '</div>'];
             else
-            html = [html '<div><p> ' convertStringsToChars(data_row.value) ' </p><div>' 10];
+            html = [html '<div><p> ' convertStringsToChars(data_row.value) ' </p></div>' 10];
             end
         case 'snapshot'
-            html = [html '<div><H2> Snapshots </H2><hr>' 10];
+%             html = [html '<div><H2> Snapshots </H2><hr>' 10];
             imgRgb = data_row.value;
             metadata = data_row.metadata;
             % Create Base64 encoder
@@ -536,7 +539,7 @@ for i=1:length(report.body)
             % Encode PNG image in Base64
             jStringImage = encoder.encode(jByteStream.toByteArray());
             % Display image in HTML
-            html = [html, '<H3>', Comment, '</H3>'];
+            html = [html, '<H3>', Comment, '</H3><hr>'];
             html = [html, '<BR>'];
             html = [html, '<IMG src="data:image/gif;base64,' char(jStringImage) '" /><BR><BR>'];
             row = find(strcmp({metadata.key},'description'),1);
