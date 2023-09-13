@@ -11,7 +11,7 @@ r_alpha       = q;
 s_rho         = 1;
 r_rho         = 1;
 
-%% Declaring dinamic variables
+%% Declaring dynamic variables
 sigma2j_post  = zeros(q,1);
 s2j           = zeros(q,1);
 etha          = zeros(q,1);

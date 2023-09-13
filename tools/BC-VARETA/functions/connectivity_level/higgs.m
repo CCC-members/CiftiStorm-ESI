@@ -2,8 +2,8 @@ function [Thetajj,Tjv,llh,Sjj,Psijj,Sigmajj] = higgs(Svv,Lvj,param)
 % Hidden Gaussian Grpahical Source-Model (HIGGS) solver. Computes the Source Empirical Covariance (Sjj) and Source Partial Correlations (Thetajj) by two sequential steps.
 % First: Unhides (Expectation) the Type II Likelihood approximated representation which shapes a pair of Hermitian Gaussian Graphical Model (HGGM), one of the state equation
 % (with empirical covariance Psijj) and another of the observation equation residuals (with empirical covariance Psixixi). The Hyperparameters are computed by maximum posterior
-% analysis (Maximization) regularized with priors. The states (source) HGGM is estimated with hermitian graphical lasso (HG-LASSO) solver controled by Rayleigh threshold
-% and the residuals HGGM with exponential prior of the noise presicion controled by nuisance inferior limit (scale parameter).
+% analysis (Maximization) regularized with priors. The states (source) HGGM is estimated with hermitian graphical lasso (HG-LASSO) solver controlled by Rayleigh threshold
+% and the residuals HGGM with exponential prior of the noise precision controlled by nuisance inferior limit (scale parameter).
 %
 % inputs:
 %    Svv                 : M/EEG time series cross-spectra
