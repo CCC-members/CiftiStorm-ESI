@@ -3,7 +3,7 @@ function [Svv,Nf,Ns,PSD] = xspectrum_thomson(data,Fs,Fm,deltaf,properties)
 % Inputs:
 %    data     = M/EEG data matrix, in which every row is a channel
 %    Fs       = sampling frequency (in Hz)
-%    Fm       = maximun frequency (in Hz) in the estimated spectrum
+%    Fm       = maximum frequency (in Hz) in the estimated spectrum
 %    deltaf   = frequency resolution
 % Outputs:
 %    PSD      = estimated power spectral density of input EEG data
