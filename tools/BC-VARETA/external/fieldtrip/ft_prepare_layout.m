@@ -20,7 +20,7 @@ function [layout, cfg] = ft_prepare_layout(cfg, data)
 % also http://www.fieldtriptoolbox.org/template/layout
 %
 % You can specify any one of the following configuration options
-%   cfg.layout      = filename containg the input layout (*.mat or *.lay file), this can also be a layout
+%   cfg.layout      = filename containing the input layout (*.mat or *.lay file), this can also be a layout
 %                     structure, which is simply returned as-is (see below for details)
 %   cfg.output      = filename (ending in .mat or .lay) to which the layout will be written (default = [])
 %   cfg.elec        = structure with electrode positions or filename, see FT_READ_SENS

@@ -9,7 +9,7 @@ function [A, A1, po]=mkfilt_lcmv(L,C,alpha)
 %    directions
 % C:  NxN matrix for N channels covariance matrix or real part of cross-spectrum
 %    (The program uses only the real of C)
-% alpha: regularization parameter. In the algorthm C+alpha*eye(N) is
+% alpha: regularization parameter. In the algorithm C+alpha*eye(N) is
 %        inverted. A reasonable value is alpha=trace(C)/(N*100)
 %
 % Output

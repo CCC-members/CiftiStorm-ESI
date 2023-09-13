@@ -52,7 +52,7 @@ else
         if isempty(iGrid)
             continue;
         end
-        % Get correpsonding row indices based on the type of region (constrained or unconstrained)
+        % Get corresponding row indices based on the type of region (constrained or unconstrained)
         switch (GridAtlas.Scouts(iScout).Region(3))
             case 'C'
                 % Create a sparse block diagonal matrix for orientations
