@@ -188,7 +188,7 @@ if verbosity
     close all;    
 end
 
-%% Step 5: Appling notch filter to 60Hz.
+%% Step 5: Applying notch filter to 60Hz.
 % EEG = pop_cleanline(EEG,'arg_direct',0,'linefreqs',60,'scanforlines',1,'p',0.01,...
 %     'bandwidth',2,'sigtype','Channels','chanlist',1:EEG.nbchan,'taperbandwidth',2,...
 %     'winsize',4,'winstep',1,'tau',100,'pad',2,'computepower',1,'normSpectrum',1,'verb',1,'plotfigures',0);
@@ -290,7 +290,7 @@ if(clean)
         %   Add sub-topics to the report
         f_report('Sub-Index','Correct continuous data using Artifact Subspace Reconstruction (ASR).');
         if(clean_art_params.default)
-            f_report('Info','Clean data with dafault params.');
+            f_report('Info','Clean data with default params.');
             EEG_cleaned             = clean_artifacts(EEG);
         else
             f_report('Info','Clean data with predefinition params.');
