@@ -21,7 +21,7 @@ for k_inner = 1:maxiter
     gamma2(idx)      = (sqrt(DET) - 1)./(2*m*a2*A2(idx)); 
     gamma2(idx0)     = m*abs(Theta(idx0)).^2;
     %%
-    %% Standarization of the Empirical Covariance Matrix
+    %% Standardization of the Empirical Covariance Matrix
     ninf             = max(gamma2(:));
     gamma2ninf       = gamma2/ninf;
     st_factor1       = nu*ninf^(-1/2)*gamma2ninf.^(1/2).*Psi_inv; % lqa corrected factor 1

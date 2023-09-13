@@ -12,14 +12,14 @@ penalty         = param.penalty;
 %% Lead Field and Data scaling by frobenious norm equivalent to the largest singular values or the
 % average variance of the observations, helps to treat the problen in a standard scale for every case,
 % a projected identity matrix Svv = Lvj*Iq*Ljv under this conditions will generate a signal with
-% (sum(abs(diag(Svv)))/p) = 1 if we fix the value of param.axi = 1E-2 the inferior admisible noise
+% (sum(abs(diag(Svv)))/p) = 1 if we fix the value of param.axi = 1E-2 the inferior admissible noise
 % will be 1% of the average signal amplitude
 scaleLvj        = sqrt(sum(abs(diag(Lvj*Lvj')))/p);
 Lvj             = Lvj/scaleLvj;
 scaleV          = (sum(abs(diag(Svv)))/p);
 Svv             = Svv/scaleV;
 %%
-%% Decide not-prewarming (prew = 0) or prewarming (prew = 1), prew = 1 is recomended for severe
+%% Decide not-prewarming (prew = 0) or prewarming (prew = 1), prew = 1 is recommended for severe
 %  ill-conditioning, whereas the number of observed variables is of the same order of magnitude
 %  that the number of hidden variables use prew = 0, in both cases the scale of Svv is readjusted
 %  by and initial computation of Sjj making the maximum singular values of Sjj and Sigmajj_pst
