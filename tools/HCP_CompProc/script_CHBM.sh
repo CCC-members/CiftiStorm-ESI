@@ -5,14 +5,22 @@ echo $tittle
 echo ""
 echo "->> Starting process..."
 
+# Params configuration
+
 anat_path="/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/Data_report/DS_BIDS_CHBM/"
-echo "->> Anat Path: "$anat_path
 freesurfer_path="/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/Data_report/DS_BIDS_CHBM/derivatives/freesurfer/"
-echo "->> Freesurfer OutPut Path: "$freesurfer_path
 ciftify_work_dir="/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/Data_report/DS_BIDS_CHBM/derivatives/ciftify/"
-echo "->> Ciftify OutPut Path: "$ciftify_path
 bet_work_dir="/data3_260T/data/CCLAB_DATASETS/CHBM/CHBM_ARIOSKY/Data_report/DS_BIDS_CHBM/derivatives/FSL_Bet/"
+
+# Printing paths
+echo "Running pipeline with:"
+echo "==================================================================================================================="
+echo "-->> Anat Path: "$anat_path
+echo "-->> Freesurfer OutPut Path: "$freesurfer_path
+echo "-->> Ciftify OutPut Path: "$ciftify_path
 echo "-->> FSL Bet output Path: "$bet_work_dir
+echo "==================================================================================================================="
+
 
 export $freesurfer_path
 # Running freesurfer

@@ -33,12 +33,12 @@ addpath('external');
 addpath(genpath('functions'));
 addpath('guide');
 addpath(genpath('templates'));
-addpath(genpath('tools'));
+addpath(genpath('tools/Common'));
 
 %%
 %% Init processing
 %%
-init_processing();
+init_processing("app/properties.json");
 
 %%
 %% Starting mode

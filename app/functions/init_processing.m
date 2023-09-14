@@ -1,4 +1,4 @@
-function app_properties = init_processing()
+function app_properties = init_processing(properties_file)
 try
     app_properties = jsondecode(fileread(fullfile('app','properties.json')));
 catch EM

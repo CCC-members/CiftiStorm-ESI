@@ -1,4 +1,4 @@
-function status = set_properties(properties)
+function status = bcv_set_properties(properties)
 %SET_PROPERTIES Summary of this function goes here
 %   Detailed explanation goes here
 status = true;

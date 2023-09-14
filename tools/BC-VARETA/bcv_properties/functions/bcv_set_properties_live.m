@@ -1,4 +1,4 @@
-function properties = set_properties_live(properties,gp,sp,ap,cp)
+function properties = bcv_set_properties_live(properties,gp,sp,ap,cp)
 
 % Updating general params
 
