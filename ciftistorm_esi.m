@@ -74,7 +74,7 @@ else
     %% Calling dataset function to analysis
     if(status)
         process_error = headmodel_process_interface(properties,reject_subjects);
-        save("process_output.mat","process_error","reject_subjects");
+        % save("process_output.mat","process_error","reject_subjects");
     end
     
     %% Stopping BrainStorm

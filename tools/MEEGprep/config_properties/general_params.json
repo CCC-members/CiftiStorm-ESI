@@ -3,10 +3,10 @@
     "params":{
         "modality":"EEG",
         "description":"",
-        "colormap":"tools/mycolormap.mat",   
+        "colormap":"tools/Common/mycolormap.mat",   
         "bcv_config":{
             "description":"",
-            "base_path":"/mnt/Store/Data/CHBM/Processing/BC-V_Structure/HeadModel_CHBMP",
+            "base_path":"/mnt/Store/Data/CHBM/Test/BC-V_Structure/HeadModel_CHBMP",
             "anat_template":{
                 "description":"",
                 "use_template":false,
@@ -15,7 +15,7 @@
         },
         "reports":{
             "description":"",
-            "output_path":"/mnt/Store/Data/CHBM/Processing/EEG_Reports"
+            "output_path":"/mnt/Store/Data/CHBM/Test/EEG_Reports"
         },
         "tmp_path":{
             "description":"",

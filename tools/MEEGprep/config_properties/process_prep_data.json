@@ -32,7 +32,7 @@
                     "BurstCriterion":20,
                     "WindowCriterion":0.25,
                     "BurstRejection":"on",
-                    "Distance":"Euclidean",
+                    "Distance":"Euclidian",
                     "WindowCriterionTolerances":[-Inf,7]
                 }
             },

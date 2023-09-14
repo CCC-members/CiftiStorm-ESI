@@ -26,12 +26,12 @@ disp('-->> Starting process');
 disp("=====================================================================");
 %restoredefaultpath;
 tic
-addpath(genpath('app'));
-addpath(genpath('bcv_properties'));
-addpath(genpath('external'));
-addpath(genpath('functions'));
-addpath(genpath('guide'));
-addpath('tools');
+addpath(genpath('tools/BC-VARETA/app'));
+addpath(genpath('tools/BC-VARETA/bcv_properties'));
+addpath('tools/BC-VARETA/external');
+addpath(genpath('tools/BC-VARETA/functions'));
+addpath(genpath('tools/BC-VARETA/guide'));
+addpath('tools/Common');
 if(isequal(nargin,2))
     idnode = varargin{1};
     count_node = varargin{2};
@@ -51,7 +51,7 @@ for i=1:length(varargin)
 end
 
 %% Init processing
-app_properties = init_processing("bcv_properties.json");
+app_properties = init_processing("tools/BC-VARETA/app/properties.json");
 
 %% BC-VARETA processing
 if(getGlobalGuimode())

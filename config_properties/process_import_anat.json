@@ -19,7 +19,7 @@
                     "base_path":"/mnt/Store/Data/CHBM_QC/Ciftify",
                     "template_name":"sub-CBM00011",
                     "T1w_file_name":"T1w.nii.gz",
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
+                    "Atlas_file_name":"aparc+aseg.nii.gz"
                 },
                 {
                     "id":3,
@@ -27,7 +27,7 @@
                     "description":"",
                     "base_path":"/mnt/Store/Data/CHBM/Test/Ciftify",
                     "T1w_file_name":"T1w.nii.gz",
-                    "Atlas_file_name":"aparc.a2009s+aseg.nii.gz"
+                    "Atlas_file_name":"aparc+aseg.nii.gz"
                 }
             ]
         },

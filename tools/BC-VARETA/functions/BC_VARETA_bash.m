@@ -31,19 +31,19 @@ disp(strcat("-->> Working in instance: ",num2str(idnode)));
 disp('---------------------------------------------------------------------');
 
 %% Adding paths
-addpath(genpath('functions'));
-addpath(('external'));
-addpath(('external/osl_core'));
-addpath(genpath('external/MEG-ROI-nets'));
+addpath(genpath('tools/BC-VARETA/functions'));
+addpath(('tools/BC-VARETA/external'));
+addpath(('tools/BC-VARETA/external/osl_core'));
+addpath(genpath('tools/BC-VARETA/external/MEG-ROI-nets'));
 
 %%
 %% Defining parameters
 %%
-properties                  = get_properties();
+properties                  = bcv_get_properties();
 if(isequal(properties,'canceled'))
     return;
 end
-[properties,status,reject]  = check_properties(properties);
+[properties,status,reject]  = bcv_check_properties(properties);
 if(~status)
     fprintf(2,strcat('\nBC-V-->> Error: The current configuration files are wrong \n'));
     disp('Please check the configuration files.');

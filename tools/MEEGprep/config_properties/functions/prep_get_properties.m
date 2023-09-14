@@ -4,12 +4,12 @@ try
 %     if(~isequal(pred_options.params.predefinition.option,'default'))
 %         properties = jsondecode(fileread(strcat('bcv_predefinition/',pred_options.params.predefinition.option,'/properties.json')));
 %     else
-        properties = jsondecode(fileread(strcat('app/properties.json')));
+        properties = jsondecode(fileread(strcat('tools/MEEGprep/app/properties.json')));
 %     end
 catch ME
     fprintf(2,strcat('\nBC-V-->> Error: Loading the property files: \n'));
     fprintf(2,strcat(ME.message,'\n'));
-    fprintf(2,strcat('Cause in file app\properties.json \n'));
+    fprintf(2,strcat('Cause in file tools/MEEGprep/app/properties.json \n'));
     disp('Please verify the json format in the file.');
     properties = 'canceled';
     return;
