@@ -51,7 +51,7 @@ for i=1:length(varargin)
 end
 
 %% Init processing
-app_properties = init_processing();
+app_properties = init_processing("bcv_properties.json");
 
 %% BC-VARETA processing
 if(getGlobalGuimode())

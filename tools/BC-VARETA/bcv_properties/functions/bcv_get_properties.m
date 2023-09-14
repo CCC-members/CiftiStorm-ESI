@@ -1,4 +1,4 @@
-function [properties] = get_properties()
+function [properties] = bcv_get_properties()
 try    
     properties = jsondecode(fileread(strcat('app/properties.json')));    
 catch ME

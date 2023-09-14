@@ -1,4 +1,4 @@
-function [properties] = get_properties()
+function [properties] = prep_get_properties()
 try
 %     pred_options = jsondecode(fileread(strcat('bcv_predefinition/pred_properties.json')));
 %     if(~isequal(pred_options.params.predefinition.option,'default'))
