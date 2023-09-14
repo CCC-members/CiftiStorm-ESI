@@ -20,18 +20,13 @@ clc;
 close all;
 clear all;
 disp('-->> Starting process');
-% restoredefaultpath;
+restoredefaultpath;
 
 %%
 %------------ Preparing properties --------------------
 % brainstorm('stop');
-addpath(fullfile('app'));
-addpath(fullfile('config_labels'));
-addpath(fullfile('config_properties'));
-addpath(genpath(fullfile('functions')));
-addpath(genpath('plugins'));
-addpath(fullfile('templates'));
-addpath(fullfile('tools'));
+addpath('tools/Common');
+addpath(genpath('tools/MEEGprep'));
 
 try
     app_properties = jsondecode(fileread(fullfile('app','properties.json')));
@@ -43,28 +38,17 @@ catch EM
     return;
 end
 
-%% Printing data information
-disp(strcat("-->> Name: ",app_properties.generals.name));
-disp(strcat("-->> Version: ",app_properties.generals.version));
-disp(strcat("-->> Version date: ",app_properties.generals.version_date));
-disp("=================================================================");
+%%
+%% Init processing
+%%
+init_processing("tools/MEEGprep/app/properties.json");
 
-%% ------------ Checking MatLab compatibility ----------------
-disp('-->> Checking installed matlab version');
-if(~check_matlab_version())
-    return;
-end
-%% ------------  Checking updates --------------------------
-disp('-->> Checking project laster version');
-if(isequal(check_version,'updated'))
-    return;
-end
 %% ------------  Checking app properties --------------------------
-properties  = get_properties();
+properties  = prep_get_properties();
 if(isequal(properties,'canceled'))
     return;
 end
-[status, reject_subjects]    = check_properties(properties);
+[status, reject_subjects]    = prep_check_properties(properties);
 if(~status)
     fprintf(2,strcat('\nBC-V-->> Error: The current configuration files are wrong \n'));
     disp('Please check the configuration files.');
@@ -80,7 +64,7 @@ properties.prep_data_params     = properties.prep_data_params.params;
 if(isfile(properties.general_params.colormap))
     load(properties.general_params.colormap);
 else
-    load('tools/mycolormap.mat');
+    load('tools/Common/mycolormap.mat');
 end
 
 %%

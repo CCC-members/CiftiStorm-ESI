@@ -4,7 +4,7 @@
         "modality":"EEG",
         "name":"HeadModel_CHBMP",
         "description":"",
-        "colormap":"tools/mycolormap.mat",        
+        "colormap":"tools/Common/mycolormap.mat",        
         "bst_config":{
             "description":"",
             "protocol_name":"HeadModel_CHBMP",

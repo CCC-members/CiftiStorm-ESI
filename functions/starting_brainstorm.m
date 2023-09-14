@@ -28,7 +28,7 @@ else
     fprintf(2,"\n ->> Error: We can not install the spm12 plugin. Please see the fallow error and restart the process. \n");
     disp("-->> Message error");
     disp(errMsg);
-    disp('-->> Process stoped!!!');
+    disp('-->> Process stopped!!!');
     status = false;
     return;
 end
@@ -40,7 +40,7 @@ if(isempty(bst_plugin('GetInstalled', 'openmeeg')))
         fprintf(2,"\n ->> Error: We can not install tha openmeeg plugin. Please see the fallow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         status = false;
         return;
     end
@@ -53,7 +53,7 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
         fprintf(2,"\n ->> Error: We can not install tha duneuro plugin. Please see the fallow error and restart the process. \n");
         disp("-->> Message error");
         disp(errMsg);
-        disp('-->> Process stoped!!!');
+        disp('-->> Process stopped!!!');
         status = false;
         return;
     end

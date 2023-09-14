@@ -1,8 +1,8 @@
 function app_properties = init_processing(properties_file)
 try
-    app_properties = jsondecode(fileread(fullfile('app','properties.json')));
+    app_properties = jsondecode(fileread(properties_file));
 catch EM
-    fprintf(2,"\n ->> Error: The app/properties file do not have a correct format \n");
+    fprintf(2,"\n ->> Error: The tools/BC-VARETA/app/properties.json file do not have a correct format \n");
     disp("-->> Message error");
     disp(EM.message);
     disp('-->> Process stopped!!!');
