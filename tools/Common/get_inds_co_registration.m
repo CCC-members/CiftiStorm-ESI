@@ -5,7 +5,7 @@ x1  = high_cortex.Vertices;
 for i = 1:length(low_cortex.Vertices)
     x2     = repmat(low_cortex.Vertices(i,:),length(x1),1);
     dist   = sqrt(sum(abs(x2-x1).^2,2));
-    if(~isempty(find(dist == 0)))
+    if(~isempty(find(dist == 0, 1)))
         inds(i) = find(dist == 0);
     end
 end
