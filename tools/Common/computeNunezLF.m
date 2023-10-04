@@ -1,7 +1,8 @@
 function [Kn,Khom,KhomN] = computeNunezLF(Ke, Vertices, VertNorms, Channels, ChannOrient, Modality)
 
-[Ne,Nv]     = size(Ke);
-Nv          = Nv/3;
+Ne          = length(Channels);
+Nv          = size(Vertices,1);
+
 if(isequal(Modality,'EEG'))    
     % H           = eye(Ne)-ones(Ne)./Ne;
     
