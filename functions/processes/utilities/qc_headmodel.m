@@ -48,8 +48,7 @@ if(isequal(modality,'EEG'))
     %% Ploting sensors and sources on the scalp and cortex
     %%
     fig_title   = strcat('Realistic field view (',desc,')');
-    [hFig25]    = view3D_K(fig_title, Kn, cortex, head, Channels,2);
-    
+    [hFig25]    = view3D_K(fig_title, Kn, cortex, head, Channels,2);    
     figures     = {hFig25, hFig25, hFig25, hFig25};
     fig_out     = merge_figures(fig_title, fig_title, figures,...
         'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
