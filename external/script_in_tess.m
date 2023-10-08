@@ -4,7 +4,7 @@ function TessMat = script_in_tess(TessFile, FileFormat, sMri, OffsetMri)
 % USAGE:  TessMat = in_tess(TessFile, FileFormat='ALL', sMri=[], Offset=[]);
 %
 % INPUT: 
-%     - TessFile   : full path to a tesselation file
+%     - TessFile   : full path to a tessellation file
 %     - FileFormat : String that describes the surface file format : {TRI, DFS, DSGL, MESH, BST, ALL ...}
 %     - sMri       : Loaded MRI structure
 %     - OffsetMri  : (x,y,z) values to add to the coordinates of the surface before converting it to SCS
@@ -218,7 +218,7 @@ end
 if isempty(TessMat)
     return;
 end
-% Fix the tesselations
+% Fix the tessellations
 for iTess = 1:length(TessMat)
     % Make sure all the values are double
     TessMat(iTess).Vertices = double(TessMat(iTess).Vertices);
@@ -251,7 +251,7 @@ end
 
 %% ===== COMMENT =====
 % Add a comment field to the TessMat structure.
-% If various tesselations were loaded from one file
+% If various tessellations were loaded from one file
 if (length(TessMat) > 1)
     for iTess = 1:length(TessMat)
         if ~isfield(TessMat(iTess), 'Comment') || isempty(TessMat(iTess).Comment)
