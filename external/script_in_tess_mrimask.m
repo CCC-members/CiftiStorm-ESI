@@ -1,5 +1,5 @@
 function TessMat = script_in_tess_mrimask(MriFile, isMni)
-% IN_TESS_MRIMASK: Import an MRI as a mask or atlas, and tesselate the volumes in it
+% IN_TESS_MRIMASK: Import an MRI as a mask or atlas, and tessellate the volumes in it
 %
 % USAGE:  TessMat = in_tess_mrimask(MriFile, isMni=0)
 %         TessMat = in_tess_mrimask(sMri,    isMni=0)
@@ -214,7 +214,7 @@ else
 end
 
 TessMat = repmat(struct('Comment', [], 'Vertices', [], 'Faces', []), [1, 0]);
-% Generate a tesselation for all the others
+% Generate a tessellation for all the others
 for i = 1:length(allValues)
     % Display progress bar
     if (length(allValues) > 1)
@@ -247,7 +247,7 @@ for i = 1:length(allValues)
         Comment = 'mask';
     end
     
-    % Add new tesselation
+    % Add new tessellation
     iTess = [];
     % If importing an atlas in MNI coordinates
     if isMni
@@ -267,7 +267,7 @@ for i = 1:length(allValues)
             maskR = mask;
             maskL(iMask(iR)) = 0;
             maskR(iMask(iL)) = 0;
-            % Tesselate left
+            % Tessellate left
             [Vertices, Faces] = TesselateMask(sMri, maskL, isMni);
             if ~isempty(Vertices)
                 iTess = length(TessMat) + 1;
@@ -275,7 +275,7 @@ for i = 1:length(allValues)
                 TessMat(iTess).Vertices = Vertices;
                 TessMat(iTess).Faces    = Faces;
             end
-            % Tesselate right
+            % Tessellate right
             [Vertices, Faces] = TesselateMask(sMri, maskR, isMni);
             if ~isempty(Vertices)
                 iTess = length(TessMat) + 1;
@@ -286,9 +286,9 @@ for i = 1:length(allValues)
         end
     end
     
-    % If tesselation was not already added
+    % If tessellation was not already added
     if isempty(iTess)
-        % Tesselate surface
+        % Tessellate surface
         [Vertices,Faces] = TesselateMask(sMri, mask, isMni);
         % Create new entry
         if ~isempty(Vertices)
