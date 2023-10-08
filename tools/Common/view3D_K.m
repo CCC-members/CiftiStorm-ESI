@@ -13,18 +13,47 @@ Kqm = sqrt(dot(Kq,Kq,2));
 Kqme = Kqm(:,:,elecIndex);
 
 %% plot Lead Field
-fig = figure('Name', fig_title, 'NumberTitle', 'off', 'units','normalized','outerposition',[0 0 1 1]);
+fig = figure('Name', fig_title, 'NumberTitle', 'off', 'units','normalized','outerposition',[0 0 1 1],'Color','w');
 hold on;
-scatter3(XYZ(:,1),XYZ(:,2),XYZ(:,3),Kqme/max(Kqme)*2*mS,'r','filled');
-patch('Vertices',head.Vertices,'Faces',head.Faces,'EdgeColor','none','FaceAlpha',.2,'FaceColor',[0.50,0.50,0.50]);
-quiver3(XYZ(:,1),XYZ(:,2),XYZ(:,3),Kq(:,1,elecIndex),Kq(:,2,elecIndex),Kq(:,3,elecIndex),'LineWidth',2,'Color','k','AutoScaleFactor',3);
-scatter3(channels(:,1),channels(:,2),channels(:,3),mS,'g','filled');
-scatter3(channels(elecIndex,1),channels(elecIndex,2),channels(elecIndex,3),mS,'b','filled');
-axis equal off;
-title(fig_title)
-rotate3d('on')
+
+% PLotting sources
+scatter3(XYZ(:,1),XYZ(:,2),XYZ(:,3),Kqme/max(Kqme)*2*mS,'k','filled');
+
+% Plotting head
+patch('Vertices',head.Vertices,'Faces',head.Faces,'EdgeColor','none','FaceAlpha',.2,'FaceColor',[0.7,0.7,0.7]);
+
+% Plotting field vector
+quiver3(XYZ(:,1),XYZ(:,2),XYZ(:,3),Kq(:,1,elecIndex),Kq(:,2,elecIndex),Kq(:,3,elecIndex),'LineWidth',2,'Color','b','AutoScaleFactor',3);
+
+% PLotting electrodes
+% ElectrodeGrid = CreateGeometry3DElectrode(channels,'EEG',head, 'nVert', 34);
+% patch('Faces',               ElectrodeGrid.Faces, ...
+%     'Vertices',            ElectrodeGrid.Vertices,...
+%     'FaceVertexCData',     ElectrodeGrid.FaceVertexCData, ...
+%     'FaceVertexAlphaData', ElectrodeGrid.FaceVertexAlphaData, ...
+%     'FaceColor',           'flat', ...
+%     'FaceAlpha',           'flat', ...
+%     'AlphaDataMapping',    'none', ...
+%     ElectrodeGrid.Options{:});
+
+% Marking channel
+ElectrodeGrid = CreateGeometry3DElectrode(channels(elecIndex,:),'EEG',head, 'ctColor', [1 0 0], 'nVert', 34);
+patch('Faces',               ElectrodeGrid.Faces, ...
+    'Vertices',            ElectrodeGrid.Vertices,...
+    'FaceVertexCData',     ElectrodeGrid.FaceVertexCData, ...
+    'FaceVertexAlphaData', ElectrodeGrid.FaceVertexAlphaData, ...
+    'FaceColor',           'flat', ...
+    'FaceAlpha',           'flat', ...
+    'AlphaDataMapping',    'none', ...
+    ElectrodeGrid.Options{:});
 
 
+axis(fig.CurrentAxes,'off');
+axis(fig.CurrentAxes,'equal');
+axis(fig.CurrentAxes,'tight');
 
+title(fig_title);
+rotate3d on;
 
+end
 
