@@ -1,5 +1,5 @@
 function TessMat = script_in_tess(TessFile, FileFormat, sMri, OffsetMri)
-% IN_TESS: Detect file format and load tesselation file.
+% IN_TESS: Detect file format and load tessellation file.
 %
 % USAGE:  TessMat = in_tess(TessFile, FileFormat='ALL', sMri=[], Offset=[]);
 %
@@ -10,7 +10,7 @@ function TessMat = script_in_tess(TessFile, FileFormat, sMri, OffsetMri)
 %     - OffsetMri  : (x,y,z) values to add to the coordinates of the surface before converting it to SCS
 %
 % OUTPUT:
-%     - TessMat:  Brainstorm tesselation structure with fields:
+%     - TessMat:  Brainstorm tessellation structure with fields:
 %         |- Vertices : {[3 x nbVertices] double}, in millimeters
 %         |- Faces    : {[nbFaces x 3] double}
 %         |- Comment  : {information string}

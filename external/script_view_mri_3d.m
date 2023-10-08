@@ -8,7 +8,7 @@ function [hFig, iDS, iFig] = script_view_mri_3d(MriFile, OverlayFile, SurfAlpha,
 % INPUT:
 %     - MriFile     : full path to the surface file to display
 %     - SurfAlpha   : value that indicates surface transparency (optional)
-%     - "NewFigure" : force new figure creation (do not re-use a previously created figure)
+%     - "NewFigure" : force new figure creation (do not reuse a previously created figure)
 %     - hFig        : Specify the figure in which to display the MRI
 %     - iDS         : Specify which loaded dataset to use
 %

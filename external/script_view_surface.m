@@ -10,7 +10,7 @@ function [hFig, iDS, iFig] = script_view_surface(SurfaceFile, SurfAlpha, SurfCol
 %     - SurfaceFile : full path to the surface file to display 
 %     - SurfAlpha   : value that indicates surface transparency (optional)
 %     - SurfColor   : Surface color [r,g,b] (optional)
-%     - "NewFigure" : force new figure creation (do not re-use a previously created figure)
+%     - "NewFigure" : force new figure creation (do not reuse a previously created figure)
 %     - hFig        : Specify the figure in which to display the surface
 %     - iDS         : Specify which loaded dataset to use
 %
