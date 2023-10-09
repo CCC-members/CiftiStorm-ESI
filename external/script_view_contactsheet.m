@@ -261,7 +261,7 @@ for iSample = 1:nImages
             alpha = bst_flip(alpha, 2);
         end
     end        
-    % Find extacted image position in final sheet
+    % Find extracted image position in final sheet
     i = floor((iSample-1) / nbCols);
     j = mod(iSample-1, nbCols);
     ImgSheet(i*H+1:(i+1)*H, j*W+1:(j+1)*W, :) = img;
