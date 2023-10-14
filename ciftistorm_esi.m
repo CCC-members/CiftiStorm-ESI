@@ -28,7 +28,7 @@ disp('==========================================================================
 %%
 addpath(genpath('app'));
 addpath('bst_templates');
-addpath(genpath('config_properties'));
+addpath(genpath('cfs_properties'));
 addpath('external');
 addpath(genpath('functions'));
 addpath('guide');

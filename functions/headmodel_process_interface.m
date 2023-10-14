@@ -26,9 +26,9 @@ switch mq_control
     case true
         iProtocol               = bst_get('Protocol', ProtocolName);
         if(isempty(iProtocol))
-            fprintf(2,strcat('\nBC-V-->> Error: The protocol name defined in config_properties/general_params.json is wrong \n'));
+            fprintf(2,strcat('\nBC-V-->> Error: The protocol name defined in cfs_properties/general_params.json is wrong \n'));
             disp(strcat("Name: ",ProtocolName));
-            disp(strcat("Please check the Protocol name or the BST db_path in config_properties/general_params.json file"));
+            disp(strcat("Please check the Protocol name or the BST db_path in cfs_properties/general_params.json file"));
             disp('-->> Process stopped!!!');
             return;
         end
