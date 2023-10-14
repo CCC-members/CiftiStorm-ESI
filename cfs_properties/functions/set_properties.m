@@ -3,32 +3,32 @@ function status = set_properties(properties)
 %   Detailed explanation goes here
 status = true;
 disp("-->> Checking properties");
-if(~isfolder(properties.general_params.params.bcv_workspace.BCV_input_dir))
+if(~isfolder(properties.general_params.bcv_workspace.BCV_input_dir))
     fprintf(2,strcat('\nBC-V-->> Error: The param BCV_input_dir defined on bcv_properties/general_params.json file: \n'));
-    disp(properties.general_params.params.bcv_workspace.BCV_input_dir);
+    disp(properties.general_params.bcv_workspace.BCV_input_dir);
     fprintf(2,strcat('It is not a correct adreess directory. \n'));
     disp('Please verify the location path.');
     status = false;
     return;
 end
-if(~isfolder(properties.general_params.params.bcv_workspace.BCV_work_dir))
+if(~isfolder(properties.general_params.bcv_workspace.BCV_work_dir))
     fprintf(2,strcat('\nBC-V-->> Error: The param BCV_work_dir defined on bcv_properties/general_params.json file: \n'));
-    disp(properties.general_params.params.bcv_workspace.BCV_work_dir);
+    disp(properties.general_params.bcv_workspace.BCV_work_dir);
     fprintf(2,strcat('It is not a correct adreess directory. \n'));
     disp('Please verify the location path.');
     status = false;
     return;
 else
-    [status,values] = fileattrib(properties.general_params.params.bcv_workspace.BCV_work_dir);
+    [status,values] = fileattrib(properties.general_params.bcv_workspace.BCV_work_dir);
     if(~values.UserWrite)
         fprintf(2,strcat('\nBC-V-->> Error: The current user do not have write permissions on: \n'));
-        disp(properties.general_params.params.bcv_workspace.BCV_work_dir);
+        disp(properties.general_params.bcv_workspace.BCV_work_dir);
         disp('Please check the folder permission.');
         status = false;
         return;
     end
 end
-frequencies = properties.spectral_params.params.frequencies;
+frequencies = properties.spectral_params.frequencies;
 for i=1:length(frequencies)
     freq = frequencies(i);
     if(freq.run && freq.f_start > freq.f_end)
@@ -51,7 +51,7 @@ properties.module_param_files(2).file_path  = strcat(pred_folder,'/activation_pa
 properties.module_param_files(3).file_path  = strcat(pred_folder,'/connectivity_params.json');
 properties.module_param_files(4).file_path  = strcat(pred_folder,'/spectral_params.json');
 pred_options                                = jsondecode(fileread(strcat('bcv_predefinition/pred_properties.json')));
-pred_options.params.predefinition.option    = properties.run_bash_mode.predefinition_params;
+pred_options.predefinition.option    = properties.run_bash_mode.predefinition_params;
 
 % saving property files
 saveJSON(pred_options,strcat('bcv_predefinition/pred_properties.json'));

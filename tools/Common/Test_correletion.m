@@ -90,7 +90,7 @@ rotate3d on
 copyobj(p2,sp2);
 
 ax = axes(fig3,'visible','off');
-c = colorbar(ax,'Position',[0.93 0.110 0.012 0.8]);  % attach colorbar to h
+c = colorbar(ax,'Position',[0.93 0.110 0.012 0.8],'FontSize',12);  % attach colorbar to h
 c.Ticks  = minColorLimit:0.1:maxColorLimit;
 c.TickLabels = round(maxColorLimit:-0.1:minColorLimit,2);
 ax.Colormap = Cmap1_cor;

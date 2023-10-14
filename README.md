@@ -13,7 +13,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
 
 
 ## Parameters configuration
-### General process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/general_params.json)
+### General process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/general_params.json)
     - modality     --> Electrophysiology data modality (EEG or MEG)
     - name         --> Processing name
     - bst_config   --> Configuration structure for Brainstorm processing
@@ -24,7 +24,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
         - after_MaQC     --> Define as false to the first processing and true after channel correction to recompute the Headmodel and the Leadfield.
     - output_path   --> Path directory for the analysis outputs.
     - tmp_path      --> Path directory for temporary files. (local) as default. Define a real directory in another case. 
-## Import anatomy process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/process_import_anat.json)
+## Import anatomy process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/process_import_anat.json)
 ### Anatomy's type parameters
     - anatomy_type:type --> Select the anatomy type to run in the (type_list) structure
     - type_list         --> List of different anatomy configurations.
@@ -53,7 +53,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
             - nvertskull    --> Skull's number of vertices. Default: 8000
             - nvertcortex   --> Cortex's number of vertices. Default: 8000        
 
-## Import channel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/process_import_channel.json)
+## Import channel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/process_import_channel.json)
     - channel_type    -->  Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template
         - raw_data    -->  Configuration for Raw data processing
             - base_path     --> Root directory of the raw data
@@ -64,7 +64,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
             - group_layout_name    --> 
             - channel_layout_name  -->
 
-## Compute Headmodel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/config_properties/process_comp_headmodel.json)
+## Compute Headmodel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/process_comp_headmodel.json)
 ### Default parameter configuration
     - radii          --> Default: [0.88,0.93,1]
     - conductivity   --> Default: [0.33,0.0042,0.33]

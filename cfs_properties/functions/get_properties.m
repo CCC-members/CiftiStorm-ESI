@@ -9,6 +9,20 @@ catch ME
     properties = 'canceled';
     return;
 end
+defaults_param_files = properties.default_param_files;
+for i=1:length(defaults_param_files)
+    try        
+        module_params                                               = jsondecode(fileread(defaults_param_files(i).file_path));
+        properties.defaults.(defaults_param_files(i).module_id)     = module_params;        
+    catch ME
+        fprintf(2,strcat('\nBC-V-->> Error: Loading the property files: \n'));
+        fprintf(2,strcat(ME.message,'\n'));
+        fprintf(2,strcat('Cause in file', defaults_param_files(i).file_path , '\n'));
+        disp('Please verify the json format in the file.');
+        properties = 'canceled';
+        return;
+    end
+end
 process_files = properties.process_files;
 for i=1:length(process_files)
     try        
@@ -23,10 +37,10 @@ for i=1:length(process_files)
         return;
     end
 end
-properties.general_params       = properties.general_params.params;
-properties.anatomy_params       = properties.anatomy_params.params;
-properties.channel_params       = properties.channel_params.params;
-properties.headmodel_params     = properties.headmodel_params.params;
+properties.general_params       = properties.general_params;
+properties.anatomy_params       = properties.anatomy_params;
+properties.channel_params       = properties.channel_params;
+properties.headmodel_params     = properties.headmodel_params;
 
 anat_type = properties.anatomy_params.anatomy_type.type;
 properties.anatomy_params.anat_config = properties.anatomy_params.anatomy_type.type_list{anat_type};
