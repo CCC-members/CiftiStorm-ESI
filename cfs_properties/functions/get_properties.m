@@ -37,11 +37,6 @@ for i=1:length(process_files)
         return;
     end
 end
-properties.general_params       = properties.general_params;
-properties.anatomy_params       = properties.anatomy_params;
-properties.channel_params       = properties.channel_params;
-properties.headmodel_params     = properties.headmodel_params;
-
 anat_type = properties.anatomy_params.anatomy_type.type;
 properties.anatomy_params.anat_config = properties.anatomy_params.anatomy_type.type_list{anat_type};
 channel_type = properties.channel_params.channel_type.type;

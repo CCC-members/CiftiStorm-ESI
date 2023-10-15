@@ -2,7 +2,7 @@
     "description":"",
     "anatomy_type":{
         "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-        "type":3,
+        "type":2,
         "type_list":[
             {
                 "id":1,
