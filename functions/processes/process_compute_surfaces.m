@@ -9,7 +9,7 @@ ProtocolInfo    = bst_get('ProtocolInfo');
 anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
 layer_desc      = properties.anatomy_params.common_params.layer_desc.desc;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
-nVertCortex     = properties.anatomy_params.common_params.surfaces_resolution.nvertcortex;
+nvertices     = properties.anatomy_params.common_params.surfaces_resolution.nvertices;
 
 %%
 %% Getting report path
@@ -36,7 +36,7 @@ for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
     if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
         comment                 = split(CSurface.comment,'_');
-        [NewFile,iSurface,I,J]  = tess_downsize(CSurface.filename, nVertCortex, 'reducepatch');
+        [NewFile,iSurface,I,J]  = tess_downsize(CSurface.filename, nvertices, 'reducepatch');
         CortexMat.Comment       = strcat('Cortex_',comment{2},'_low');
         if(isequal(layer_desc,lower('bigbrain')) || isequal(layer_desc,lower('fs_lr')))
             if(isequal(comment{2},'pial'))

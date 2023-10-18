@@ -1,13 +1,18 @@
 {
     "description":"",
     "modality":"EEG",
-    "name":"HeadModel_CHBMP_NDC",
-    "description":"",
+    "dataset":{
+        "Name":"CHBM",
+        "Description":[
+            "CHBM Cl_eyes"
+        ]
+    },
     "colormap":"tools/Common/mycolormap.mat",
+
     "bst_config":{
         "description":"",
         "protocol_name":"HeadModel_CHBMP_NDC",
-        "protocol_reset":false,
+        "reset_protocol":false,
         "bst_path":"/mnt/Develop/Tools/brainstorm3",
         "db_path":"local",
         "after_MaQC":{
