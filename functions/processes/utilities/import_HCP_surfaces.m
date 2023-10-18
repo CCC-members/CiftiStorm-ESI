@@ -19,8 +19,7 @@ if(~isequal(anatomy_type.id,1))
     midthickness_R      = surfaces{7};
     white_L             = surfaces{8};
     white_R             = surfaces{9};    
-    nVertHead           = surfaces_resolution.nverthead;
-    nVertSkull          = surfaces_resolution.nvertskull;
+    nvertices           = surfaces_resolution.nvertices;
     
     %% Importing non-brain surfacs
     bst_process('CallProcess', 'process_import_surfaces', [], [], ...
@@ -28,8 +27,8 @@ if(~isequal(anatomy_type.id,1))
         'headfile',    {head_file, 'MRI-MASK-MNI'}, ...
         'innerfile',   {innerskull_file, 'MRI-MASK-MNI'}, ...
         'outerfile',   {outerskull_file, 'MRI-MASK-MNI'}, ...
-        'nverthead',   nVertHead, ...
-        'nvertskull',  nVertSkull);
+        'nverthead',   nvertices, ...
+        'nvertskull',  nvertices);
     
     %% Importing Brain surfaces
     if(isequal(lower(layer_desc),'white') || isequal(lower(layer_desc),'midthickness') || isequal(lower(layer_desc),'pial'))

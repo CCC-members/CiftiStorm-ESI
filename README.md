@@ -18,7 +18,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
     - name         --> Processing name
     - bst_config   --> Configuration structure for Brainstorm processing
         - protocol_name  --> Brainstorm protocol name
-        - protocol_reset --> Reset the protocol information if the protocol already exists in the Brainstorm database (true|false)
+        - reset_protocol --> Reset the protocol information if the protocol already exists in the Brainstorm database (true|false)
         - bst_path       --> Brainstorm Toolbox root directory
         - db_path        --> Path to create the Brainstorm database. (local) Will create it in the user's home directory. Define a real path in another case.
         - after_MaQC     --> Define as false to the first processing and true after channel correction to recompute the Headmodel and the Leadfield.
@@ -48,10 +48,8 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
               - base_path           --> FSL Bet root directory
         - layer_desc         --> Layer descriptor structure
             - desc                --> Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).
-        - surfaces_resolution --> Numbers of vertices for downsampling each surface
-            - nverthead     --> Scalp's number of vertices. Default: 8000
-            - nvertskull    --> Skull's number of vertices. Default: 8000
-            - nvertcortex   --> Cortex's number of vertices. Default: 8000        
+        - surfaces_resolution --> Numbers of vertices for downsampling the surface
+            - nvertices           --> Number of vertices. Default: 8000        
 
 ## Import channel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/process_import_channel.json)
     - channel_type    -->  Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template

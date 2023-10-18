@@ -2,7 +2,7 @@
     "description":"",
     "anatomy_type":{
         "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-        "type":3,
+        "type":2,
         "type_list":[
             {
                 "id":1,
@@ -36,10 +36,8 @@
             "desc":"midthickness"
         },
         "surfaces_resolution":{
-            "description":"Numbers of vertices for downsample each surface: default <<8000>>",
-            "nverthead":8000,
-            "nvertskull":8000,
-            "nvertcortex":8000
+            "description":"Numbers of vertices for downsample the surfaces: default <<8000>>",
+            "nvertices":8000
         }
     }
 }

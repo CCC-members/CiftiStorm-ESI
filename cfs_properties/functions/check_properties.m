@@ -310,27 +310,13 @@ if(~general_params.bst_config.after_MaQC.run)
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking surface resolution');
     surf_resol = anat_params.common_params.surfaces_resolution;
-    if(isempty(surf_resol.nverthead) || surf_resol.nverthead < 2000 || surf_resol.nverthead > 15000)
-        fprintf(2,'The Head resolution have be between 2000 and 15000 vertices.\n');
-        disp('Please check the nverthead configuration in the process_import_anat.json file.');
+    if(isempty(surf_resol.nvertices) || surf_resol.nvertices > 15000)
+        fprintf(2,'The surfaces resolution have be between 2000 and 15000 vertices.\n');
+        disp('Please check the nvertices configuration in the process_import_anat.json file.');
         status = false;
         disp('-->> Process stopped!!!');
         return;
-    end
-    if(isempty(surf_resol.nvertskull) || surf_resol.nvertskull < 2000 || surf_resol.nvertskull > 15000)
-        fprintf(2,'The Skull resolution have be between 2000 and 15000 vertices.\n');
-        disp('Please check the nvertskull configuration in the process_import_anat.json file.');
-        status = false;
-        disp('-->> Process stopped!!!');
-        return;
-    end
-%     if(isempty(surf_resol.nvertcortex) || surf_resol.nvertcortex < 2000 || surf_resol.nvertcortex > 15000)
-%         fprintf(2,'The Cortex resolution have be between 2000 and 15000 vertices.\n');
-%         disp('Please check the nvertcortex configuration in the process_import_anat.json file.');
-%         status = false;
-%         disp('-->> Process stopped!!!');
-%         return;
-%     end
+    end   
     
     %%
     %% Checking import channel params

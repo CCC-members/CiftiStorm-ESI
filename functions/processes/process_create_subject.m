@@ -7,7 +7,7 @@ ProtocolName    = general_params.bst_config.protocol_name;
 %%
 %% Creating BST Protocol
 %%
-if(general_params.bst_config.protocol_reset)
+if(general_params.bst_config.reset_protocol)
     gui_brainstorm('DeleteProtocol',ProtocolName);
     bst_db_path = bst_get('BrainstormDbDir');
     if(isfolder(fullfile(bst_db_path,ProtocolName)))
