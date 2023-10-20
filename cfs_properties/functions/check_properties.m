@@ -113,7 +113,7 @@ if(~general_params.bst_config.after_MaQC.run)
         disp('-->> Checking template configuration');
         selected_anatomy = anat_params.anatomy_type.type_list{1};
         template_name = selected_anatomy.template_name;
-        defaults = jsondecode(fileread(fullfile('bst_templates','bst_default_anatomy.json')));
+        defaults = jsondecode(fileread(fullfile('bst_defaults','bst_default_anatomy.json')));
         if(~contains(template_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
             disp(strcat("Name: ",template_name));
@@ -390,7 +390,7 @@ if(~general_params.bst_config.after_MaQC.run)
         channel = channel_params.channel_type.type_list{2};
         group_name = channel.group_layout_name;
         layout_name = channel.channel_layout_name;
-        defaults = jsondecode(fileread(fullfile('bst_templates','bst_eeg_layouts.json')));
+        defaults = jsondecode(fileread(fullfile('bst_defaults','bst_eeg_layouts.json')));
         if(~contains(group_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template group in process_import_channel.json is wrong \n'));
             disp(strcat("Name: ",group_name));
