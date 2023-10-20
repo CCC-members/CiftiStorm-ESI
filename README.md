@@ -58,7 +58,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
             - file_location --> Reference path for the raw data (after the subject folder)
             - data_format   --> Standard format for the data
             - isfile        --> Define true if the data is a file or false if a folder.
-        - import_channel -->    Select the group and name of the sensor layout. See bst_templates/bst_layout_default.json file.
+        - import_channel -->    Select the group and name of the sensor layout. See bst_templates/bst_eeg_layouts.json file.
             - group_layout_name    --> 
             - channel_layout_name  -->
 
