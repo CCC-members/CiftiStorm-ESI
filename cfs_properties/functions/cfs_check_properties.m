@@ -5,8 +5,13 @@ if ((nargin >= 1) && ischar(varargin{1}))
 else
     return
 end
+if((nargin >= 2))
+    path = varargin{2};
+else
+    return;
+end
 
-% Get required context structure
+% Check case parameters
 switch contextName
     %% General
     case 'BST_path'
@@ -18,11 +23,17 @@ switch contextName
             checked = false;
         end
         [~,values] = fileattrib(path);
-        if(values.UserWrite)
-            app.BSTdbpathEditField.Value = folder;
+        if(~values.UserWrite)
+            checked = false;
         end
     case 'output_path'
-
+        if(~isfolder(fullfile(path)) && ~isequal(path,'local'))
+            checked = false;
+        end
+        [~,values] = fileattrib(path);
+        if(~values.UserWrite)
+            checked = false;
+        end
 
     %% Anatomy
 
