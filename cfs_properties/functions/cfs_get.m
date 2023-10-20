@@ -17,5 +17,8 @@ switch contextName
         output3 =  fullfile(cfs_db_dir,'defaults','meg');
     case 'dataset'
 
+    case 'bst_default_eeg'
+        output1 = 'https://github.com/brainstorm-tools/brainstorm3/raw/master/defaults/eeg';
+end
 
 end
