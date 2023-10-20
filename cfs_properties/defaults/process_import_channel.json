@@ -18,7 +18,7 @@
             {
                 "id":2,
                 "name":"import_channel",
-                "description":"Select the group and name of the sensor layout. See bst_templates/bst_layout_default.json file and select all params from there",
+                "description":"Select the group and name of the sensor layout. See bst_defaults/bst_eeg_layouts.json file and select all params from there",
                 "group_layout_name":"ICBM152",
                 "channel_layout_name":"ASA 10-05 343"
             }

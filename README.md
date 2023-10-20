@@ -29,7 +29,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
     - anatomy_type:type --> Select the anatomy type to run in the (type_list) structure
     - type_list         --> List of different anatomy configurations.
         1. default_anatomy
-            - template_name    --> Brainstorm's Anatomy template name. See **bst_templates/bst_default_anatomy.json** file as reference 
+            - template_name    --> Brainstorm's Anatomy template name. See **bst_defaults/bst_default_anatomy.json** file as reference 
             - default_atlas    --> Brainstorm's default atlas to use in the analysis See
         2. hcp_anat_template
             - base_path        --> Path directory for the anatomy template in HCP format
@@ -58,7 +58,7 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
             - file_location --> Reference path for the raw data (after the subject folder)
             - data_format   --> Standard format for the data
             - isfile        --> Define true if the data is a file or false if a folder.
-        - import_channel -->    Select the group and name of the sensor layout. See bst_templates/bst_layout_default.json file.
+        - import_channel -->    Select the group and name of the sensor layout. See bst_defaults/bst_eeg_layouts.json file.
             - group_layout_name    --> 
             - channel_layout_name  -->
 
