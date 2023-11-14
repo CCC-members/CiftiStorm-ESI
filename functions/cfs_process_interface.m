@@ -1,4 +1,4 @@
-function [process_error] = headmodel_process_interface(properties, reject_subjects)
+function [process_error] = cfs_process_interface(properties, reject_subjects)
 % HeadModel Process Interface
 %   
 %

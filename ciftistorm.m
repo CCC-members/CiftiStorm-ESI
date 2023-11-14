@@ -1,4 +1,4 @@
-function ciftistorm_esi(varargin)
+function ciftistorm(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%         Brainstorm Protocol for Automatic Head Model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,7 +73,7 @@ else
     
     %% Calling dataset function to analysis
     if(status)
-        process_error = headmodel_process_interface(properties,reject_subjects);
+        process_error = cfs_process_interface(properties,reject_subjects);
         % save("process_output.mat","process_error","reject_subjects");
     end
     
