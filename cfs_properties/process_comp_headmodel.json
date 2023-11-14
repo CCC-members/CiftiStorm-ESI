@@ -1,5 +1,6 @@
 {
     "description":"",
+    "use_defaults":true,
     "radii":[0.88,0.93,1],
     "conductivity":[0.33,0.0042,0.33],
     "BemNames":["Scalp","Skull","Brain"],
