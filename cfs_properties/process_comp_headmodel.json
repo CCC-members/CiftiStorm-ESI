@@ -24,7 +24,7 @@
             "description":"Use this configuration as anatomy template",
             "MEGMethod":"os_meg"
         },
-        {
+        { 
             "name":"duneuro",
             "description":"",
             "FemCond":[1.79,0.0080,0.43],
