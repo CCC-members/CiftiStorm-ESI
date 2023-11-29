@@ -1,7 +1,7 @@
 {
     "description":"",
     "Method":{
-        "description":"Recomended options EEG=<<openmeeg>> MEG=<<os_meg>>. Others options <<meg_sphere>> <<eeg_3sphereberg>> <<duneuro>> ",
+        "description":"Recommended options EEG=<<openmeeg>> MEG=<<os_meg>>. Others options <<meg_sphere>> <<eeg_3sphereberg>> <<duneuro>> ",
         "value":"openmeeg"
     },
     "method_type":[

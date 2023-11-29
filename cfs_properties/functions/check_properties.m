@@ -117,7 +117,7 @@ if(~general_params.bst_config.after_MaQC.run)
         if(~contains(template_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
             disp(strcat("Name: ",template_name));
-            disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
+            disp(strcat("Please check the available anatomy templates in bst_template/bst_default_anatomy.json file"));
             status = false;
             disp('-->> Process stopped!!!');
             return;
@@ -394,7 +394,7 @@ if(~general_params.bst_config.after_MaQC.run)
         if(~contains(group_name, {defaults.name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template group in process_import_channel.json is wrong \n'));
             disp(strcat("Name: ",group_name));
-            disp(strcat("Please check the aviable channel templates in bst_template/bst_eeg_layouts.json file"));
+            disp(strcat("Please check the available channel templates in bst_template/bst_eeg_layouts.json file"));
             status = false;
             disp('-->> Process stopped!!!');
             return;
@@ -404,7 +404,7 @@ if(~general_params.bst_config.after_MaQC.run)
             if(~contains(layout_name, {layout_names.name}))
                 fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_channel.json is wrong \n'));
                 disp(strcat("Name: ",layout_name));
-                disp(strcat("Please check the aviable channel templates in bst_template/bst_eeg_layouts.json file"));
+                disp(strcat("Please check the available channel templates in bst_template/bst_eeg_layouts.json file"));
                 status = false;
                 disp('-->> Process stopped!!!');
                 return;

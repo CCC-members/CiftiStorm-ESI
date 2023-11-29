@@ -15,7 +15,7 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %
 %   verbosity       - Logical value for debbuging (key='debug',value=true OR false)
 %   max_freq        - Integer maximum frequency to filtering the data (key='max_freq', value=from 1 to 92)
-%   save_path       - full path to save the cleanned EEG (key='save_path', value="fullpath")
+%   save_path       - full path to save the cleaned EEG (key='save_path', value="fullpath")
 %   freq_list       - vector of frequencies point to show in plots (key='freq_list', value=[1 6 10 18])
 %   labels          - list of labels to select in the data (key='labels', value={'L1';'L2';'L3';.......;'Ln'})
 %   read_segments   - true or false if you want to read the good time segments and reject the bad time segments
@@ -30,7 +30,7 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %                   ranges in the middle of epochs cannot be removed from epoched data.
 %
 % Outputs:
-%   EEGs            - Cleanned EEGs structure
+%   EEGs            - Cleaned EEGs structure
 %
 %
 % Author: Eduardo Gonzalez-Moreira
