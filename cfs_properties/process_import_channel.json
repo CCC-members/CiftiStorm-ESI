@@ -1,28 +1,1 @@
-{
-    "description":"",
-    "channel_type":{
-        "description":"Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template ",
-        "type":2,
-        "type_list":[
-            {
-                "id":1,
-                "name":"raw_data",
-                "description":"",
-                "subID_prefix":"",
-                "base_path":"/mnt/Store/Data/Conectome/Sample",
-                "file_location":"meg/SubID/unprocessed/MEG/5-Restin/4D/c,rfDC",
-                "data_format":"4D",
-                "group_layout_name":"",
-                "channel_layout_name":""
-            },
-            {
-                "id":2,
-                "name":"import_channel",
-                "description":"Select the group and name of the sensor layout. See bst_defaults/bst_eeg_layouts.json file and select all params from there",
-                "group_layout_name":"ICBM152",
-                "channel_layout_name":"ASA 10-05 343"
-            }
-        ]
-    },
-    "channel_label_file":""
-}
+{    "description":"",    "channel_type":{        "description":"Select the type of import channel process to be used. <<1>> Use raw data. <<2>> Use BST default template ",        "type":2,        "type_list":[            {                "id":1,                "name":"raw_data",                "description":"",                "subID_prefix":"",                "base_path":"/mnt/Store/Data/Conectome/Sample",                "file_location":"meg/SubID/unprocessed/MEG/5-Restin/4D/c,                \r\trfDC",                "data_format":"4D",                "group_layout_name":"",                "channel_layout_name":""            },            {                "id":2,                "name":"import_channel",                "description":"Select the group and name of the sensor layout. See bst_defaults/bst_eeg_layouts.json file and select all params from there",                "group_layout_name":"ICBM152",                "channel_layout_name":"ASA 10-05 343"            }        ]    },    "channel_label_file":"",    "chann_config":{        "id":2,        "name":"import_channel",        "description":"Select the group and name of the sensor layout. See bst_defaults/bst_eeg_layouts.json file and select all params from there",        "group_layout_name":"ICBM152",        "channel_layout_name":"ASA 10-05 343"    }}

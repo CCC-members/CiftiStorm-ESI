@@ -7,8 +7,6 @@
             "CHBM Dataset"
         ]
     },
-    "colormap":"tools/Common/mycolormap.mat",
-
     "bst_config":{
         "description":"",
         "protocol_name":"HeadModel_CHBMP_NDC",
@@ -19,6 +17,6 @@
             "run":false
         }
     },
-    "output_path":"/mnt/Store/ShatePoint/CC-Lab Education - Ariosky Thesis - 文档/Ariosky Thesis/Papers/CiftiStorm/Review 1er round/Source_model/QC",
+    "output_path":"/mnt/Store/Data/CHBM/Test_Visual",
     "tmp_path":"local"
 }

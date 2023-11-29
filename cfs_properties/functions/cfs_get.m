@@ -19,6 +19,10 @@ switch contextName
 
     case 'bst_default_eeg'
         output1 = 'https://github.com/brainstorm-tools/brainstorm3/raw/master/defaults/eeg';
+
+    case 'openmeeg'
+        
+    case 'duneruro'
 end
 
 end

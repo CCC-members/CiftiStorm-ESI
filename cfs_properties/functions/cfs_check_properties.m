@@ -20,10 +20,15 @@ switch contextName
     case 'BST_path'
         if(~isfile(fullfile(path,'brainstorm.m')))
             checked = false;
+            return;
         end
     case 'BST_db'
         if(~isfolder(fullfile(path)) && ~isequal(path,'local'))
             checked = false;
+            return;
+        end
+        if(isequal(path,'local'))
+            return;
         end
         [~,values] = fileattrib(path);
         if(~values.UserWrite)
@@ -32,8 +37,9 @@ switch contextName
     
     %% Anatomy
     case 'output_path'
-        if(~isfolder(fullfile(path)) && ~isequal(path,'local'))
+        if(~isfolder(fullfile(path)) && ~isempty(path))
             checked = false;
+            return;
         end
         [~,values] = fileattrib(path);
         if(~values.UserWrite)
