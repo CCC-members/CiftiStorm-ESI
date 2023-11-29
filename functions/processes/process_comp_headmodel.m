@@ -18,105 +18,56 @@ else
 end
 sStudy                      = bst_get('Study', iStudy);
 HeadModelPath               = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name); 
-iHeadModel                  = 1;
 for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
-    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
-        [options, errMessage]       = bst_headmodeler;
-               
-        options.HeadModelType       = 'surface';
-        
-        % Uploading Channels
-        BSTChannelsFile             = bst_fullfile(ProtocolInfo.STUDIES,sStudy.Channel.FileName);
-        BSTChannels                 = load(BSTChannelsFile);
-        options.Channel             = BSTChannels.Channel;
-        
-        options.Radii               = properties.headmodel_params.radii';
-        options.Conductivity        = properties.headmodel_params.conductivity';
-        % Uploading head
-        ScalpFile                   = sSubject.Surface(sSubject.iScalp).FileName;
-        options.HeadFile            = ScalpFile;
-        % Uploading OuterSkull
-        OuterSkullFile              = sSubject.Surface(sSubject.iOuterSkull).FileName;
-        options.OuterSkullFile      = OuterSkullFile;
-        % options.OuterSkullFile      = [];
-        % Uploading InnerSkull
-        InnerSkullFile              = sSubject.Surface(sSubject.iInnerSkull).FileName;
-        options.InnerSkullFile      = InnerSkullFile;
-        % Uploading cortex
-        CortexFile                  = sSubject.Surface(CSurface.iSurface).FileName;
-        options.CortexFile          = CortexFile;
-        
-        options.Interactive         = false;
-        options.SaveFile            = true;
-        
-        BSTScalpFile                = bst_fullfile(ProtocolInfo.SUBJECTS, ScalpFile);
-        BSTOuterSkullFile           = bst_fullfile(ProtocolInfo.SUBJECTS, OuterSkullFile);
-        BSTInnerSkullFile           = bst_fullfile(ProtocolInfo.SUBJECTS, InnerSkullFile);
-        BemFiles                    = {BSTScalpFile, BSTOuterSkullFile,BSTInnerSkullFile};
-        options.BemFiles            = BemFiles;
-        %         options.BemFiles = {BSTScalpFile,BSTInnerSkullFile};
-        options.BemNames            = properties.headmodel_params.BemNames;
-        %         options.BemNames = {'Scalp','Brain'};
-        options.BemCond             = properties.headmodel_params.BemCond;
-        options.BemSelect           = properties.headmodel_params.BemSelect;
-        
-        switch modality
-            case 'EEG'
-                options.MEGMethod   = [];
-                options.EEGMethod   = Method;
-                options.ECOGMethod  = [];
-                options.SEEGMethod  = [];
-            case 'MEG'
-                options.MEGMethod   = Method;
-                options.EEGMethod   = [];
-                options.ECOGMethod  = [];
-                options.SEEGMethod  = [];
-            case 'ECOG'
-                options.MEGMethod   = [];
-                options.EEGMethod   = [];
-                options.ECOGMethod  = Method;
-                options.SEEGMethod  = [];
-            case 'SEEG'
-                options.MEGMethod   = [];
-                options.EEGMethod   = [];
-                options.ECOGMethod  = [];
-                options.SEEGMethod  = Method;
-        end
+    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))  
         switch Method
-            case 'openmeeg'
-                options.HeadModelFile       = fullfile(HeadModelPath, strcat('headmodel_surf_',CSurface.name,'_openmeeg.mat'));
-                options.Comment             = strcat('headmodel_surf_',CSurface.name,'_openmeeg');
-                options.MegRefCoef          = [];
-                options.MEGMethod           = '';
-                options.EEGMethod           = 'openmeeg';
-                options.BemFiles            = BemFiles;
-                %         options.BemFiles = {BSTScalpFile,BSTInnerSkullFile};
-                options.BemNames            = {'Scalp','Skull','Brain'};
-                %         options.BemNames = {'Scalp','Brain'};
-                options.BemCond             = [1,0.0125,1];
-                %         options.BemCond = [1,1];
-                options.iMeg                = [];
-                options.iEeg                = 1:length(BSTChannels.Channel);
-                options.iEcog               = [];
-                options.iSeeg               = [];
-                options.BemSelect           = [true,true,true];
-                %         options.BemSelect = [true,true];
-                options.isAdjoint           = false;
-                options.isAdaptative        = true;
-                options.isSplit             = false;
-                options.SplitLength         = 4000;
+            case 'meg_sphere'
+                sMethod.Comment = 'Single sphere';
+                sMethod.HeadModelType = 'surface';
+                sMethod.MEGMethod = 'meg_sphere';
+                sMethod.EEGMethod = '';
+                sMethod.ECOGMethod = '';
+                sMethod.SEEGMethod = '';
+                sMethod.SaveFile = 1;
+
+            case 'eeg_3sphereberg'
+                sMethod.Comment = '3-shell sphere';
+                sMethod.HeadModelType = 'surface';
+                sMethod.MEGMethod = '';
+                sMethod.EEGMethod = 'eeg_3sphereberg';
+                sMethod.ECOGMethod = '';
+                sMethod.SEEGMethod = '';
+                sMethod.SaveFile = 1;          
+
             case 'os_meg'    
-                options.HeadModelFile       = fullfile(HeadModelPath, strcat('headmodel_surf_',CSurface.name,'_os_meg.mat'));
-                options.Comment             = strcat('headmodel_surf_',CSurface.name,'_os_meg');
-                options.MegRefCoef          = BSTChannels.MegRefCoef;
-                options.MEGMethod           = 'os_meg'; %openmeg
-                options.EEGMethod           = '';
-                options.OuterSkullFile      = [];
+                sMethod.Comment = 'Overlapping spheres';
+                sMethod.HeadModelType = 'surface';
+                sMethod.MEGMethod = 'os_meg';
+                sMethod.EEGMethod = '';
+                sMethod.ECOGMethod = '';
+                sMethod.SEEGMethod = '';
+                sMethod.SaveFile = 1; 
+
+            case 'openmeeg'
+                sMethod.Comment = 'OpenMEEG BEM';
+                sMethod.HeadModelType = 'surface';
+                sMethod.MEGMethod = '';
+                sMethod.EEGMethod = 'openmeeg';
+                sMethod.ECOGMethod = '';
+                sMethod.SEEGMethod = '';
+                sMethod.SaveFile = 1;
+
             case 'duneuro'
-                options.HeadModelFile       = fullfile(HeadModelPath, strcat('headmodel_surf_',CSurface.name,'_duneuro.mat'));
-                options.Comment             = strcat('headmodel_surf_',CSurface.name,'_duneuro');
-                fem_params                  = properties.headmodel_params.method_type{3};
+                sMethod.Comment = 'DUNEuro FEM';
+                sMethod.HeadModelType = 'surface';
+                sMethod.MEGMethod = '';
+                sMethod.EEGMethod = 'duneuro';
+                sMethod.ECOGMethod = '';
+                sMethod.SEEGMethod = '';
+                sMethod.SaveFile = 1;
+                
+                fem_params                  = properties.headmodel_params.method_type{5};
                 fem_mesh_params             = fem_params.FemMesh;
                 mesh_opt                    = process_fem_mesh( 'GetDefaultOptions' );
                 mesh_opt.Method             = fem_mesh_params.Method.value;
@@ -179,42 +130,20 @@ for i=1:length(CSurfaces)
                 options.BstMegLfFile        = 'meg_lf.dat';
                 options.UseIntegrationPoint = 1;
                 options.EnableCacheMemory   = 0;
-                options.MegPerBlockOfSensor = 0;
-                
-            case 'meg_sphere'
-            case 'eeg_3sphereberg'
+                options.MegPerBlockOfSensor = 0;             
+            
+
         end
         
         %%
         %% Computing Headmodel
         %%
-        [OPTIONS, errMessage] = bst_headmodeler(options);        
-        if ~isempty(OPTIONS)                       
-            % If a new head model is available
-            newHeadModel                = db_template('HeadModel');
-            newHeadModel.FileName       = file_win2unix(strrep(OPTIONS.HeadModelFile, ProtocolInfo.STUDIES, ''));
-            newHeadModel.Comment        = OPTIONS.Comment;
-            newHeadModel.HeadModelType  = OPTIONS.HeadModelType;
-            newHeadModel.MEGMethod      = OPTIONS.MEGMethod;
-            newHeadModel.EEGMethod      = OPTIONS.EEGMethod;
-            newHeadModel.ECOGMethod     = OPTIONS.ECOGMethod;
-            newHeadModel.SEEGMethod     = OPTIONS.SEEGMethod;             
-             % Update Study structure  
-            sStudy.HeadModel(iHeadModel) = newHeadModel;   
-            if(~isempty(CSurface.iCSurface) && CSurface.iCSurface)
-                sStudy.iHeadModel = iHeadModel;
-            end
-            iHeadModel = iHeadModel + 1;
-            % Update DataBase
-            bst_set('Study', iStudy, sStudy);
-            panel_protocols('UpdateNode', 'Study', iStudy);            
-        end
-        db_save();
+        [OutputFiles, errMessage] = script_panel_headmodel('ComputeHeadModel', iStudy,sMethod);       
         
         %%
         %% Quality control of Head model
         %%        
-        qc_headmodel(OPTIONS, properties, subID);        
+        qc_headmodel(OutputFiles, properties, subID);        
     end
 end
 end

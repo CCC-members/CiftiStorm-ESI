@@ -2,23 +2,21 @@
     "description":"",
     "modality":"EEG",
     "dataset":{
-        "Name":"CHBM",
+        "Name":"Example Dataset",
         "Description":[
-            "CHBM Cl_eyes"
+            "Example Dataset Description"
         ]
     },
-    "colormap":"tools/Common/mycolormap.mat",
-
     "bst_config":{
         "description":"",
-        "protocol_name":"HeadModel_CHBMP_NDC",
+        "protocol_name":"Exmple_Protocol",
         "reset_protocol":false,
-        "bst_path":"/mnt/Develop/Tools/brainstorm3",
+        "bst_path":"/path/to/brainstorm3",
         "db_path":"local",
         "after_MaQC":{
             "run":false
         }
     },
-    "output_path":"/mnt/Store/ShatePoint/CC-Lab Education - Ariosky Thesis - 文档/Ariosky Thesis/Papers/CiftiStorm/Review 1er round/Source_model/QC",
+    "output_path":"",
     "tmp_path":"local"
 }
