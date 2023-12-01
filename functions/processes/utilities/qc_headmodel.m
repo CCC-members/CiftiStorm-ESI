@@ -13,7 +13,7 @@ report_path     = get_report_path(properties, subID);
 %%
 ProtocolInfo    = bst_get('ProtocolInfo');
 sSubject        = bst_get('Subject', subID);
-if(isequal(properties.channel_params.channel_type.type,1))
+if(isequal(lower(properties.channel_params.channel_type.id),'raw'))
     sStudy      = bst_get('StudyWithSubject', sSubject.FileName);else
     sStudy      = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 end
