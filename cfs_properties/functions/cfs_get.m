@@ -9,13 +9,16 @@ end
 % Get required context structure
 switch contextName
     case 'cfs_dir'
-        output1 = fullfile(getUserDir(),'.ciftistorm');
+        output1 = fullfile(getUserDir(),'.CiftiStorm');
     case 'defaults_dir'
-        cfs_db_dir = fullfile(getUserDir(),'.ciftistorm');
+        cfs_db_dir = fullfile(getUserDir(),'.CiftiStorm');
         output1 =  fullfile(cfs_db_dir,'defaults','anatomy');
         output2 =  fullfile(cfs_db_dir,'defaults','eeg');
         output3 =  fullfile(cfs_db_dir,'defaults','meg');
-    case 'dataset'
+    case 'datasets'
+        cfs_db_dir = fullfile(getUserDir(),'.CiftiStorm');
+        datasets_file =  fullfile(cfs_db_dir,'Datasets','Datasets.json');
+        output1 = jsondecode(fileread(datasets_file));
 
     case 'bst_default_eeg'
         output1 = 'https://github.com/brainstorm-tools/brainstorm3/raw/master/defaults/eeg';

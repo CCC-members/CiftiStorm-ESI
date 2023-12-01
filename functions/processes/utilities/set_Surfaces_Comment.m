@@ -32,7 +32,7 @@ db_reload_subjects(iSubject);
 %%
 %% Removing uneeded surfaces in case single surface processing
 %%
-if(isequal(layer_desc,'white') || isequal(layer_desc,'midthickness') || isequal(layer_desc,'pial'))
+if(isequal(lower(layer_desc),'white') || isequal(lower(layer_desc),'midthickness') || isequal(lower(layer_desc),'pial'))
     [sSubject,~]        = bst_get('Subject', iSubject);
     Surfaces            = sSubject.Surface;
     for i=1:length(Surfaces)
@@ -41,7 +41,7 @@ if(isequal(layer_desc,'white') || isequal(layer_desc,'midthickness') || isequal(
             [~,name,~]  = fileparts(surface.Comment);
             comment     = split(name,'_');
             desc        = comment{end-1};
-            if(~isequal(layer_desc,desc))
+            if(~isequal(lower(layer_desc),desc))
                 file_delete(file_fullpath({surface.FileName}), 1);
             end
         end

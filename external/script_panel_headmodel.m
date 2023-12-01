@@ -284,8 +284,8 @@ function [OutputFiles, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DE
             end
             
             % Let user edit OpenMEEG options
-            properties = get_properties();
-            openMEEGProperties = properties.headmodel_params.method_type{1};
+            properties = get_properties('run');
+            openMEEGProperties = properties.headmodel_params.Method;
             OpenmeegOptions.BemSelect = OPTIONS.BemSelect;
             OpenmeegOptions.BemCond = OPTIONS.BemCond;
             OpenmeegOptions.BemNames = OPTIONS.BemNames;
@@ -350,8 +350,8 @@ function [OutputFiles, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DE
             % Interactive interface to set the OpenMEEG options
             defOPTIONS = duneuro_defaults();
 
-            properties = get_properties();
-            DUNeuroProperties = properties.headmodel_params.method_type{5};
+            properties = get_properties('run');
+            DUNeuroProperties = headmodel_params.Method;
 
             % Fill defOPTIONS with UserOptions
             

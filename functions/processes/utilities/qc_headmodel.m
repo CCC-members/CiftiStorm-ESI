@@ -148,7 +148,7 @@ if(isequal(modality,'EEG'))
     close(hFig29);
     
     %%
-    %% Finding points of low corelation
+    %% Finding points of low correlation
     %%
     low_cor_inds            = find(corelv < .3);
     BSTCortexFile           = bst_fullfile(ProtocolInfo.SUBJECTS, headmodel_options.CortexFile);

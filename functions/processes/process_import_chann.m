@@ -4,19 +4,10 @@ function channel_error = process_import_chann(properties, subID, CSurfaces)
 %% Getting params
 %%
 channel_error   = [];
-channel_params  = properties.channel_params.chann_config;
+channel_params  = properties.channel_params.channel_type;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 sSubject        = bst_get('Subject', subID);
-%%
-%% Getting channel type
-%%
-if(isequal(properties.channel_params.channel_type.type,3))
-    channel_type = 'template';
-elseif(isequal(properties.channel_params.channel_type.type,1))
-    channel_type = 'individual';
-else
-    channel_type = 'default';    
-end
+type            = properties.channel_params.channel_type.id;
 
 
 %%
@@ -28,7 +19,7 @@ if(~mq_control)
     %%
     %% ===== IMPORT CHANNEL =====
     %%    
-    switch channel_type
+    switch lower(type)
         case 'default'
             % ===== GET DEFAULT =====
             % Get registered Brainstorm EEG defaults
@@ -63,12 +54,12 @@ if(~mq_control)
             if(isequal(properties.general_params.modality,'EEG'))
             else
                 % Process: Create link to raw file
-                channel_type        = properties.channel_params.channel_type.type_list{3};
-                temp_sub_ID         = channel_type.template_name;
+                type        = properties.channel_params.channel_type.type_list{3};
+                temp_sub_ID         = type.template_name;
                 % MRI File
-                base_path           = strrep(channel_type.base_path, 'SubID', '');
-                base_path           = strrep(base_path, channel_type.template_name, '');
-                filepath            = strrep(channel_type.file_location, 'SubID', temp_sub_ID);
+                base_path           = strrep(type.base_path, 'SubID', '');
+                base_path           = strrep(base_path, type.template_name, '');
+                filepath            = strrep(type.file_location, 'SubID', temp_sub_ID);
                 raw_file            = fullfile(base_path, temp_sub_ID, filepath);
                 format = channel_params.data_format;
                 bst_process('CallProcess', 'process_import_data_raw', [], [], ...
@@ -146,7 +137,7 @@ end
 %%
 % View sources on MRI (3D orthogonal slices)
 
-if(isequal( channel_type, 'individual'))
+if(isequal( type, 'individual'))
      [~, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName);
 else    
     [~, iStudy]  = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');

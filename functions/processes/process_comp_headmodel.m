@@ -5,19 +5,16 @@ function errMessage = process_comp_headmodel(properties, subID, CSurfaces)
 %%
 
 % Get Protocol information
-modality                    = properties.general_params.modality;
-Method                      = properties.headmodel_params.Method.value;
-mq_control                  = properties.general_params.bst_config.after_MaQC.run;
+headmodel_params            = properties.headmodel_params.Method;
+Method                      = headmodel_params.name;
 ProtocolInfo                = bst_get('ProtocolInfo');
 % Get subject directory
 [sSubject, iSubject]        = bst_get('Subject', subID);
-if(isequal(properties.channel_params.channel_type.type,1))
+if(isequal(properties.channel_params.channel_type.id,'raw'))
     [~, iStudy]             = bst_get('StudyWithSubject', sSubject.FileName);
 else
     [~, iStudy]             = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
 end
-sStudy                      = bst_get('Study', iStudy);
-HeadModelPath               = bst_fullfile(ProtocolInfo.STUDIES,sSubject.Name,sStudy.Name); 
 for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
     if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))  
@@ -67,7 +64,7 @@ for i=1:length(CSurfaces)
                 sMethod.SEEGMethod = '';
                 sMethod.SaveFile = 1;
                 
-                fem_params                  = properties.headmodel_params.method_type{5};
+                fem_params                  = properties.headmodel_params.Method.methods;
                 fem_mesh_params             = fem_params.FemMesh;
                 mesh_opt                    = process_fem_mesh( 'GetDefaultOptions' );
                 mesh_opt.Method             = fem_mesh_params.Method.value;

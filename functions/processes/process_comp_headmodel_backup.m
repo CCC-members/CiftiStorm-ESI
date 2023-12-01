@@ -141,7 +141,7 @@ for i=1:length(CSurfaces)
             case 'duneuro'
                 options.HeadModelFile       = fullfile(HeadModelPath, strcat('headmodel_surf_',CSurface.name,'_duneuro.mat'));
                 options.Comment             = strcat('headmodel_surf_',CSurface.name,'_duneuro');
-                fem_params                  = properties.headmodel_params.method_type{3};
+                fem_params                  = properties.headmodel_params.Method.methods;
                 fem_mesh_params             = fem_params.FemMesh;
                 mesh_opt                    = process_fem_mesh( 'GetDefaultOptions' );
                 mesh_opt.Method             = fem_mesh_params.Method.value;

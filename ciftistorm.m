@@ -53,7 +53,7 @@ if(getGlobalGuimode())
     CiftiStorm
 else    
     %% Checking app properties
-    properties  = get_properties();
+    properties  = get_properties('run');
     if(isequal(properties,'canceled'))
         return;
     end

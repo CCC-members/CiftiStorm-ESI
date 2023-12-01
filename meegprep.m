@@ -20,7 +20,7 @@ clc;
 close all;
 clear all;
 disp('-->> Starting process');
-restoredefaultpath;
+% restoredefaultpath;
 
 %%
 %------------ Preparing properties --------------------

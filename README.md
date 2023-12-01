@@ -63,49 +63,51 @@ A pipeline to integrate “legacy” datasets into a Human Connectome Project (H
             - channel_layout_name  -->
 
 ## Compute Headmodel process [[File]](https://github.com/CCC-members/CiftiStorm/blob/master/cfs_properties/process_comp_headmodel.json)
-### Default parameter configuration
-    - radii          --> Default: [0.88,0.93,1]
-    - conductivity   --> Default: [0.33,0.0042,0.33]
-    - BemNames       --> Default: ["Scalp","Skull","Brain"]
-    - BemCond        --> Default: [1,0.0125,1]
-    - BemSelect      --> Default: [true,true,true]
+### Default parameter configuration    
     - Method      --> Recommended options EEG=<<openmeeg>> MEG=<<os_meg>>. Others options <<meg_sphere>> <<eeg_3sphereberg>> <<duneuro>> 
         - value   --> 
-    - method_type        -->
-        - openmeeg
-            - EEGMethod        -->
-            - isAdjoint        -->
-            - isAdaptative     -->
-            - isSplit          -->
-            - SplitLength      -->
-        - os_meg
-            - MEGMethod        -->
-        - duneuro
-            - FemCond          --> Default: [1.79,0.0080,0.43]
-            - FemSelect        --> Default: [1,1,1]
-            - Isotropic        --> Default: 1
-            - UseTensor        --> Default: 0
-            - FemMesh          -->
-                - Method       --> <<iso2mesh>> <<brain2mesh>> <<simnibs>> <<roast>> <<fieldtrip>>
-                    - value    --> Default:iso2mesh
-                - MeshType     --> iso2mesh=<<tetrahedral>>.  simnibs=<<tetrahedral>>. roast=<<hexahedral>>|<<tetrahedral>>.  fieldtrip=<<hexahedral>>|<<tetrahedral>>
-                    - value    --> Default: tetrahedral
-                - MaxVol       --> iso2mesh Max tetrahedral volume (10=coarse, 0.0001=fine)
-                    - value    --> Default: 0.1
-                - KeepRatio    --> iso2mesh Percentage of elements kept (1-100%)
-                    - value    --> Default: 100
-                - MergeMethod  --> iso2mesh <<mergemesh>>|<<mergesurf>> Function used to merge the meshes
-                    - value    --> Default: mergesurf
-                - VertexDensity--> SimNIBS <<0.1 - X>> setting the vertex density (nodes per mm2)  of the surface meshes
-                    - value    --> Default: 0.5
-                - NbVertices   --> SimNIBS Number of vertices for the cortex surface imported from CAT12
-                    - value    --> Default: 15000
-                - NodeShift    --> FieldTrip <<0 - 0.49>> Improves the geometrical properties of the mesh
-                    - value    --> Default: 0.3
-                - Downsample   --> FieldTrip Integer, Downsampling factor to apply to the volumes before meshing
-                    - value    --> Default: 3
-                - Zneck        --> Input T1/T2: Cut volumes below neck (MNI Z-coordinate)
-                    - value    --> Default: -115
+        - methods        -->
+            - meg_sphere
+                - MEGMethod        -->
+            - os_meg
+                - MEGMethod        -->
+            - eeg_3sphereberg
+                - EEGMethod        -->
+            - openmeeg
+                - BemNames         --> Default: ["Scalp","Skull","Brain"]
+                - BemCond          --> Default: [1,0.0125,1]
+                - BemSelect        --> Default: [true,true,true]
+                - EEGMethod        -->
+                - isAdjoint        -->
+                - isAdaptative     -->
+                - isSplit          -->
+                - SplitLength      -->
+            - duneuro
+                - FemCond          --> Default: [1.79,0.0080,0.43]
+                - FemSelect        --> Default: [1,1,1]
+                - Isotropic        --> Default: 1
+                - UseTensor        --> Default: 0
+                - FemMesh          -->
+                    - Method       --> <<iso2mesh>> <<brain2mesh>> <<simnibs>> <<roast>> <<fieldtrip>>
+                        - value    --> Default:iso2mesh
+                    - MeshType     --> iso2mesh=<<tetrahedral>>.  simnibs=<<tetrahedral>>. roast=<<hexahedral>>|<<tetrahedral>>.  fieldtrip=<<hexahedral>>|<<tetrahedral>>
+                        - value    --> Default: tetrahedral
+                    - MaxVol       --> iso2mesh Max tetrahedral volume (10=coarse, 0.0001=fine)
+                        - value    --> Default: 0.1
+                    - KeepRatio    --> iso2mesh Percentage of elements kept (1-100%)
+                        - value    --> Default: 100
+                    - MergeMethod  --> iso2mesh <<mergemesh>>|<<mergesurf>> Function used to merge the meshes
+                        - value    --> Default: mergesurf
+                    - VertexDensity--> SimNIBS <<0.1 - X>> setting the vertex density (nodes per mm2)  of the surface meshes
+                        - value    --> Default: 0.5
+                    - NbVertices   --> SimNIBS Number of vertices for the cortex surface imported from CAT12
+                        - value    --> Default: 15000
+                    - NodeShift    --> FieldTrip <<0 - 0.49>> Improves the geometrical properties of the mesh
+                        - value    --> Default: 0.3
+                    - Downsample   --> FieldTrip Integer, Downsampling factor to apply to the volumes before meshing
+                        - value    --> Default: 3
+                    - Zneck        --> Input T1/T2: Cut volumes below neck (MNI Z-coordinate)
+                        - value    --> Default: -115
 
 ## Run CiftiStorm
 * Open CiftiStorm pipeline on Matlab
