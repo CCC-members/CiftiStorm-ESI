@@ -33,14 +33,14 @@ for i=1:length(Surfaces)
             resol       = comment{3};
             fix         = comment{end};
             if(isequal(resol,'low'))
-                switch desc
+                switch lower(desc)
                     case 'pial'
                         if(isequal(fix,'fix') || isempty(CSurfaces(1).name))
                             CSurfaces(1).name       = 'Pial';
                             CSurfaces(1).comment    = 'Cortex_pial_low';
                             CSurfaces(1).iCSurface  = true;
                             CSurfaces(1).iSurface   = i;
-                            if(isequal(layer_desc,'pial') || isequal(layer_desc,'fs_LR') || isequal(layer_desc,'bigbrain')) 
+                            if(isequal(lower(layer_desc),'pial') || isequal(lower(layer_desc),'fs_LR') || isequal(lower(layer_desc),'bigbrain')) 
                                 CSurfaces(1).iCSurface  = true; 
                             else
                                 CSurfaces(1).iCSurface  = false; 
@@ -54,7 +54,7 @@ for i=1:length(Surfaces)
                             CSurfaces(4).name       = 'Midthickness';
                             CSurfaces(4).comment    = 'Cortex_midthickness_low';
                             CSurfaces(4).iSurface   = i;
-                            if(isequal(layer_desc,'midthickness')) CSurfaces(4).iCSurface  = true; else CSurfaces(4).iCSurface  = false; end
+                            if(isequal(lower(layer_desc),'midthickness')) CSurfaces(4).iCSurface  = true; else CSurfaces(4).iCSurface  = false; end
                             CSurfaces(4).type       = 'cortex';
                             CSurfaces(4).filename   = surface.FileName;
                         end
@@ -63,7 +63,7 @@ for i=1:length(Surfaces)
                             CSurfaces(7).name       = 'White';                            
                             CSurfaces(7).comment    = 'Cortex_white_low';
                             CSurfaces(7).iSurface   = i;
-                            if(isequal(layer_desc,'white')) CSurfaces(7).iCSurface  = true; else CSurfaces(7).iCSurface  = false; end
+                            if(isequal(lower(layer_desc),'white')) CSurfaces(7).iCSurface  = true; else CSurfaces(7).iCSurface  = false; end
                             CSurfaces(7).type       = 'cortex';                            
                             CSurfaces(7).filename   = surface.FileName;
                         end

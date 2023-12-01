@@ -15,6 +15,7 @@ if(~mq_control)
         'subjectname', subID, ...
         'resolution',  2);  % 8196
 end
+
 %%
 %% Quality control
 %%

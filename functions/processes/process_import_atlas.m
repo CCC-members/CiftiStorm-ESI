@@ -5,10 +5,9 @@ function atlas_error = process_import_atlas(properties, subID, CSurfaces)
 %%
 report_path     = get_report_path(properties, subID);
 atlas_error     = [];
-anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-if(isequal(anatomy_type.id,1)); type = 'default';end
-if(isequal(anatomy_type.id,2)); type = 'template';end
-if(isequal(anatomy_type.id,3)); type = 'individual';end
+anatomy_type    = properties.anatomy_params.anatomy_type;
+type            = anatomy_type.id;
+
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 ProtocolInfo    = bst_get('ProtocolInfo');
 [sSubject, ~]   = bst_get('Subject', subID);

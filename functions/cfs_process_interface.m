@@ -18,8 +18,7 @@ general_params                  = properties.general_params;
 anatomy_params                  = properties.anatomy_params;
 ProtocolName                    = general_params.bst_config.protocol_name;
 output_path                     = general_params.output_path;
-anatomy_type                    = anatomy_params.anatomy_type.type;
-anatomy_config                  = anatomy_params.anatomy_type.type_list{anatomy_type};
+anatomy_type                    = anatomy_params.anatomy_type;
 mq_control                      = general_params.bst_config.after_MaQC.run;
 
 switch mq_control
@@ -36,8 +35,8 @@ switch mq_control
         subjects                = bst_get('ProtocolSubjects');
         subjects                = subjects.Subject;
     case false
-        if(isequal(anatomy_type,1))
-            subjects.name       = anatomy_config.template_name;
+        if(isequal(lower(anatomy_type.id),'template'))
+            subjects.name       = anatomy_type.template_name;
             sTemplates          = bst_get('AnatomyDefaults');
             sTemplate           = sTemplates(find(strcmpi(subjects.name, {sTemplates.Name}),1));
             if(isempty(sTemplate))
@@ -46,18 +45,15 @@ switch mq_control
                 disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
                 disp('-->> Process stopped!!!');
                 return;
-            end
-        elseif(isequal(anatomy_type,2))
-            subjects.name       = anatomy_config.template_name;
-            subjects.folder     = anatomy_config.base_path;
+            end        
         else
-            base_path           = anatomy_config.base_path;
+            base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
             subjects(ismember({subjects.name},{'.','..'}))           = [];  %remove . and ..
             if(~isempty(reject_subjects))
                 subjects(ismember({subjects.name},reject_subjects))  = [];
             end
-            disp(strcat('-->> Data Source:  ', anatomy_config.base_path ));
+            disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
 end
 % for j=18:18

@@ -2,11 +2,11 @@ function CSurfaces = import_HCP_surfaces(properties, subID, surfaces)
 %%
 %% Getting params
 %%
-anatomy_type            = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
+anatomy_type            = properties.anatomy_params.anatomy_type;
 layer_desc              = properties.anatomy_params.common_params.layer_desc.desc;
 surfaces_resolution     = properties.anatomy_params.common_params.surfaces_resolution;
 
-if(~isequal(anatomy_type.id,1))
+if(~isequal(anatomy_type.id,'default'))
     %%
     %% Process: Import surfaces
     %%
@@ -41,7 +41,7 @@ if(~isequal(anatomy_type.id,1))
     switch type
         case 'single'
             %% ===== IMPORT SURFACES 32K =====
-            switch layer_desc
+            switch lower(layer_desc)
                 case 'pial'
                     L_surface_file  = pial_L;
                     R_surface_file  = pial_R;
@@ -58,11 +58,11 @@ if(~isequal(anatomy_type.id,1))
             BstTessLhFile           = BstTessLhFile{1};
             [~,BstTessRhFile,~]     = import_surfaces(iSubject, R_surface_file, 'GII-MNI', 0);
             BstTessRhFile           = BstTessRhFile{1};
-            [TessFile32K,iSurface]  = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_',layer_desc,'_high'));
+            [TessFile32K,iSurface]  = tess_concatenate({BstTessLhFile, BstTessRhFile}, strcat('Cortex_',lower(layer_desc),'_high'));
             file_delete(file_fullpath({BstTessLhFile, BstTessRhFile}), 1);
             [~, TessFile32K]        = in_tess_bst(TessFile32K,1);
             TessFile32K             = db_surface_type(TessFile32K,'Cortex');            
-            switch layer_desc
+            switch lower(layer_desc)
                 case 'pial'
                     CSurfaces(1).name               = 'Pial';
                     CSurfaces(1).comment            = 'Cortex_pial_high';

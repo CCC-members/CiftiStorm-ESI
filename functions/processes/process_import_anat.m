@@ -5,10 +5,8 @@ anat_error = struct;
 %%
 %% Getting params
 %%
-anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
-if(isequal(anatomy_type.id,1)); type = 'default';end
-if(isequal(anatomy_type.id,2)); type = 'template';end
-if(isequal(anatomy_type.id,3)); type = 'individual';end
+anatomy_type    = properties.anatomy_params.anatomy_type;
+type            = anatomy_type.id;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 
 % Get subject definition
@@ -22,7 +20,6 @@ if(mq_control)
     sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
 else    
     if isequal(type, 'default')
-        anatomy_type    = properties.anatomy_params.anatomy_type.type_list{1};
         sTemplates      = bst_get('AnatomyDefaults');
         Name            = anatomy_type.template_name;
         sTemplate       = sTemplates(find(strcmpi(Name, {sTemplates.Name}),1));
@@ -124,7 +121,7 @@ catch
 end
 close(hFigMri3);
 
-if(isequal(type,'template') || isequal(type,'individual'))
+if(isequal(type,'individual'))
     %%
     %% Quality control
     %%

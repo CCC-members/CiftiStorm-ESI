@@ -6,7 +6,7 @@ errMessage = [];
 %% Getting params
 %%
 ProtocolInfo    = bst_get('ProtocolInfo');
-anatomy_type    = properties.anatomy_params.anatomy_type.type_list{properties.anatomy_params.anatomy_type.type};
+anatomy_type    = properties.anatomy_params.anatomy_type;
 layer_desc      = properties.anatomy_params.common_params.layer_desc.desc;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 nvertices     = properties.anatomy_params.common_params.surfaces_resolution.nvertices;
