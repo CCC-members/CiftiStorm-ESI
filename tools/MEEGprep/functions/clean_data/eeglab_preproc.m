@@ -13,7 +13,7 @@ function EEGs  = eeglab_preproc(subID, file_name, data_type, eeglab_path, vararg
 %
 % Optional inputs:
 %
-%   verbosity       - Logical value for debbuging (key='debug',value=true OR false)
+%   verbosity       - Logical value for debugging (key='debug',value=true OR false)
 %   max_freq        - Integer maximum frequency to filtering the data (key='max_freq', value=from 1 to 92)
 %   save_path       - full path to save the cleaned EEG (key='save_path', value="fullpath")
 %   freq_list       - vector of frequencies point to show in plots (key='freq_list', value=[1 6 10 18])

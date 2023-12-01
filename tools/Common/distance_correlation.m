@@ -1,6 +1,6 @@
 
  %%
-            %% Voxel corelation vs Cortex and InnerSkull Minimal Distance
+            %% Voxel correlation vs Cortex and InnerSkull Minimal Distance
             %%
             iSkull = load(BSTInnerSkullFile);
             [vert_inds,distances,min_distances] = get_points_within_limit(head.Vertices,outer.Vertices,0.003);
@@ -10,7 +10,7 @@
             plot(min_distances,corelv,'.');
             xlabel('Cortex-InnerSkull distance');
             ylabel('Correlation');
-            title('Voxel corelation vs Cortex and InnerSkull Minimal Distance');
+            title('Voxel correlation vs Cortex and InnerSkull Minimal Distance');
             hold on;
             corela_low = corelv(vert_inds);
             low_distance = min_distances(vert_inds);
@@ -21,7 +21,7 @@
             close(hFig30);
             
             %%
-            %% Finding points of low corelation
+            %% Finding points of low correlation
             %%           
             low_cor_inds = find(corelv < .3);            
             save(fullfile(subject_report_path,'voxel_cor.fig'),'corelv','low_cor_inds');
