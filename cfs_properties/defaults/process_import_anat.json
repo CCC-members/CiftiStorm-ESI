@@ -1,18 +1,18 @@
 {
     "description":"",
     "anatomy_type":{
-        "description":"Select the type of anatomy to use. <<1>> Brainstorm default anatomy. <<2>> HCP anatomy as Template <<3>> HCP individual anatomy",
-        "type":2,
+        "description":"Select the type of anatomy to use. <<template>> Brainstorm default anatomy. <<individual>> HCP individual anatomy",
+        "type":"individual",
         "type_list":[
             {
-                "id":1,
+                "id":"default",
                 "name":"default_anatomy",
                 "description":"Select the group and name of the sensor layout. See app/bst_default_anatomy.json file and select all params from there",
-                "template_name":"ICBM152_2023",
+                "template_name":"ICBM152_2023b",
                 "default_atlas":"Desikan-Killiany"
             },
             {
-                "id":2,
+                "id":"individual",
                 "name":"hcp_anat_individual",
                 "description":"",
                 "base_path":"/mnt/Store/Data/CHBM/Test/Ciftify",
@@ -33,7 +33,7 @@
         },
         "layer_desc":{
             "description":"Layer descriptor. Options <<white>> OR <<midthickness>> OR <<pial>> OR <<bigbrain>> multilayer like bigbrain OR <<fs_LR>> like HCP FSAve (three layers).",
-            "desc":"midthickness"
+            "desc":"Midthickness"
         },
         "surfaces_resolution":{
             "description":"Numbers of vertices for downsample the surfaces: default <<8000>>",

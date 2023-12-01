@@ -25,13 +25,6 @@ if(isempty(general_params.bst_config.protocol_name))
     disp('-->> Process stopped!!!');
     return;
 end
-if(~isempty(general_params.colormap) && ~isequal(general_params.colormap,'none') && ~isfile(general_params.colormap))
-    status = false;
-    fprintf(2,'\n-->> Error: Do not exist the colormap file defined in selected dataset configuration file.\n');
-    disp(general_params.colormap);
-    disp('-->> Process stopped!!!');
-    return;
-end
 if(~isfolder(general_params.bst_config.bst_path)...
         || ~isfile(fullfile(general_params.bst_config.bst_path,'brainstorm.m')))
     fprintf(2,"\n ->> Error: The selected Brainstorm path is wrong. \n");
@@ -95,26 +88,15 @@ if(~general_params.bst_config.after_MaQC.run)
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking anatomy params');
     anat_params = properties.anatomy_params;
-    if(isempty(anat_params.anatomy_type.type)...
-            && ~isequal(anat_params.anatomy_type.type,1)...
-            && ~isequal(anat_params.anatomy_type.type,2)...
-            && ~isequal(anat_params.anatomy_type.type,3))
-        fprintf(2,"\n ->> Error: The anatomy type have to be <<1>>, <<2>>, or <<3>>. \n");
-        disp('1: For use default anatomy type.');
-        disp('2: For use HCP anatomy as template.');
-        disp('3: For use HCP individual anatomy.');
-        status = false;
-        disp('-->> Process stopped!!!');
-        return;
-    end
+    
     % Check default template configuration
-    if(isequal(anat_params.anatomy_type.type,1))
+    if(isequal(lower(anat_params.anatomy_type.id),'template'))
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking template configuration');
-        selected_anatomy = anat_params.anatomy_type.type_list{1};
+        selected_anatomy = anat_params.anatomy_type;
         template_name = selected_anatomy.template_name;
         defaults = jsondecode(fileread(fullfile('bst_defaults','bst_default_anatomy.json')));
-        if(~contains(template_name, {defaults.name}))
+        if(~contains(template_name, {defaults.Name}))
             fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
             disp(strcat("Name: ",template_name));
             disp(strcat("Please check the available anatomy templates in bst_template/bst_default_anatomy.json file"));
@@ -123,69 +105,12 @@ if(~general_params.bst_config.after_MaQC.run)
             return;
         end
     end
-    % Check HCP template configuration
-    if(isequal(anat_params.anatomy_type.type,2))
-        disp("--------------------------------------------------------------------------");
-        disp('-->> Checking template configuration');
-        selected_anatomy = anat_params.anatomy_type.type_list{2};
-        template_name = selected_anatomy.template_name;
-        if(isempty(template_name))
-            fprintf(2,'The HCP template name can not be empty.\n');
-            disp('Please type a HCP Template name.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-        base_path = selected_anatomy.base_path;
-        if(~isfolder(fullfile(base_path)))
-            fprintf(2,'The HCP template base_path is not a folder.\n');
-            disp('Please select a correct HCP Template folder in the process_import_anat.json configuration file.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-        if(~isfolder(fullfile(base_path,template_name)))
-            fprintf(2,strcat("There is no folder with <<",template_name,">> in the selected HCP Template folder.\n"));
-            disp('Please select a correct HCP Template folder or check the Template name filed.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-        anat_path = fullfile(base_path,template_name,strrep(selected_anatomy.HCP_anat_path,'SubID',template_name), 'T1w');
-        checked = check_HCP_anat_structure(anat_path, template_name, selected_anatomy);
-        if(~checked)
-            fprintf(2,strcat("The folder <<",template_name,">> is not an HCP Template folder.\n"));
-            disp('Please select a correct HCP Template folder or check the Template name filed.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-        % Check non brain surfaces configuration
-        disp("--------------------------------------------------------------------------");
-        disp('-->> Checking non brain surfaces configuration');
-        non_brain = anat_params.non_brain_surfaces;
-        base_path = non_brain.base_path;
-        if(~isfolder(fullfile(base_path)))
-            fprintf(2,'The Non-brain surfaces base_path is not a folder.\n');
-            disp('Please select a Non-brain surfaces folder in the process_import_anat.json configuration file.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-        checked = check_non_brain_surfaces(base_path,template_name);
-        if(~checked)
-            fprintf(2,'The Non-brain selected folder is not a FSL Bet command output.\n');
-            disp('Please correct the Non-brain surfaces folder in the process_import_anat.json configuration file.');
-            status = false;
-            disp('-->> Process stopped!!!');
-            return;
-        end
-    end
+   
     % Check HCP individual configuration
-    if(isequal(anat_params.anatomy_type.type,3))
+    if(isequal(lower(anat_params.anatomy_type.id),'individual'))
         disp("--------------------------------------------------------------------------");
         disp('-->> Checking HCP anatomy configuration');
-        selected_anatomy = anat_params.anatomy_type.type_list{3};        
+        selected_anatomy = anat_params.anatomy_type;        
         SubID = 'SubID';
         base_path = strrep(selected_anatomy.base_path,SubID,'');
         if(~isfolder(fullfile(base_path)))
@@ -310,8 +235,8 @@ if(~general_params.bst_config.after_MaQC.run)
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking surface resolution');
     surf_resol = anat_params.common_params.surfaces_resolution;
-    if(isempty(surf_resol.nvertices) || surf_resol.nvertices > 15000)
-        fprintf(2,'The surfaces resolution have be between 2000 and 15000 vertices.\n');
+    if(isempty(surf_resol.nvertices) || surf_resol.nvertices > 100000)
+        fprintf(2,'The surfaces resolution have be between 2000 and 100000 vertices.\n');
         disp('Please check the nvertices configuration in the process_import_anat.json file.');
         status = false;
         disp('-->> Process stopped!!!');
@@ -324,18 +249,9 @@ if(~general_params.bst_config.after_MaQC.run)
     disp("--------------------------------------------------------------------------");
     disp('-->> Checking channel params');
     channel_params = properties.channel_params;
-    if(isempty(channel_params.channel_type.type)...
-            && ~isequal(channel_params.channel_type.type,1)...
-            && ~isequal(channel_params.channel_type.type,2))
-        fprintf(2,"\n ->> Error: The channel type have to be <<1>> or <<2>>. \n");
-        disp('1: Use raw data channel.');
-        disp('2: Use BST default channel.');
-        status = false;
-        disp('-->> Process stopped!!!');
-        return;
-    end
-    if(isequal(channel_params.channel_type.type,1))
-        raw_data = channel_params.channel_type.type_list{1};
+   
+    if(isequal(lower(channel_params.channel_type.id),'raw'))
+        raw_data = channel_params.channel_type;
         base_path = strrep(raw_data.base_path,'SubID','');
         if(~isfolder(fullfile(base_path)))
             fprintf(2,'The raw_data base path is not a folder.\n');
@@ -357,17 +273,10 @@ if(~general_params.bst_config.after_MaQC.run)
         for i=1:length(structures)
             structure = structures(i);
             raw_file = fullfile(base_path,structure.name,strrep(raw_data.file_location,'SubID',structure.name));
-            if(raw_data.isfile)
-                if(~isfile(raw_file))
-                    count_raw = count_raw + 1;
-                    reject_subjects{length(reject_subjects)+1} = structure.name;
-                end
-            else
-                if(~isfolder(raw_file))
-                    count_raw = count_raw + 1;
-                    reject_subjects{length(reject_subjects)+1} = structure.name;
-                end
-            end
+            if(~isfile(raw_file))
+                count_raw = count_raw + 1;
+                reject_subjects{length(reject_subjects)+1} = structure.name;
+            end            
         end
         if(~isequal(count_raw,0))
             if(isequal(count_raw,length(structures)))
@@ -386,8 +295,8 @@ if(~general_params.bst_config.after_MaQC.run)
             end
         end
     end
-    if(isequal(channel_params.channel_type.type,2))
-        channel = channel_params.channel_type.type_list{2};
+    if(isequal(lower(channel_params.channel_type.id),'default'))
+        channel = channel_params.channel_type;
         group_name = channel.group_layout_name;
         layout_name = channel.channel_layout_name;
         defaults = jsondecode(fileread(fullfile('bst_defaults','bst_eeg_layouts.json')));
@@ -415,7 +324,7 @@ if(~general_params.bst_config.after_MaQC.run)
     %% Checking subject number in each folder
     %%
     anat_params = properties.anatomy_params;
-    if(isequal(anat_params.anatomy_type.type,3))
+    if(isequal(lower(anat_params.anatomy_type.id),'individual'))
         hcp_base_path = selected_anatomy.base_path;
         hcp_subjects = dir(hcp_base_path);
         hcp_subjects(ismember( {hcp_subjects.name}, {'.', '..'})) = [];  %remove . and ..
