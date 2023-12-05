@@ -1,4 +1,4 @@
-function [errMessage, CSurfaces] = process_gen_bem_surfaces(properties, subID, CSurfaces)
+function [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces)
 
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
@@ -67,5 +67,20 @@ catch
 end
 % Closing figure
 close(fig_out,hFigSurf11);
+
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(3).Name    = "BEM_surfaces";
+    CiftiStorm.Participants(end).Process(3).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(3).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(3).Name    = "BEM_surfaces";
+    CiftiStorm.Participants(end).Process(3).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(3).Error   = errMessage;     
+end
+
 end
 

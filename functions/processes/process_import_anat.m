@@ -1,6 +1,6 @@
-function [anat_error, CSurfaces, properties] = process_import_anat(properties, subID)
+function [CiftiStorm, CSurfaces, properties] = process_import_anat(CiftiStorm, properties, subID)
 % === ANATOMY ===
-anat_error = struct;
+errMessage = [];
 
 %%
 %% Getting params
@@ -25,8 +25,7 @@ else
         sTemplate       = sTemplates(find(strcmpi(Name, {sTemplates.Name}),1));
         surfaces        = {};
         db_set_template( iSubject, sTemplate, false );
-        set_Surfaces_Comment(properties,iSubject);
-        
+        set_Surfaces_Comment(properties,iSubject);        
         CSurfaces = get_Surfaces_from_template(subID);
         
     else
@@ -59,7 +58,6 @@ else
         
         atlas_file          = fullfile(anat_path,anatomy_type.Atlas_file_name);
         surfaces            = {head_file, outerskull_file, innerskull_file, pial_L, pial_R, midthickness_L, midthickness_R, white_L, white_R, atlas_file};
-        properties.anatomy_params.surfaces = surfaces;
         
         %%
         %% Process: Applaying MRI transformation 
@@ -183,6 +181,20 @@ if(isequal(type,'individual'))
     end
     % Closing figures
     close(hFigMri9);
+end
+
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(2).Name    = "Import_anat";
+    CiftiStorm.Participants(end).Process(2).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(2).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(2).Name    = "Import_anat";
+    CiftiStorm.Participants(end).Process(2).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(2).Error   = errMessage;     
 end
 
 end

@@ -1,9 +1,9 @@
-function channel_error = process_import_chann(properties, subID, CSurfaces)
+function CiftiStorm = process_import_chann(CiftiStorm, properties, subID, CSurfaces)
 
 %%
 %% Getting params
 %%
-channel_error   = [];
+errMessage      = [];
 channel_params  = properties.channel_params.channel_type;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
 sSubject        = bst_get('Subject', subID);
@@ -211,5 +211,18 @@ else
     end
     % Closing figure
     close(fig_out,hFigScalp20);
+end
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(7).Name    = "Import_chann";
+    CiftiStorm.Participants(end).Process(7).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(7).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(7).Name    = "Import_chann";
+    CiftiStorm.Participants(end).Process(7).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(7).Error   = errMessage;     
 end
 end

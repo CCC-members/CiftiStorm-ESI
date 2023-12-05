@@ -1,10 +1,10 @@
-function atlas_error = process_import_atlas(properties, subID, CSurfaces)
+function CiftiStorm = process_import_atlas(CiftiStorm, properties, subID, CSurfaces)
 
 %%
 %% Getting report path and params
 %%
 report_path     = get_report_path(properties, subID);
-atlas_error     = [];
+errMessage      = [];
 anatomy_type    = properties.anatomy_params.anatomy_type;
 type            = anatomy_type.id;
 
@@ -36,7 +36,12 @@ for i=1:length(CSurfaces)
                         bst_memory('UnloadSurface', BSTCortexFile);
                     end
                 otherwise
-                    Atlas_seg_location  = properties.anatomy_params.surfaces{end};
+                    folderlist          = dir(fullfile(anatomy_type.base_path,subID, '**'));  %get list of files and folders in any subfolder
+                    folderlist          = folderlist([folderlist.isdir]);  %remove folders from list
+                    C                   = {folderlist.name};
+                    idx                 = find(~cellfun('isempty',regexp(C,'T1w')),1);
+                    anat_path           = fullfile(folderlist(idx).folder, 'T1w');
+                    Atlas_seg_location  = fullfile(anat_path,anatomy_type.Atlas_file_name);
                     % Add this sentence in import_label function in line 80
                     %  case '.gz',     FileFormat = 'MRI-MASK-MNI';
                     % modify import_label function in line 341
@@ -70,6 +75,19 @@ for i=1:length(CSurfaces)
         % Closing figure
         close(fig_out,hFigSurf);
     end
+end
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(5).Name    = "Import_atlas";
+    CiftiStorm.Participants(end).Process(5).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(5).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(5).Name    = "Import_atlas";
+    CiftiStorm.Participants(end).Process(5).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(5).Error   = errMessage;     
 end
 end
 

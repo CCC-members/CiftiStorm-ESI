@@ -1,9 +1,9 @@
-function errMessage = process_comp_headmodel(properties, subID, CSurfaces)
+function CiftiStorm = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces)
 
 %%
 %% Getting Headmodel options
 %%
-
+errMessage = [];
 % Get Protocol information
 headmodel_params            = properties.headmodel_params.Method;
 Method                      = headmodel_params.name;
@@ -17,7 +17,7 @@ else
 end
 for i=1:length(CSurfaces)
     CSurface = CSurfaces(i);
-    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))  
+    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
         switch Method
             case 'meg_sphere'
                 sMethod.Comment = 'Single sphere';
@@ -35,16 +35,16 @@ for i=1:length(CSurfaces)
                 sMethod.EEGMethod = 'eeg_3sphereberg';
                 sMethod.ECOGMethod = '';
                 sMethod.SEEGMethod = '';
-                sMethod.SaveFile = 1;          
+                sMethod.SaveFile = 1;
 
-            case 'os_meg'    
+            case 'os_meg'
                 sMethod.Comment = 'Overlapping spheres';
                 sMethod.HeadModelType = 'surface';
                 sMethod.MEGMethod = 'os_meg';
                 sMethod.EEGMethod = '';
                 sMethod.ECOGMethod = '';
                 sMethod.SEEGMethod = '';
-                sMethod.SaveFile = 1; 
+                sMethod.SaveFile = 1;
 
             case 'openmeeg'
                 sMethod.Comment = 'OpenMEEG BEM';
@@ -63,7 +63,7 @@ for i=1:length(CSurfaces)
                 sMethod.ECOGMethod = '';
                 sMethod.SEEGMethod = '';
                 sMethod.SaveFile = 1;
-                
+
                 fem_params                  = properties.headmodel_params.Method.methods;
                 fem_mesh_params             = fem_params.FemMesh;
                 mesh_opt                    = process_fem_mesh( 'GetDefaultOptions' );
@@ -79,7 +79,7 @@ for i=1:length(CSurfaces)
                 mesh_opt.Downsample         = fem_mesh_params.Downsample.value;
                 mesh_opt.Zneck              = fem_mesh_params.Zneck.value;
                 [isOk, errMsg]              = process_fem_mesh('Compute', iSubject, [], false, mesh_opt);
-                
+
                 [sSubject]                  = bst_get('Subject', subID);
                 FemFile                     = sSubject.Surface(sSubject.iFEM).FileName;
                 BSTFemFile                  = bst_fullfile(ProtocolInfo.SUBJECTS, FemFile);
@@ -127,20 +127,32 @@ for i=1:length(CSurfaces)
                 options.BstMegLfFile        = 'meg_lf.dat';
                 options.UseIntegrationPoint = 1;
                 options.EnableCacheMemory   = 0;
-                options.MegPerBlockOfSensor = 0;             
-            
-
+                options.MegPerBlockOfSensor = 0;
         end
-        
+
         %%
         %% Computing Headmodel
         %%
-        [OutputFiles, errMessage] = script_panel_headmodel('ComputeHeadModel', iStudy,sMethod);       
-        
+        [OPTIONS, errMessage] = script_panel_headmodel('ComputeHeadModel', iStudy,sMethod);
+
         %%
         %% Quality control of Head model
-        %%        
-        qc_headmodel(OutputFiles, properties, subID);        
+        %%
+        qc_headmodel(OPTIONS, properties, subID);
+
     end
+end
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(8).Name    = "Headmodel";
+    CiftiStorm.Participants(end).Process(8).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(8).Error   = errMessage;
+else
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(8).Name    = "Headmodel";
+    CiftiStorm.Participants(end).Process(8).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(8).Error   = errMessage;
 end
 end
