@@ -17,9 +17,16 @@ subjects_processed              = [];
 general_params                  = properties.general_params;
 anatomy_params                  = properties.anatomy_params;
 ProtocolName                    = general_params.bst_config.protocol_name;
-output_path                     = general_params.output_path;
 anatomy_type                    = anatomy_params.anatomy_type;
 mq_control                      = general_params.bst_config.after_MaQC.run;
+CiftiStorm                      = struct();
+TempUUID                        = java.util.UUID.randomUUID;
+CiftiStorm.UUID                 = char(TempUUID.toString);
+CiftiStorm.Name                 = general_params.dataset.Name;
+CiftiStorm.Description          = general_params.dataset.Description;
+CiftiStorm.Location             = fullfile(general_params.output_path,'CiftiStorm');
+CiftiStorm.Properties           = properties;
+CiftiStorm.Participants         = [];
 
 switch mq_control
     case true
@@ -56,13 +63,13 @@ switch mq_control
             disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
 end
-% for j=18:18
-for j=1:length(subjects)
+for sub=1:length(subjects)
     if(mq_control)
-        subID        = subjects(j).Name;
+        subID        = subjects(sub).Name;
     else
-        subID        = subjects(j).name;
-    end     
+        subID        = subjects(sub).name;
+    end 
+    CiftiStorm.Participants(end+1).SubID     = subID;
     disp('==========================================================================');
     disp(strcat('-->> Processing subject: ', subID));
     disp('==========================================================================');    
@@ -70,9 +77,8 @@ for j=1:length(subjects)
     %%
     %%  Process: Create BST Protocol and add subject
     %%
-    if(~mq_control)
-        errMessage          = process_create_subject(properties, subID);
-    end
+    CiftiStorm          = process_create_subject(CiftiStorm, properties, subID);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
     %% Start a New Report
@@ -86,10 +92,8 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
-    [anat_error, CSurfaces, properties] = process_import_anat(properties,subID);
-    if(~isempty(fieldnames(anat_error)))
-        continue;
-    end
+    [CiftiStorm, CSurfaces] = process_import_anat(CiftiStorm, properties,subID);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
        
     %%
     %% Process: Generate BEM surfaces
@@ -97,7 +101,8 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Generate BEM surfaces");
     disp("--------------------------------------------------------------------------");    
-    [errMessage, CSurfaces] = process_gen_bem_surfaces(properties, subID, CSurfaces);   
+    [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces);   
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
     %% Process: Transform surfaces
@@ -105,23 +110,26 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Transform surfaces");
     disp("--------------------------------------------------------------------------");    
-    [errMessage, CSurfaces, sub_to_FSAve] = process_compute_surfaces(properties, subID, CSurfaces);
-    
+    [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
+
     %%
     %% Process: Import Atlas
     %%
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Atlas");
     disp("--------------------------------------------------------------------------");
-    atlas_error     = process_import_atlas(properties, subID, CSurfaces);
-    
+    CiftiStorm     = process_import_atlas(CiftiStorm, properties, subID, CSurfaces);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
+
     %%
     %% Process: Generate SPM canonical surfaces
     %%
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Generate SPM canonical surfaces");
     disp("--------------------------------------------------------------------------");
-    errMessage      = process_canonical_surfaces(properties, subID);
+    CiftiStorm      = process_canonical_surfaces(CiftiStorm, properties, subID);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
     %% Process Import Channel
@@ -129,10 +137,8 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Import Channel");
     disp("--------------------------------------------------------------------------");
-    channel_error   = process_import_chann(properties, subID, CSurfaces);
-    if(~isempty(channel_error))
-        continue;
-    end
+    CiftiStorm   = process_import_chann(CiftiStorm, properties, subID, CSurfaces);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
         
     %%
     %% Process: Compute Headmodel
@@ -140,42 +146,18 @@ for j=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("-->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
-    errMessage      = process_comp_headmodel(properties, subID, CSurfaces);
+    CiftiStorm      = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
-    %% Export subject from protocol
+    %% Process: Export subject
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Export Subject from BST Protocol");
+    disp("-->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    if(~isfolder(fullfile(output_path,'BST','Subjects',ProtocolName)))
-        mkdir(fullfile(output_path,'BST','Subjects',ProtocolName));
-    end
-    iProtocol       = bst_get('iProtocol');
-    [~, iSubject]   = bst_get('Subject', subID);
-    export_protocol(iProtocol, iSubject, fullfile(output_path,'BST','Subjects',ProtocolName,strcat(subID,'.zip')));
+    CiftiStorm      = process_export_subject(CiftiStorm,properties,subID);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
-    %%
-    %% Save and display report
-    %%
-    disp("--------------------------------------------------------------------------");
-    disp("-->> Export BST Report");
-    disp("--------------------------------------------------------------------------");
-    report_path     = get_report_path(properties, subID);
-    ReportFile      = bst_report('Save', []);
-    bst_report('Export',  ReportFile, fullfile(report_path,[subID,'.html']));
-    disp(strcat("-->> Process finished for subject: ",subID));
-        
-    %%
-    %% Export Subject to BC-VARETA
-    %%
-    disp("--------------------------------------------------------------------------");
-    disp("-->> Export to BC-VARETA Structure");
-    disp("--------------------------------------------------------------------------");
-    if(isempty(errMessage))
-        disp(strcat('BC-V -->> Export subject:' , subID, ' to BC-VARETA structure'));
-        export_error = export_subject_BCV_structure(properties, subID, CSurfaces, sub_to_FSAve);        
-    end
     disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    
 end

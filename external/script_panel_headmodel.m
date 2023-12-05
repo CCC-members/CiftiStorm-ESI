@@ -52,7 +52,7 @@ end
 %         |- GridLoc      : [Nx3] Grid of source points, to override what is defined in bst_headmodeler
 %         |- GridOrient   : [Nx3] Normal vectors for the points in GridLoc (constrained orientation at those source points)
 %         |- GridOptions  : Necessary information to compute the grid if the above fields are not available (see bst_sourcegrid.m)
-function [OutputFiles, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DEFNU>
+function [OPTIONS, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DEFNU>
     global GlobalData;
     OutputFiles = {};
     errMessage = [];
@@ -246,6 +246,9 @@ function [OutputFiles, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DE
         if ~isempty(sSubject.iInnerSkull)
             OPTIONS.InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull(1)).FileName;
         end
+        if ~isempty(sSubject.iOuterSkull)
+            OPTIONS.OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull(1)).FileName;
+        end
         if ~isempty(sSubject.iScalp)
             OPTIONS.HeadFile = sSubject.Surface(sSubject.iScalp(1)).FileName;
         end
@@ -397,10 +400,10 @@ function [OutputFiles, errMessage] = ComputeHeadModel(iStudies, sMethod) %#ok<DE
             bst_set('Study', iStudy, sStudy);
             panel_protocols('UpdateNode', 'Study', iStudy);
             % Return saved file
-            OutputFiles{end+1} = OPTIONS.HeadModelFile;
+            OutputFiles{end+1} = OPTIONS;
         % Else: return the matrix
         else
-            OutputFiles{end+1} = OPTIONS.HeadModelMat;
+            OutputFiles{end+1} = OPTIONS;
         end
     end
     % Save database

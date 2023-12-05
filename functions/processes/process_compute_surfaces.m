@@ -1,4 +1,4 @@
-function [errMessage, CSurfaces, sub_to_FSAve] = process_compute_surfaces(properties, subID, CSurfaces)
+function [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces)
 
 errMessage = [];
 
@@ -216,7 +216,19 @@ if(isequal(lower(layer_desc),'fs_lr') || isequal(lower(layer_desc),'bigbrain'))
     % Closing figure
     close(fig_out,hFigSurfaces);
 end
-
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(4).Name    = "Compute_surfaces";
+    CiftiStorm.Participants(end).Process(4).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(4).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(4).Name    = "Compute_surfaces";
+    CiftiStorm.Participants(end).Process(4).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(4).Error   = errMessage;     
+end
 
 end
 

@@ -1,4 +1,4 @@
-function errMessage = process_canonical_surfaces(properties,subID)
+function CiftiStorm = process_canonical_surfaces(CiftiStorm, properties,subID)
 
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
@@ -31,4 +31,18 @@ catch
 end
 % Close figures
 close(hFigMri15);
+
+if(isempty(errMessage))
+    CiftiStorm.Participants(end).Status             = "Processing";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(6).Name    = "SPM_surfaces";
+    CiftiStorm.Participants(end).Process(6).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(6).Error   = errMessage;
+else    
+    CiftiStorm.Participants(end).Status             = "Rejected";
+    CiftiStorm.Participants(end).FileInfo           = "";
+    CiftiStorm.Participants(end).Process(6).Name    = "SPM_surfaces";
+    CiftiStorm.Participants(end).Process(6).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(6).Error   = errMessage;     
+end
 end
