@@ -2,7 +2,7 @@ function [status, reject_subjects] = check_properties(properties)
 %CHECK_PROPERTIES Summary of this function goes here
 %   Detailed explanation goes here
 status = true;
-reject_subjects = struct;
+reject_subjects = [];
 reject_anat = {};
 reject_nonbrain = {};
 
@@ -352,7 +352,7 @@ if(~general_params.bst_config.after_MaQC.run)
         disp("--------------------------------------------------------------------------");
         warning('-->> Some subject do not have the correct structure');
         warning('-->> The following subjects will be rejected for analysis');
-        disp(reject_subjects);
+        disp({reject_subjects.SubID});
         warning('Please check the folder structure.');
     end
 else
