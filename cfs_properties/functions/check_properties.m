@@ -2,7 +2,9 @@ function [status, reject_subjects] = check_properties(properties)
 %CHECK_PROPERTIES Summary of this function goes here
 %   Detailed explanation goes here
 status = true;
-reject_subjects = {};
+reject_subjects = struct;
+reject_anat = {};
+reject_nonbrain = {};
 
 disp('==========================================================================');
 disp("-->> Checking properties");
@@ -63,8 +65,8 @@ if(isfolder(general_params.output_path))
         status = false;
         return;
     end
-    if(~isfolder(fullfile(general_params.output_path,'BC-V_Structure',protocol_name)))
-        mkdir(fullfile(general_params.output_path,'BC-V_Structure',protocol_name));        
+    if(~isfolder(fullfile(general_params.output_path,'CiftiStorm',protocol_name)))
+        mkdir(fullfile(general_params.output_path,'CiftiStorm',protocol_name));        
     end
     if(~isfolder(fullfile(general_params.output_path,'BST','Subjects',protocol_name)))
         mkdir(fullfile(general_params.output_path,'BST','Subjects',protocol_name));        
@@ -128,7 +130,7 @@ if(~general_params.bst_config.after_MaQC.run)
             checked = check_HCP_anat_structure(structure, selected_anatomy);
             if(~checked)
                 count_HCP_structure = count_HCP_structure + 1;
-                reject_subjects{length(reject_subjects)+1} = structure.name;
+                reject_anat{end+1} = structure.name;
             end
         end
         if(~isequal(count_HCP_structure,0))
@@ -166,7 +168,7 @@ if(~general_params.bst_config.after_MaQC.run)
             checked = check_non_brain_surfaces(structure);
             if(~checked)
                 count_non_brain = count_non_brain + 1;
-                reject_subjects{length(reject_subjects)+1} = structure.name;
+                reject_nonbrain{end+1} = structure.name;
             end
         end
         if(~isequal(count_non_brain,0))
@@ -275,7 +277,7 @@ if(~general_params.bst_config.after_MaQC.run)
             raw_file = fullfile(base_path,structure.name,strrep(raw_data.file_location,'SubID',structure.name));
             if(~isfile(raw_file))
                 count_raw = count_raw + 1;
-                reject_subjects{length(reject_subjects)+1} = structure.name;
+                reject_chann{end+1} = structure.name;
             end            
         end
         if(~isequal(count_raw,0))
@@ -319,29 +321,32 @@ if(~general_params.bst_config.after_MaQC.run)
                 return;
             end
         end
+    end    
+    
+    %% Joinning rejected subjects
+    for i=1:length(reject_anat)
+        reject_subjects(end+1).SubID                = reject_anat{i};
+        reject_subjects(end).Status                 = "Rejected";
+        reject_subjects(end).FileInfo               = "";
+        reject_subjects(end).Process(1).Name        = "Check_anat";
+        reject_subjects(end).Process(1).Status      = "Rejected";
+        reject_subjects(end).Process(1).Error       = 'The subject do not contain a correct anatomy folder';
     end
-    %%
-    %% Checking subject number in each folder
-    %%
-    anat_params = properties.anatomy_params;
-    if(isequal(lower(anat_params.anatomy_type.id),'individual'))
-        hcp_base_path = selected_anatomy.base_path;
-        hcp_subjects = dir(hcp_base_path);
-        hcp_subjects(ismember( {hcp_subjects.name}, {'.', '..'})) = [];  %remove . and ..
-        hcp_names = {hcp_subjects.name};
-        
-        non_brain_path = non_brain.base_path;
-        nb_subjects = dir(non_brain_path);
-        nb_subjects(ismember( {nb_subjects.name}, {'.', '..'})) = [];  %remove . and ..
-        nb_names = {nb_subjects.name};
-        
-        index1 = ismember(hcp_names,nb_names);
-        index2 = ismember(nb_names,hcp_names);
-        hcp_names(index1) = [];
-        nb_names(index2) = [];
-        reject_subjects = [reject_subjects , hcp_names, nb_names];
+    for i=1:length(reject_nonbrain)
+        idx = find(ismember({reject_subjects.Name},reject_nonbrain{i}),1);
+        if(isempty(idx))
+            reject_subjects(end+1).SubID            = reject_nonbrain{i};
+            reject_subjects(end).Status             = "Rejected";
+            reject_subjects(end).FileInfo           = "";
+            reject_subjects(end).Process(1).Name    = "Check_nonbrain";
+            reject_subjects(end).Process(1).Status  = "Rejected";
+            reject_subjects(end).Process(1).Error   = 'The subject do not contain a correct non-brain structure';
+        else            
+            reject_subjects(idx).Process(2).Name    = reject_nonbrain{i};
+            reject_subjects(idx).Process(2).Status  = "Rejected";
+            reject_subjects(idx).Process(2).Error   = 'The subject do not contain a correct non-brain structure';
+        end
     end
-    reject_subjects = unique(reject_subjects);
     if(~isempty(reject_subjects))
         disp("-->> Subjects to reject");
         disp("--------------------------------------------------------------------------");

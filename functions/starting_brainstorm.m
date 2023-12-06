@@ -2,6 +2,8 @@ function status = starting_brainstorm(properties)
 %%
 %% Starting BrainStorm
 %%
+bst_path        = properties.general_params.bst_config.bst_path;
+addpath(genpath(bst_path));
 status = true;
 brainstorm reset
 brainstorm nogui local
@@ -16,7 +18,8 @@ end
 %%
 %% Loading BST modules
 %%
-disp("-->> Installing external plugins.");
+disp('==========================================================================');
+disp("CFS -->> Installing external plugins.");
 disp('==========================================================================');
 if(~isempty(bst_plugin('GetInstalled', 'spm12')))
     [isOk, errMsg, PlugDesc] = bst_plugin('Unload', 'spm12');

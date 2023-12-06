@@ -22,10 +22,6 @@ if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) 
     return;
 end
 
-%% Uploding Subject file into BrainStorm Protocol
-disp('BST-P ->> Uploading Subject file into BrainStorm Protocol.');
-disp('==========================================================================');
-
 %%
 %% Genering leadfield file
 %%
@@ -50,7 +46,7 @@ Cdata           = load(BSTChannelsFile);
 %%
 %% Saving files in BC-VARETA Structure
 %%
-base_path = fullfile(output_path,'BC-V_Structure',ProtocolInfo.Comment);
+base_path = fullfile(output_path,'CiftiStorm',ProtocolInfo.Comment);
 save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex);
 
 end

@@ -1,4 +1,4 @@
-function [process_error] = cfs_process_interface(properties, reject_subjects)
+function datasetFile = cfs_process_interface(properties, reject_subjects)
 % HeadModel Process Interface
 %   
 %
@@ -54,6 +54,7 @@ switch mq_control
                 return;
             end        
         else
+            
             base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
             subjects(ismember({subjects.name},{'.','..'}))           = [];  %remove . and ..
@@ -68,10 +69,9 @@ for sub=1:length(subjects)
         subID        = subjects(sub).Name;
     else
         subID        = subjects(sub).name;
-    end 
-    CiftiStorm.Participants(end+1).SubID     = subID;
+    end     
     disp('==========================================================================');
-    disp(strcat('-->> Processing subject: ', subID));
+    disp(strcat('CFS -->> Processing subject: ', subID));
     disp('==========================================================================');    
     
     %%
@@ -90,7 +90,7 @@ for sub=1:length(subjects)
     %% Process Import Anatomy
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Import Anatomy");
+    disp("CFS -->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
     [CiftiStorm, CSurfaces] = process_import_anat(CiftiStorm, properties,subID);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -99,7 +99,7 @@ for sub=1:length(subjects)
     %% Process: Generate BEM surfaces
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Generate BEM surfaces");
+    disp("CFS -->> Process Generate BEM surfaces");
     disp("--------------------------------------------------------------------------");    
     [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces);   
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -108,7 +108,7 @@ for sub=1:length(subjects)
     %% Process: Transform surfaces
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Transform surfaces");
+    disp("CFS -->> Transform surfaces");
     disp("--------------------------------------------------------------------------");    
     [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -117,7 +117,7 @@ for sub=1:length(subjects)
     %% Process: Import Atlas
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Import Atlas");
+    disp("CFS -->> Process Import Atlas");
     disp("--------------------------------------------------------------------------");
     CiftiStorm     = process_import_atlas(CiftiStorm, properties, subID, CSurfaces);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -126,7 +126,7 @@ for sub=1:length(subjects)
     %% Process: Generate SPM canonical surfaces
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Generate SPM canonical surfaces");
+    disp("CFS -->> Process Generate SPM canonical surfaces");
     disp("--------------------------------------------------------------------------");
     CiftiStorm      = process_canonical_surfaces(CiftiStorm, properties, subID);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -135,7 +135,7 @@ for sub=1:length(subjects)
     %% Process Import Channel
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Import Channel");
+    disp("CFS -->> Process Import Channel");
     disp("--------------------------------------------------------------------------");
     CiftiStorm   = process_import_chann(CiftiStorm, properties, subID, CSurfaces);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -144,7 +144,7 @@ for sub=1:length(subjects)
     %% Process: Compute Headmodel
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Compute HeadModel");
+    disp("CFS -->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
     CiftiStorm      = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
@@ -153,16 +153,24 @@ for sub=1:length(subjects)
     %% Process: Export subject
     %%
     disp("--------------------------------------------------------------------------");
-    disp("-->> Process Export subject");
+    disp("CFS -->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_export_subject(CiftiStorm,properties,subID);
+    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
-    disp(strcat('-->> Subject:' , subID, '. Processing finished.'));
+    disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    
 end
-disp(strcat('-->> Process finished....'));
+disp(strcat('CFS -->> Saving Dataset.'));
+disp('==============================================================================');
+datasetFile = fullfile(CiftiStorm.Location,'CiftiStorm.json');
+saveJSON(CiftiStorm,datasetFile);
+h = matlab.desktop.editor.openDocument(datasetFile);
+h.smartIndentContents
+h.save
+h.close
+
+disp(strcat('CFS -->> Dataset processed....'));
 disp('==============================================================================');
 disp('==============================================================================');
-save report.mat subjects_processed subjects_process_error;
 end
