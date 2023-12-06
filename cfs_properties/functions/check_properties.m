@@ -338,9 +338,9 @@ if(~general_params.bst_config.after_MaQC.run)
             reject_subjects(end+1).SubID            = reject_nonbrain{i};
             reject_subjects(end).Status             = "Rejected";
             reject_subjects(end).FileInfo           = "";
-            reject_subjects(end).Process(2).Name    = "Check_nonbrain";
-            reject_subjects(end).Process(2).Status  = "Rejected";
-            reject_subjects(end).Process(2).Error   = 'The subject do not contain a correct non-brain structure';
+            reject_subjects(end).Process(1).Name    = "Check_nonbrain";
+            reject_subjects(end).Process(1).Status  = "Rejected";
+            reject_subjects(end).Process(1).Error   = 'The subject do not contain a correct non-brain structure';
         else            
             reject_subjects(idx).Process(2).Name    = reject_nonbrain{i};
             reject_subjects(idx).Process(2).Status  = "Rejected";
