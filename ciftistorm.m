@@ -20,7 +20,7 @@ clc;
 close all;
 restoredefaultpath;
 clearvars -except varargin;
-disp('-->> Starting process');
+disp('CFS -->> Starting process');
 disp('==========================================================================');
 
 %%
@@ -57,24 +57,29 @@ else
     if(isequal(properties,'canceled'))
         return;
     end
-    [status, reject_subjects]     = check_properties(properties);
+    [status, reject_subjects]   = check_properties(properties);
     if(~status)
-        fprintf(2,strcat('\nBC-V-->> Error: The current configuration files are wrong \n'));
+        fprintf(2,strcat('\n-->> Error: The current configuration files are wrong \n'));
         disp('Please check the configuration files.');
         return;
     end    
     
     %% BrainStorm configuration
-    disp('-->> Preparing BrainStorm properties.');
-    disp('==========================================================================');
-    bst_path        = properties.general_params.bst_config.bst_path;
-    addpath(genpath(bst_path));
+    disp('CFS -->> Preparing BrainStorm properties.');
+    disp('==========================================================================');    
     status          = starting_brainstorm(properties);
     
     %% Calling dataset function to analysis
     if(status)
-        process_error = cfs_process_interface(properties,reject_subjects);
-        % save("process_output.mat","process_error","reject_subjects");
+        datasetFile = cfs_process_interface(properties,reject_subjects);
+        dataset = jsondecode(fileread(datasetFile));
+        datasets  = cfs_get('datasets');
+        if(isempty(datasets))            
+            datasets = dataset;
+        else
+            datasets(end+1) = dataset;
+        end
+        cfs_set('datasets',datasets);
     end
     
     %% Stopping BrainStorm

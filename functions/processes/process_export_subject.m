@@ -1,15 +1,13 @@
 function CiftiStorm = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve)
 
 errMessage      = [];
-ProtocolName    = general_params.bst_config.protocol_name;
-output_path     = general_params.output_path;
+ProtocolName    = properties.general_params.bst_config.protocol_name;
+output_path     = properties.general_params.output_path;
 
 %%
 %% Export subject from protocol
 %%
-disp("--------------------------------------------------------------------------");
 disp("-->> Export Subject from BST Protocol");
-disp("--------------------------------------------------------------------------");
 if(~isfolder(fullfile(output_path,'BST','Subjects',ProtocolName)))
     mkdir(fullfile(output_path,'BST','Subjects',ProtocolName));
 end
@@ -21,22 +19,15 @@ export_protocol(iProtocol, iSubject, subject_file);
 %%
 %% Save and display report
 %%
-disp("--------------------------------------------------------------------------");
 disp("-->> Export BST Report");
-disp("--------------------------------------------------------------------------");
 report_path     = get_report_path(properties, subID);
 ReportFile      = bst_report('Save', []);
 bst_report('Export',  ReportFile, fullfile(report_path,[subID,'.html']));
-disp(strcat("-->> Process finished for subject: ",subID));
 
 %%
 %% Export Subject
 %%
-disp("--------------------------------------------------------------------------");
-disp("-->> Export to CiftiStorm");
-disp("--------------------------------------------------------------------------");
-
-disp(strcat('cfs -->> Export subject:' , subID));
+disp(strcat('-->> Export subject:' , subID));
 errMessage = export_subject_structure(properties, subID, CSurfaces, sub_to_FSAve);
 
 if(isempty(errMessage))

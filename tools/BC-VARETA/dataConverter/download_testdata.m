@@ -7,7 +7,7 @@ end
 if(~isfolder(fullfile(pwd,'data')) && isequal(testDataPath,fullfile(pwd,'data')))
     mkdir(fullfile(pwd,'data'));
 end
-dafaultWorkspace = fullfile(char(java.lang.System.getProperty('user.home')),"BC-VARETA_Structure");
+dafaultWorkspace = fullfile(char(java.lang.System.getProperty('user.home')),"CiftiStorm");
 if(~isfolder(BC_V_Workspace) && ~isequal(BC_V_Workspace,dafaultWorkspace))
     disp("The Workspace path is not a folder");
     return;
