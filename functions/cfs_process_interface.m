@@ -54,12 +54,12 @@ switch mq_control
                 return;
             end        
         else
-            
+
             base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
             subjects(ismember({subjects.name},{'.','..'}))           = [];  %remove . and ..
             if(~isempty(reject_subjects))
-                subjects(ismember({subjects.name},reject_subjects))  = [];
+                subjects(ismember({subjects.name},{reject_subjects.SubID}))  = [];
             end
             disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
