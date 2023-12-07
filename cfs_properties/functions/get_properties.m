@@ -38,7 +38,7 @@ for i=1:length(process_files)
         return;
     end
 end
-if(~isempty(varargin{1}))
+if(~isempty(varargin))
     if(~isequal(lower(properties.anatomy_params.anatomy_type.type),'template') ...
             && ~isequal(lower(properties.anatomy_params.anatomy_type.type),'individual'))
         fprintf(2,"\n ->> Error: The anatomy type have to be <<template>>, or <<individual>>. \n");
