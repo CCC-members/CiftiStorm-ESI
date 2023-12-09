@@ -1,6 +1,6 @@
 function ciftistorm(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%         Brainstorm Protocol for Automatic Head Model
+%%         Automatic Head Model Processing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Scripted leadfield pipeline for Freesurfer anatomy files
 % Brainstorm (25-Sep-2019) or higher

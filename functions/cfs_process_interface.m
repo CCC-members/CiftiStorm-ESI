@@ -11,9 +11,6 @@ function datasetFile = cfs_process_interface(properties, reject_subjects)
 %%
 %% Preparing protocol specifications
 %%
-process_error                   = [];
-subjects_process_error          = [];
-subjects_processed              = [];
 general_params                  = properties.general_params;
 anatomy_params                  = properties.anatomy_params;
 ProtocolName                    = general_params.bst_config.protocol_name;
