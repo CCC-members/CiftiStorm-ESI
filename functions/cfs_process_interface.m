@@ -21,7 +21,8 @@ TempUUID                        = java.util.UUID.randomUUID;
 CiftiStorm.UUID                 = char(TempUUID.toString);
 CiftiStorm.Name                 = general_params.dataset.Name;
 CiftiStorm.Description          = general_params.dataset.Description;
-CiftiStorm.Location             = fullfile(general_params.output_path,'CiftiStorm');
+CiftiStorm.ProtocolName         = ProtocolName;
+CiftiStorm.Location             = fullfile(general_params.output_path,'CiftiStorm',ProtocolName);
 CiftiStorm.Properties           = properties;
 CiftiStorm.Participants         = [];
 
@@ -61,7 +62,7 @@ switch mq_control
             disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
 end
-for sub=1:length(subjects)
+for sub=1:5
     if(mq_control)
         subID        = subjects(sub).Name;
     else
