@@ -11,15 +11,17 @@ end
 if(~isfolder(output_path))
     mkdir(output_path);
 end
-if(~isfolder(fullfile(output_path,'Reports')))
-    mkdir(fullfile(output_path,'Reports'));
+if(~isfolder(fullfile(output_path,'CiftiStorm',ProtocolName)))
+    mkdir(fullfile(output_path,'CiftiStorm',ProtocolName));
 end
-if(~isfolder(fullfile(output_path,'Reports',ProtocolName)))
-    mkdir(fullfile(output_path,'Reports',ProtocolName));
+if(~isfolder(fullfile(output_path,'CiftiStorm',ProtocolName,subID)))
+    mkdir(fullfile(output_path,'CiftiStorm',ProtocolName,subID));
 end
-if(isfolder(fullfile(output_path,'Reports',ProtocolName,subID)))
-    rmdir(fullfile(output_path,'Reports',ProtocolName,subID),'s');
+if(~isfolder(fullfile(output_path,'BST',ProtocolName,'Subjects')))
+    mkdir(fullfile(output_path,'BST',ProtocolName,'Subjects'));
 end
-mkdir(fullfile(output_path,'Reports',ProtocolName,subID));
+if(~isfolder(fullfile(output_path,'BST',ProtocolName,'Reports')))
+    mkdir(fullfile(output_path,'BST',ProtocolName,'Reports'));
+end
 end
 

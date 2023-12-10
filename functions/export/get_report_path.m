@@ -8,9 +8,9 @@ output_path         = properties.general_params.output_path;
 if(output_path == "local")
     output_path     = pwd;
 end
-report_path = fullfile(output_path,'BST','Reports',ProtocolName,subID);
+report_path = fullfile(output_path,'BST',ProtocolName,'Reports',subID);
 if(~isfolder(report_path))
-        mkdir(report_path);
+    mkdir(report_path);
 end
 end
 
