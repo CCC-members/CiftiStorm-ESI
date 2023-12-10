@@ -1,4 +1,4 @@
-function [CiftiStorm, errMessage] = process_create_subject(CiftiStorm, properties, subID)
+function CiftiStorm = process_create_subject(CiftiStorm, properties, subID)
 
 errMessage      = [];
 general_params  = properties.general_params;

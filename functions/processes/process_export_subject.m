@@ -8,12 +8,12 @@ output_path     = properties.general_params.output_path;
 %% Export subject from protocol
 %%
 disp("-->> Export Subject from BST Protocol");
-if(~isfolder(fullfile(output_path,'BST','Subjects',ProtocolName)))
-    mkdir(fullfile(output_path,'BST','Subjects',ProtocolName));
+if(~isfolder(fullfile(output_path,'BST',ProtocolName,'Subjects')))
+    mkdir(fullfile(output_path,'BST',ProtocolName,'Subjects'));
 end
 iProtocol       = bst_get('iProtocol');
 [~, iSubject]   = bst_get('Subject', subID);
-subject_file    = fullfile(output_path,'BST','Subjects',ProtocolName,strcat(subID,'.zip'));
+subject_file    = fullfile(output_path,'BST',ProtocolName,'Subjects',strcat(subID,'.zip'));
 export_protocol(iProtocol, iSubject, subject_file);
 
 %%
