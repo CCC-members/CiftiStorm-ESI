@@ -64,16 +64,7 @@ if(isfolder(general_params.output_path))
         disp(' Please check the folder permission or select another output folder.');
         status = false;
         return;
-    end
-    if(~isfolder(fullfile(general_params.output_path,'CiftiStorm',protocol_name)))
-        mkdir(fullfile(general_params.output_path,'CiftiStorm',protocol_name));        
-    end
-    if(~isfolder(fullfile(general_params.output_path,'BST','Subjects',protocol_name)))
-        mkdir(fullfile(general_params.output_path,'BST','Subjects',protocol_name));        
-    end
-    if(~isfolder(fullfile(general_params.output_path,'BST','Reports',protocol_name)))
-        mkdir(fullfile(general_params.output_path,'BST','Reports',protocol_name));        
-    end
+    end   
 else
     fprintf(2,strcat("The Output path do not exist."));
     disp(general_params.output_path)

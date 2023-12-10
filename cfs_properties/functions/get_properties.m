@@ -1,7 +1,7 @@
 function [properties,status] = get_properties(varargin)
 
 try
-    properties = jsondecode(fileread(strcat('app/properties.json')));
+    app_properties = jsondecode(fileread(strcat('app/properties.json')));
 catch ME
     fprintf(2,strcat('\nBC-V-->> Error: Loading the property files: \n'));
     fprintf(2,strcat(ME.message,'\n'));
@@ -10,7 +10,7 @@ catch ME
     properties = 'canceled';
     return;
 end
-defaults_param_files = properties.default_param_files;
+defaults_param_files = app_properties.default_param_files;
 for i=1:length(defaults_param_files)
     try
         module_params                                               = jsondecode(fileread(defaults_param_files(i).file_path));
@@ -24,7 +24,7 @@ for i=1:length(defaults_param_files)
         return;
     end
 end
-process_files = properties.process_files;
+process_files = app_properties.process_files;
 for i=1:length(process_files)
     try
         module_params                            = jsondecode(fileread(process_files(i).file_path));
@@ -96,6 +96,7 @@ if(~isempty(varargin))
         case 'duneuro'
             properties.headmodel_params.Method = properties.headmodel_params.Method.methods{5};
     end
+    properties = rmfield(properties,'defaults');
 end
 
 end
