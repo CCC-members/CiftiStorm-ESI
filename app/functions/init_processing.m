@@ -30,5 +30,9 @@ if(app_properties.check_app_update)
         return;
     end
 end
+
+%% ----------- Create CiftiStrom Database ---------------------
+cfs_create_db()
+
 end
 
