@@ -1,31 +1,31 @@
 function cfs_create_db()
-app.ciftistormDir = fullfile(getUserDir(),'.CiftiStorm');
-if(~isfolder(app.ciftistormDir))
-    mkdir(app.ciftistormDir);
+ciftistormDir = fullfile(getUserDir(),'.CiftiStorm');
+if(~isfolder(ciftistormDir))
+    mkdir(ciftistormDir);
 end
 %% Defaults
-if(~isfolder(fullfile(app.ciftistormDir,'defaults')))
-    mkdir(fullfile(app.ciftistormDir,'defaults'));
+if(~isfolder(fullfile(ciftistormDir,'defaults')))
+    mkdir(fullfile(ciftistormDir,'defaults'));
 end
-if(~isfolder(fullfile(app.ciftistormDir,'defaults','anatomy')))
-    mkdir(fullfile(app.ciftistormDir,'defaults','anatomy'));
+if(~isfolder(fullfile(ciftistormDir,'defaults','anatomy')))
+    mkdir(fullfile(ciftistormDir,'defaults','anatomy'));
 end
-if(~isfolder(fullfile(app.ciftistormDir,'defaults','eeg')))
-    mkdir(fullfile(app.ciftistormDir,'defaults','eeg'));
-    mkdir(fullfile(app.ciftistormDir,'defaults','eeg','Colin27'));
-    mkdir(fullfile(app.ciftistormDir,'defaults','eeg','ICBM152'));
-    mkdir(fullfile(app.ciftistormDir,'defaults','eeg','NotAligned'));
+if(~isfolder(fullfile(ciftistormDir,'defaults','eeg')))
+    mkdir(fullfile(ciftistormDir,'defaults','eeg'));
+    mkdir(fullfile(ciftistormDir,'defaults','eeg','Colin27'));
+    mkdir(fullfile(ciftistormDir,'defaults','eeg','ICBM152'));
+    mkdir(fullfile(ciftistormDir,'defaults','eeg','NotAligned'));
 end
-if(~isfolder(fullfile(app.ciftistormDir,'defaults','meg')))
-    mkdir(fullfile(app.ciftistormDir,'defaults','meg'));
+if(~isfolder(fullfile(ciftistormDir,'defaults','meg')))
+    mkdir(fullfile(ciftistormDir,'defaults','meg'));
 end
 
 %% Datasets
-if(~isfolder(fullfile(app.ciftistormDir,'Datasets')))
-    mkdir(fullfile(app.ciftistormDir,'Datasets'));
+if(~isfolder(fullfile(ciftistormDir,'Datasets')))
+    mkdir(fullfile(ciftistormDir,'Datasets'));
 end
-if(~isfile(fullfile(app.ciftistormDir,'Datasets','Datasets.json')))
-    saveJSON([],fullfile(app.ciftistormDir,'Datasets','Datasets.json'));
+if(~isfile(fullfile(ciftistormDir,'Datasets','Datasets.json')))
+    saveJSON([],fullfile(ciftistormDir,'Datasets','Datasets.json'));
 end
 end
 
