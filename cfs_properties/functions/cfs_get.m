@@ -16,13 +16,15 @@ switch contextName
         output2 =  fullfile(cfs_db_dir,'defaults','eeg');
         output3 =  fullfile(cfs_db_dir,'defaults','meg');
     case 'datasets'
-        cfs_db_dir = fullfile(getUserDir(),'.CiftiStorm');
+        cfs_db_dir = fullfile(getUserDir(),'.CiftiStorm');        
         datasets_file =  fullfile(cfs_db_dir,'Datasets','Datasets.json');
-        output1 = jsondecode(fileread(datasets_file));
-
+        if(isfile(datasets_file))
+            output1 = jsondecode(fileread(datasets_file));
+        else
+            output1 = [];
+        end
     case 'bst_default_eeg'
         output1 = 'https://github.com/brainstorm-tools/brainstorm3/raw/master/defaults/eeg';
-
     case 'openmeeg'
         
     case 'duneruro'
