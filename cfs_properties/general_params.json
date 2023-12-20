@@ -2,14 +2,14 @@
     "description":"",
     "modality":"EEG",
     "dataset":{
-        "Name":"CHBM",
+        "Name":"CHBMP",
         "Description":[
-            "CHBM Dataset"
+            "CHBMP Dataset"
         ]
     },
     "bst_config":{
         "description":"",
-        "protocol_name":"HeadModel_CHBMP_NDC",
+        "protocol_name":"HeadModel_CHBMP",
         "reset_protocol":false,
         "bst_path":"/mnt/Develop/Tools/brainstorm3",
         "db_path":"local",
@@ -17,6 +17,6 @@
             "run":false
         }
     },
-    "output_path":"/mnt/Store/Data/CHBM/Test_Visual",
+    "output_path":"/mnt/Store/Data/CHBM/CHBMP",
     "tmp_path":"local"
 }
