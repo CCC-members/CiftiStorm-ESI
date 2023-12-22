@@ -31,7 +31,7 @@ addpath('bst_defaults');
 addpath(genpath('cfs_properties'));
 addpath('external');
 addpath(genpath('functions'));
-addpath('guide');
+addpath(genpath('guide'));
 addpath(genpath('templates'));
 addpath(genpath('tools/Common'));
 
