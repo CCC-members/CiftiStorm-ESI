@@ -1,42 +1,42 @@
-function ComputeTransformation(val)
+function [Rnew, Tnew, Rescale] = ComputeChannelsTransf(action, val)
 % Get channels to modify
-iSelChan = GetSelectedChannels();
+
 % Initialize the transformations that are done
 Rnew = [];
 Tnew = [];
 Rescale = [];
 % Selected button
-switch (gChanAlign.selectedButton)
-    case gChanAlign.hButtonTransX
+switch (action)
+    case 'TransX'
         Tnew = [val / 5, 0, 0];
-    case gChanAlign.hButtonTransY
+    case 'TransY'
         Tnew = [0, val / 5, 0];
-    case gChanAlign.hButtonTransZ
+    case 'TransZ'
         Tnew = [0, 0, val / 5];
-    case gChanAlign.hButtonRotX
+    case 'RotX'
         a = val;
         Rnew = [1,       0,      0;
             0,  cos(a), sin(a);
             0, -sin(a), cos(a)];
-    case gChanAlign.hButtonRotY
+    case 'RotY'
         a = val;
         Rnew = [cos(a), 0, -sin(a);
             0, 1,       0;
             sin(a), 0,  cos(a)];
-    case gChanAlign.hButtonRotZ
+    case 'RotZ'
         a = val;
         Rnew = [cos(a), -sin(a), 0;
             sin(a),  cos(a), 0;
             0,  0,      1];
-    case gChanAlign.hButtonResize
+    case 'Resize'
         Rescale = repmat(1 + val, [1 3]);
-    case gChanAlign.hButtonResizeX
+    case 'ResizeX'
         Rescale = [1 + val, 0, 0];
-    case gChanAlign.hButtonResizeY
+    case 'ResizeY'
         Rescale = [0, 1 + val, 0];
-    case gChanAlign.hButtonResizeZ
+    case 'ResizeZ'
         Rescale = [0, 0, 1 + val];
-    case gChanAlign.hButtonMoveChan
+    case 'MoveChan'
         % Works only iif one channel is selected
         if (length(iSelChan) ~= 1)
             return
@@ -50,10 +50,6 @@ switch (gChanAlign.selectedButton)
     otherwise
         return;
 end
-% Apply transformation
-ApplyTransformation(iSelChan, Rnew, Tnew, Rescale);
-% Update display
-UpdatePoints(iSelChan);
 end
 
 
