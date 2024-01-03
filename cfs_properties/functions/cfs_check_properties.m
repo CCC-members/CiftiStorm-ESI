@@ -127,6 +127,10 @@ switch contextName
         end
 
     %% Headmodel
+
+    
+    otherwise
+        checked = false;
 end
 
 end
