@@ -168,6 +168,10 @@ h.smartIndentContents
 h.save
 h.close
 
+%% Delete Protocol after analysis
+db_delete_protocol(isUserConfirm, isRemoveFiles)
+gui_brainstorm('DeleteProtocol', ProtocolName);
+
 disp(strcat('CFS -->> Dataset processed....'));
 disp('==============================================================================');
 disp('==============================================================================');

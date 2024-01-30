@@ -65,8 +65,8 @@ end
 %%
 %% Checking templates
 %%
-if(isequal(lower(properties.anatomy_params.anatomy_type.id),'template'))
-    anatomy_type    = properties.anatomy_params.anatomy_type;
+if(isequal(lower(properties.anatomy_params.anatomy_type.type),'template'))
+    anatomy_type    = properties.anatomy_params.anatomy_type.type_list{1};
     sTemplates      = bst_get('AnatomyDefaults');
     Name            = anatomy_type.template_name;
     sTemplate       = sTemplates(find(strcmpi(Name, {sTemplates.Name}),1));
@@ -79,10 +79,10 @@ if(isequal(lower(properties.anatomy_params.anatomy_type.id),'template'))
         return;
     end
 end
-if(isequal(lower(properties.channel_params.channel_type.id),'default'))
+if(isequal(lower(properties.channel_params.channel_type.type),'default'))
     % ===== GET DEFAULT =====
     % Get registered Brainstorm EEG defaults
-    channel_params          = properties.channel_params.channel_type;
+    channel_params          = properties.channel_params.channel_type.type_list{2};
     bstDefaults             = bst_get('EegDefaults');
     nameGroup               = channel_params.group_layout_name;
     nameLayout              = channel_params.channel_layout_name;
