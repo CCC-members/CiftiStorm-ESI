@@ -62,7 +62,7 @@ switch mq_control
             disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
 end
-for sub=1:lenght(subjects)
+for sub=1:length(subjects)
     if(mq_control)
         subID        = subjects(sub).Name;
     else
@@ -144,9 +144,14 @@ for sub=1:lenght(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
+    [CiftiStorm, OPTIONS]     = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
+    %%
+    %% Process: Automatic QC
+    %%
+    CiftiStorm  = process_AQC(CiftiStorm, OPTIONS, properties, subID);
+
     %%
     %% Process: Export subject
     %%
