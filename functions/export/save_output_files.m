@@ -41,7 +41,12 @@ save(fullfile(output_subject_dir,'leadfield','leadfield.mat'),'-struct','HeadMod
 disp ("-->> Saving surf file");
 save(fullfile(output_subject_dir,'sourcemodel','cortex.mat'),'-struct','Scortex');
 disp ("-->> Saving subject file");
-save(fullfile(output_subject_dir,'subject.mat'),'-struct','subject_info');
+subjectFile = fullfile(output_subject_dir,strcat(subID,'.json'));
+saveJSON(subject_info,subjectFile);
+h = matlab.desktop.editor.openDocument(subjectFile);
+h.smartIndentContents
+h.save
+h.close
 disp("--------------------------------------------------------------------------");
 end
 
