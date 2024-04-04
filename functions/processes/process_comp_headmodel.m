@@ -1,4 +1,4 @@
-function CiftiStorm = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces)
+function [CiftiStorm, OPTIONS] = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces)
 
 %%
 %% Getting Headmodel options
@@ -133,12 +133,7 @@ for i=1:length(CSurfaces)
         %%
         %% Computing Headmodel
         %%
-        [OPTIONS, errMessage] = script_panel_headmodel('ComputeHeadModel', iStudy,sMethod);
-
-        %%
-        %% Quality control of Head model
-        %%
-        qc_headmodel(OPTIONS, properties, subID);
+        [OPTIONS, errMessage] = script_panel_headmodel('ComputeHeadModel', iStudy,sMethod);        
 
     end
 end

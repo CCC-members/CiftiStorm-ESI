@@ -11,17 +11,17 @@ end
 if(~isfolder(output_path))
     mkdir(output_path);
 end
-if(~isfolder(fullfile(output_path,'CiftiStorm',ProtocolName)))
-    mkdir(fullfile(output_path,'CiftiStorm',ProtocolName));
+if(~isfolder(fullfile(output_path,'ciftistorm')))
+    mkdir(fullfile(output_path,'ciftistorm'));
 end
-if(~isfolder(fullfile(output_path,'CiftiStorm',ProtocolName,subID)))
-    mkdir(fullfile(output_path,'CiftiStorm',ProtocolName,subID));
+if(~isfolder(fullfile(output_path,'ciftistorm',subID)))
+    mkdir(fullfile(output_path,'ciftistorm',subID));
 end
-if(~isfolder(fullfile(output_path,'BST',ProtocolName,'Subjects')))
-    mkdir(fullfile(output_path,'BST',ProtocolName,'Subjects'));
+if(~isfolder(fullfile(output_path,'brainstorm')))
+    mkdir(fullfile(output_path,'brainstorm'));
 end
-if(~isfolder(fullfile(output_path,'BST',ProtocolName,'Reports')))
-    mkdir(fullfile(output_path,'BST',ProtocolName,'Reports'));
+if(~isfolder(fullfile(output_path,'brainstorm','Reports')))
+    mkdir(fullfile(output_path,'brainstorm','Reports'));
 end
 end
 

@@ -9,9 +9,9 @@ end
 subject_path = fullfile(base_path,subID);
 meeg_path = fullfile(subject_path,'meeg');
 leadfield_path = fullfile(subject_path,'leadfield');
-scalp_path = fullfile(subject_path,'scalp');
+headmodel_path = fullfile(subject_path,'headmodel');
 channel_path = fullfile(subject_path,'channel');
-surf_path = fullfile(subject_path,'surf');
+sourcemodel_path = fullfile(subject_path,'sourcemodel');
 if(isequal(action,'all'))    
     if(~isfolder(subject_path))
         mkdir(subject_path);
@@ -22,14 +22,14 @@ if(isequal(action,'all'))
     if(~isfolder(leadfield_path))
         mkdir(leadfield_path);
     end
-    if(~isfolder(scalp_path))
-        mkdir(scalp_path);
+    if(~isfolder(headmodel_path))
+        mkdir(headmodel_path);
     end
     if(~isfolder(channel_path))
         mkdir(channel_path);
     end
-    if(~isfolder(surf_path))
-        mkdir(surf_path);
+    if(~isfolder(sourcemodel_path))
+        mkdir(sourcemodel_path);
     end    
 end
 if(isequal(action,'meeg'))    
@@ -47,14 +47,14 @@ if(isequal(action,'anat'))
     if(~isfolder(leadfield_path))
         mkdir(leadfield_path);
     end
-    if(~isfolder(scalp_path))
-        mkdir(scalp_path);
+    if(~isfolder(headmodel_path))
+        mkdir(headmodel_path);
     end
     if(~isfolder(channel_path))
         mkdir(channel_path);
     end
-    if(~isfolder(surf_path))
-        mkdir(surf_path);
+    if(~isfolder(sourcemodel_path))
+        mkdir(sourcemodel_path);
     end  
 end
 
