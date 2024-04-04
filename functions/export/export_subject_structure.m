@@ -46,7 +46,7 @@ Cdata           = load(BSTChannelsFile);
 %%
 %% Saving files in BC-VARETA Structure
 %%
-base_path = fullfile(output_path,'CiftiStorm',ProtocolInfo.Comment);
+base_path = fullfile(output_path,'ciftistorm',ProtocolInfo.Comment);
 save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex);
 
 end
