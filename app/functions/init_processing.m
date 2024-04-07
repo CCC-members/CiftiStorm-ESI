@@ -16,7 +16,7 @@ disp(strcat("-->> Version date:",app_properties.generals.version_date));
 disp("==========================================================================");
 
 %% ------------ Checking MatLab compatibility ----------------
-if(app_properties.check_matlab_version)
+if(app_properties.generals.check_matlab_version)
     disp('-->> Checking installed matlab version');
     if(~check_matlab_version())
         return;
@@ -24,7 +24,7 @@ if(app_properties.check_matlab_version)
 end
 
 %% ------------  Checking updates --------------------------
-if(app_properties.check_app_update)
+if(app_properties.generals.check_app_update)
     disp('-->> Checking last project version');
     if(isequal(check_version,'updated'))
         return;
