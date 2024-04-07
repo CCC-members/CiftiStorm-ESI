@@ -103,6 +103,10 @@ if(isequal(modality,'EEG'))
     % Closing figure
     close(hFig27);
     
+    % (𝜗𝑐ℎ𝑎𝑛𝑛𝑒𝑙, 𝜗𝑠𝑜𝑢𝑟𝑐𝑒) = (0.80, 0.79) Artifactual greater than −0.9755
+    distE=sum((Khom-Kn).^2,2).^0.5; 
+    distV=sum((Khom-Kn).^2,1).^0.5;
+
     %%
     %% Computing channel-wise correlation
     %%
