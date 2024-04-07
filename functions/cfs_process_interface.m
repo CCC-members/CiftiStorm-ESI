@@ -103,7 +103,7 @@ for sub=1:length(subjects)
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
-    %% Process: Transform surfaces
+    %% Process: Compute surfaces
     %%
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Transform surfaces");

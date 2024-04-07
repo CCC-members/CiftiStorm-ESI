@@ -33,7 +33,7 @@ addpath('external');
 addpath(genpath('functions'));
 addpath(genpath('guide'));
 addpath(genpath('templates'));
-addpath(genpath('tools/Common'));
+addpath(genpath('tools'));
 
 %%
 %% Init processing
@@ -44,9 +44,13 @@ init_processing("app/properties.json");
 %% Starting mode
 %%
 setGlobalGuimode(true);
+setGlobalVerbose(false);
 for i=1:length(varargin)
-    if(isequal(varargin{i},'nogui'))
+    if(isequal(lower(varargin{i}),'nogui'))
         setGlobalGuimode(false);
+    end
+    if(isequal(lower(varargin{i}),'verbose'))
+        setGlobalVerbose(true);
     end
 end
 if(getGlobalGuimode())
