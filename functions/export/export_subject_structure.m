@@ -1,4 +1,4 @@
-function export_error = export_subject_structure(properties,subID,CSurfaces,sub_to_FSAve)
+function export_error = export_subject_structure(properties,subID,CSurfaces,sub_to_FSAve, AQCI)
 
 %%
 %% Get Protocol information
@@ -47,7 +47,7 @@ Cdata           = load(BSTChannelsFile);
 %% Saving files in BC-VARETA Structure
 %%
 base_path = fullfile(output_path,'ciftistorm');
-save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex);
+save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI);
 
 end
 

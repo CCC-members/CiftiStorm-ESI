@@ -1,4 +1,4 @@
-function status = starting_brainstorm(properties, varargin)
+function status = starting_brainstorm(properties)
 %%
 %% Starting BrainStorm
 %%
@@ -59,54 +59,6 @@ if(isempty(bst_plugin('GetInstalled', 'duneuro')))
         disp('-->> Process stopped!!!');
         status = false;
         return;
-    end
-end
-
-%%
-%% Checking templates
-%%
-if(isempty(varargin))
-    if(isequal(lower(properties.anatomy_params.anatomy_type.type),'template'))
-        anatomy_type    = properties.anatomy_params.anatomy_type.type_list{1};
-        sTemplates      = bst_get('AnatomyDefaults');
-        Name            = anatomy_type.template_name;
-        sTemplate       = sTemplates(find(strcmpi(Name, {sTemplates.Name}),1));
-        if(isempty(sTemplate))
-            fprintf(2,'\n ->> Error: The selected anatomy template is wrong.');
-            disp(Name);
-            disp("Please, type a correct anatomy template in configuration file.");
-            disp("The process will be stoped!!!");
-            status = false;
-            return;
-        end
-    end
-    if(isequal(lower(properties.channel_params.channel_type.type),'default'))
-        % ===== GET DEFAULT =====
-        % Get registered Brainstorm EEG defaults
-        channel_params          = properties.channel_params.channel_type.type_list{2};
-        bstDefaults             = bst_get('EegDefaults');
-        nameGroup               = channel_params.group_layout_name;
-        nameLayout              = channel_params.channel_layout_name;
-        copyfile("templates/channel_GSN_129.mat",fullfile(bst_get('BrainstormHomeDir'),"defaults","eeg",nameGroup));
-        copyfile("templates/channel_GSN_HydroCel_129_E001.mat",fullfile(bst_get('BrainstormHomeDir'),"defaults","eeg",nameGroup));
-        iGroup                  = find(strcmpi(nameGroup, {bstDefaults.name}));
-        if(isempty(iGroup))
-            fprintf(2,'\n ->> Error: The selected channel template group name is wrong.');
-            disp(nameGroup);
-            disp("Please, type a correct  Channel group name");
-            disp("The process will be stoped!!!");
-            status = false;
-            return;
-        end
-        iLayout                 = strcmpi(nameLayout, {bstDefaults(iGroup).contents.name});
-        if(isempty(find(iLayout,1)))
-            fprintf(2,'\n ->> Error: The selected channel layout is wrong.');
-            disp(nameLayout);
-            disp("Please, type a correct Channel layout name");
-            disp("The process will be stoped!!!");
-            status = false;
-            return;
-        end
     end
 end
 

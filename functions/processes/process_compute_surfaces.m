@@ -49,7 +49,7 @@ for i=1:length(CSurfaces)
                 SurfaceHigh         = load(SurfaceDir);
                 CortexMat.Faces     = Fcommon;
                 CortexMat.Vertices  = SurfaceHigh.Vertices(Vcommon,:);
-            end   
+            end
         end
         bst_save(file_fullpath(NewFile), CortexMat, 'v7', 1);
         bst_memory('UnloadSurface', file_fullpath(NewFile));
@@ -93,7 +93,7 @@ if(~mq_control)
             CortexFile                  = Surfaces(CSurface.iSurface).FileName;
             % [NewTessFile, iSurface]     = tess_force_envelope(CortexFile, InnerSkullFile);
             [NewTessFile, iSurface]     = script_tess_force_envelope(CortexFile, InnerSkullFile, report_path);
-            if(~isempty(iSurface)) 
+            if(~isempty(iSurface))
                 CSurfaces(i).comment    = strcat(CSurface.comment,'_fix');
                 CSurfaces(i).iSurface   = iSurface;
                 CSurfaces(i).filename   = NewTessFile;
@@ -117,10 +117,10 @@ end
 %                 CSurfaces(i).filename   = NewTessFile;
 %             end
 %         end
-%     end 
+%     end
 %     if(isequal(lower(layer_desc),'bigbrain'))
 %         disp("-->> Correcting overlapping vertices between surfaces");
-%         for i=1:6            
+%         for i=1:6
 %             Envelop                     = CSurfaces(i);
 %             Tess                        = CSurfaces(i+1);
 %             [NewTessFile, iSurface]     = correct_surfaces_overlaping(Envelop.filename,Tess.filename, report_path);
@@ -129,11 +129,11 @@ end
 %                 CSurfaces(i+1).iSurface = iSurface;
 %                 CSurfaces(i+1).filename = NewTessFile;
 %             end
-%             
+%
 %         end
 %     end
 % end
-% 
+%
 % %% Reload subject
 % db_reload_subjects(iSubject);
 
@@ -156,78 +156,81 @@ end
 %%
 %% FSAve Surfaces interpolation
 %%
-sub_to_FSAve        = [];
-% sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
+% sub_to_FSAve        = [];
+sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
 
 %%
 %% Quality control
 %%
-[sSubject, ~]       = bst_get('Subject', subID);
-Surfaces            = sSubject.Surface;
-for i=1:length(CSurfaces)
-    CSurface        = CSurfaces(i);
-    if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
-        Cortex      = Surfaces(CSurface.iSurface);
-        hFigSurf    = view_surface(Cortex.FileName);
-        delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutPatch'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
-        figures     = {hFigSurf, hFigSurf, hFigSurf, hFigSurf};
-        fig_out     = merge_figures(Cortex.Comment, strrep(Cortex.Comment,'_','-'), figures,...
+if(getGlobalVerbose())
+    [sSubject, ~]       = bst_get('Subject', subID);
+    Surfaces            = sSubject.Surface;
+    for i=1:length(CSurfaces)
+        CSurface        = CSurfaces(i);
+        if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
+            Cortex      = Surfaces(CSurface.iSurface);
+            hFigSurf    = view_surface(Cortex.FileName);
+            delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
+            delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
+            delete(findobj(hFigSurf, 'Tag', 'ScoutPatch'));
+            delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
+            figures     = {hFigSurf, hFigSurf, hFigSurf, hFigSurf};
+            fig_out     = merge_figures(Cortex.Comment, strrep(Cortex.Comment,'_','-'), figures,...
+                'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+                'colorbars',{'off','off','off','off'},...
+                'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+            bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' 3D view'), [200,200,900,700]);
+            try
+                savefig( hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' 3D view.fig')));
+            catch
+            end
+            % Closing figure
+            close(fig_out,hFigSurf);
+        end
+    end
+    if(isequal(lower(layer_desc),'fs_lr') || isequal(lower(layer_desc),'bigbrain'))
+        for i=length(CSurfaces):-1:1
+            CSurface    = CSurfaces(i);
+            if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
+                Cortex  = Surfaces(CSurface.iSurface);
+                if(~exist('hFigSurfaces','var'))
+                    hFigSurfaces = script_view_surface(Cortex.FileName, [], [], [],'top');
+                else
+                    hFigSurfaces = script_view_surface(Cortex.FileName, [], [], hFigSurfaces);
+                end
+            end
+        end
+        delete(findobj(hFigSurfaces, 'Tag', 'ScoutLabel'));
+        delete(findobj(hFigSurfaces, 'Tag', 'ScoutMarker'));
+        delete(findobj(hFigSurfaces, 'Tag', 'ScoutPatch'));
+        delete(findobj(hFigSurfaces, 'Tag', 'ScoutContour'));
+        figures     = {hFigSurfaces, hFigSurfaces, hFigSurfaces, hFigSurfaces};
+        fig_out     = merge_figures("Surfaces cortex 3D view", "Surfaces cortex 3D view", figures,...
             'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
             'colorbars',{'off','off','off','off'},...
             'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-        bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' 3D view'), [200,200,900,700]);
+        bst_report('Snapshot',fig_out,[],strcat('Surfaces cortex 3D view'), [200,200,900,700]);
         try
-            savefig( hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' 3D view.fig')));
+            savefig( hFigSurfaces,fullfile(report_path,strcat('Surfaces cortex 3D view.fig')));
         catch
         end
         % Closing figure
-        close(fig_out,hFigSurf);
+        close(fig_out,hFigSurfaces);
     end
 end
-if(isequal(lower(layer_desc),'fs_lr') || isequal(lower(layer_desc),'bigbrain'))
-    for i=length(CSurfaces):-1:1
-        CSurface    = CSurfaces(i);
-        if(~isempty(CSurface.name) && isequal(CSurface.type,'cortex'))
-            Cortex  = Surfaces(CSurface.iSurface);
-            if(~exist('hFigSurfaces','var'))
-                hFigSurfaces = script_view_surface(Cortex.FileName, [], [], [],'top');
-            else
-                hFigSurfaces = script_view_surface(Cortex.FileName, [], [], hFigSurfaces);
-            end            
-        end
-    end
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutLabel'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutMarker'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutPatch'));
-    delete(findobj(hFigSurfaces, 'Tag', 'ScoutContour'));
-    figures     = {hFigSurfaces, hFigSurfaces, hFigSurfaces, hFigSurfaces};
-    fig_out     = merge_figures("Surfaces cortex 3D view", "Surfaces cortex 3D view", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Surfaces cortex 3D view'), [200,200,900,700]);
-    try
-        savefig( hFigSurfaces,fullfile(report_path,strcat('Surfaces cortex 3D view.fig')));
-    catch
-    end
-    % Closing figure
-    close(fig_out,hFigSurfaces);
-end
+
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";
     CiftiStorm.Participants(end).Process(4).Name    = "Compute_surfaces";
     CiftiStorm.Participants(end).Process(4).Status  = "Completed";
     CiftiStorm.Participants(end).Process(4).Error   = errMessage;
-else    
+else
     CiftiStorm.Participants(end).Status             = "Rejected";
     CiftiStorm.Participants(end).FileInfo           = "";
     CiftiStorm.Participants(end).Process(4).Name    = "Compute_surfaces";
     CiftiStorm.Participants(end).Process(4).Status  = "Rejected";
-    CiftiStorm.Participants(end).Process(4).Error   = errMessage;     
+    CiftiStorm.Participants(end).Process(4).Error   = errMessage;
 end
 
 end

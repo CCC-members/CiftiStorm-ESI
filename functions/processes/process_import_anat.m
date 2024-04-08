@@ -93,96 +93,103 @@ report_path = get_report_path(properties, subID);
 %% Quality control
 %%
 % Get MRI file and surface files
-[sSubject,~]    = bst_get('Subject', subID);
-MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-hFigMri1        = view_mri_slices(MriFile, 'x', 20);
-bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,900,700]);
-try
-    savefig( hFigMri1,fullfile(report_path,'MRI Axial view.fig'));
-catch
-end
-close(hFigMri1);
+if(getGlobalVerbose())
+    [sSubject,~]    = bst_get('Subject', subID);
+    MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+    hFigMri1        = view_mri_slices(MriFile, 'x', 20);
+    bst_report('Snapshot',hFigMri1,MriFile,'MRI Axial view', [200,200,900,700]);
+    try
+        savefig( hFigMri1,fullfile(report_path,'MRI Axial view.fig'));
+    catch
+    end
+    close(hFigMri1);
 
-hFigMri2        = view_mri_slices(MriFile, 'y', 20);
-bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,900,700]);
-try
-    savefig( hFigMri2,fullfile(report_path,'MRI Coronal view.fig'));
-catch
-end
-close(hFigMri2);
+    hFigMri2        = view_mri_slices(MriFile, 'y', 20);
+    bst_report('Snapshot',hFigMri2,MriFile,'MRI Coronal view', [200,200,900,700]);
+    try
+        savefig( hFigMri2,fullfile(report_path,'MRI Coronal view.fig'));
+    catch
+    end
+    close(hFigMri2);
 
-hFigMri3        = view_mri_slices(MriFile, 'z', 20);
-bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,900,700]);
-try
-    savefig( hFigMri3,fullfile(report_path,'MRI Sagital view.fig'));
-catch
+    hFigMri3        = view_mri_slices(MriFile, 'z', 20);
+    bst_report('Snapshot',hFigMri3,MriFile,'MRI Sagital view', [200,200,900,700]);
+    try
+        savefig( hFigMri3,fullfile(report_path,'MRI Sagital view.fig'));
+    catch
+    end
+    close(hFigMri3);
 end
-close(hFigMri3);
 
 if(isequal(type,'individual'))
     %%
     %% Quality control
     %%
     % Get subject definition and subject files
-    sSubject       = bst_get('Subject', subID);
-    MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
-    CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
-    InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
-    OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
-    ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;    
-    %
-    hFigMriSurf = view_mri(MriFile, CortexFile);
-    hFigMri4    = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
-    bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,900,700]);
-    try
-        savefig( hFigMri4,fullfile(report_path,'Cortex - MRI registration Axial view.fig'));
-    catch
+    if(getGlobalVerbose())
+        sSubject       = bst_get('Subject', subID);
+        MriFile        = sSubject.Anatomy(sSubject.iAnatomy).FileName;
+        CortexFile     = sSubject.Surface(sSubject.iCortex).FileName;
+        InnerSkullFile = sSubject.Surface(sSubject.iInnerSkull).FileName;
+        OuterSkullFile = sSubject.Surface(sSubject.iOuterSkull).FileName;
+        ScalpFile      = sSubject.Surface(sSubject.iScalp).FileName;
+        %
+        hFigMriSurf = view_mri(MriFile, CortexFile);
+        hFigMri4    = script_view_contactsheet( hFigMriSurf, 'volume', 'x','');
+        bst_report('Snapshot',hFigMri4,MriFile,'Cortex - MRI registration Axial view', [200,200,900,700]);
+        try
+            savefig( hFigMri4,fullfile(report_path,'Cortex - MRI registration Axial view.fig'));
+        catch
+        end
+        close(hFigMri4);
+        %
+        hFigMri5    = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
+        bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,900,700]);
+        try
+            savefig( hFigMri5,fullfile(report_path,'Cortex - MRI registration Coronal view.fig'));
+        catch
+        end
+        close(hFigMri5);
+        %
+        hFigMri6    = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
+        bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,900,700]);
+        try
+            savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagital view.fig'));
+        catch
+        end
+        % Closing figures
+        close([hFigMri6,hFigMriSurf]);
+        %
+        hFigMri7    = view_mri(MriFile, ScalpFile);
+        bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,900,700]);
+        try
+            savefig( hFigMri7,fullfile(report_path,'Scalp registration.fig'));
+        catch
+        end
+        close(hFigMri7);
+        %
+        hFigMri8    = view_mri(MriFile, OuterSkullFile);
+        bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,900,700]);
+        try
+            savefig( hFigMri8,fullfile(report_path,'Outer Skull - MRI registration.fig'));
+        catch
+        end
+        close(hFigMri8);
+        %
+        hFigMri9    = view_mri(MriFile, InnerSkullFile);
+        bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,900,700]);
+        try
+            savefig( hFigMri9,fullfile(report_path,'Inner Skull - MRI registration.fig'));
+        catch
+        end
+        % Closing figures
+        close(hFigMri9);
     end
-    close(hFigMri4);
-    %
-    hFigMri5    = script_view_contactsheet( hFigMriSurf, 'volume', 'y','');
-    bst_report('Snapshot',hFigMri5,MriFile,'Cortex - MRI registration Coronal view', [200,200,900,700]);
-    try
-        savefig( hFigMri5,fullfile(report_path,'Cortex - MRI registration Coronal view.fig'));
-    catch
-    end
-    close(hFigMri5);
-    %
-    hFigMri6    = script_view_contactsheet( hFigMriSurf, 'volume', 'z','');
-    bst_report('Snapshot',hFigMri6,MriFile,'Cortex - MRI registration Sagital view', [200,200,900,700]);
-    try
-        savefig( hFigMri6,fullfile(report_path,'Cortex - MRI registration Sagital view.fig'));
-    catch
-    end
-    % Closing figures
-    close([hFigMri6,hFigMriSurf]);    
-    %
-    hFigMri7    = view_mri(MriFile, ScalpFile);
-    bst_report('Snapshot',hFigMri7,MriFile,'Scalp registration', [200,200,900,700]);
-    try
-        savefig( hFigMri7,fullfile(report_path,'Scalp registration.fig'));
-    catch
-    end
-    close(hFigMri7);
-    %
-    hFigMri8    = view_mri(MriFile, OuterSkullFile);
-    bst_report('Snapshot',hFigMri8,MriFile,'Outer Skull - MRI registration', [200,200,900,700]);
-    try
-        savefig( hFigMri8,fullfile(report_path,'Outer Skull - MRI registration.fig'));
-    catch
-    end
-    close(hFigMri8);
-    %
-    hFigMri9    = view_mri(MriFile, InnerSkullFile);
-    bst_report('Snapshot',hFigMri9,MriFile,'Inner Skull - MRI registration', [200,200,900,700]);
-    try
-        savefig( hFigMri9,fullfile(report_path,'Inner Skull - MRI registration.fig'));
-    catch
-    end
-    % Closing figures
-    close(hFigMri9);
 end
 
+%%
+%% Registering process
+%%
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";

@@ -49,31 +49,34 @@ for i=1:length(CSurfaces)
                     script_import_label(BSTCortexFile,Atlas_seg_location,0);
             end
         end
+
         %%
         %% Quality control
         %%
-        panel_scout('SetScoutsOptions', 0, 0, 1, 'all', 1, 0, 0, 0);
-        panel_scout('UpdateScoutsDisplay', 'all');
-        panel_scout('SetScoutContourVisible', 0, 0);
-        panel_scout('SetScoutTransparency', 0);
-        panel_scout('SetScoutTextVisible', 0, 1);
-        hFigSurf    = view_surface(BSTCortexFile,  0, [.6,.6,.6], 'NewFigure', 1);
-        % Deleting the Atlas Labels and Countour from Cortex
-        delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
-        delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
-        figures     = {hFigSurf, hFigSurf, hFigSurf, hFigSurf};
-        fig_out     = merge_figures(Cortex.Comment, strrep(Cortex.Comment,'_','-'), figures,...
-            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-            'colorbars',{'off','off','off','off'},...
-            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-        bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' atlas seg'), [200,200,900,700]);
-        try
-            savefig(hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' atlas seg.fig')));
-        catch
+        if(getGlobalVerbose())
+            panel_scout('SetScoutsOptions', 0, 0, 1, 'all', 1, 0, 0, 0);
+            panel_scout('UpdateScoutsDisplay', 'all');
+            panel_scout('SetScoutContourVisible', 0, 0);
+            panel_scout('SetScoutTransparency', 0);
+            panel_scout('SetScoutTextVisible', 0, 1);
+            hFigSurf    = view_surface(BSTCortexFile,  0, [.6,.6,.6], 'NewFigure', 1);
+            % Deleting the Atlas Labels and Countour from Cortex
+            delete(findobj(hFigSurf, 'Tag', 'ScoutLabel'));
+            delete(findobj(hFigSurf, 'Tag', 'ScoutMarker'));
+            delete(findobj(hFigSurf, 'Tag', 'ScoutContour'));
+            figures     = {hFigSurf, hFigSurf, hFigSurf, hFigSurf};
+            fig_out     = merge_figures(Cortex.Comment, strrep(Cortex.Comment,'_','-'), figures,...
+                'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+                'colorbars',{'off','off','off','off'},...
+                'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+            bst_report('Snapshot',fig_out,[],strcat(Cortex.Comment,' atlas seg'), [200,200,900,700]);
+            try
+                savefig(hFigSurf,fullfile(report_path,strcat(Cortex.Comment,' atlas seg.fig')));
+            catch
+            end
+            % Closing figure
+            close(fig_out,hFigSurf);
         end
-        % Closing figure
-        close(fig_out,hFigSurf);
     end
 end
 if(isempty(errMessage))

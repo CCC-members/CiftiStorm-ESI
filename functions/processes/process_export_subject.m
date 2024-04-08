@@ -1,7 +1,6 @@
-function CiftiStorm = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve)
+function CiftiStorm = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve, AQCI)
 
 errMessage      = [];
-ProtocolName    = properties.general_params.bst_config.protocol_name;
 output_path     = properties.general_params.output_path;
 
 %%
@@ -19,16 +18,18 @@ export_protocol(iProtocol, iSubject, subject_file);
 %%
 %% Save and display report
 %%
-disp("-->> Export BST Report");
-report_path     = get_report_path(properties, subID);
-ReportFile      = bst_report('Save', []);
-bst_report('Export',  ReportFile, fullfile(report_path,[subID,'.html']));
+if(getGlobalVerbose())
+    disp("-->> Export BST Report");
+    report_path     = get_report_path(properties, subID);
+    ReportFile      = bst_report('Save', []);
+    bst_report('Export',  ReportFile, fullfile(report_path,[subID,'.html'])); 
+end
 
 %%
 %% Export Subject
 %%
 disp(strcat('-->> Export subject:' , subID));
-errMessage = export_subject_structure(properties, subID, CSurfaces, sub_to_FSAve);
+errMessage = export_subject_structure(properties, subID, CSurfaces, sub_to_FSAve, AQCI);
 
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Completed";

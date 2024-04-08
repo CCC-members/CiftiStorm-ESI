@@ -147,71 +147,80 @@ ChannelFile     = sStudy.Channel.FileName;
 ScalpFile       = sSubject.Surface(sSubject.iScalp).FileName;
 MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 
-if(isequal(properties.general_params.modality,'EEG'))
-    hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
-    hFigMri16   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
-    figures     = {hFigMri16, hFigMri16, hFigMri16, hFigMri16};
-    fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    try
-        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
-    catch
+%%
+%% 
+%%
+if(getGlobalVerbose())
+    if(isequal(properties.general_params.modality,'EEG'))
+        hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
+        hFigMri16   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);
+        figures     = {hFigMri16, hFigMri16, hFigMri16, hFigMri16};
+        fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
+        try
+            savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+        catch
+        end
+        % Closing figure
+        close(fig_out,hFigMri16);
+
+        % View sources on Scalp
+        hFigMri20   = script_view_surface(ScalpFile, [], [], [],'front');
+        hFigMri20   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
+
+        figures     = {hFigMri20, hFigMri20, hFigMri20, hFigMri20};
+        fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
+        try
+            savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+        catch
+        end
+        % Closing figure
+        close(fig_out,hFigMri20);
+    else
+        hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
+        hFigMri16   = view_helmet(ChannelFile, hFigMri16);
+
+        figures     = {hFigMri16, hFigMri16, hFigMri16, hFigMri16};
+        fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
+        try
+            savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+        catch
+        end
+        % Closing figure
+        close(fig_out,hFigMri16);
+
+        hFigScalp20 = script_view_surface(ScalpFile, [], [], [], 'front');
+        hFigScalp20 = view_helmet(ChannelFile, hFigScalp20);
+
+        figures     = {hFigScalp20, hFigScalp20, hFigScalp20, hFigScalp20};
+        fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
+            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+            'colorbars',{'off','off','off','off'},...
+            'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+        bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
+        try
+            savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
+        catch
+        end
+        % Closing figure
+        close(fig_out,hFigScalp20);
     end
-    % Closing figure
-    close(fig_out,hFigMri16);
-    
-    % View sources on Scalp
-    hFigMri20   = script_view_surface(ScalpFile, [], [], [],'front');
-    hFigMri20   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri20, 1);
-    
-    figures     = {hFigMri20, hFigMri20, hFigMri20, hFigMri20};
-    fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    try
-        savefig( hFigMri20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
-    catch
-    end
-    % Closing figure
-    close(fig_out,hFigMri20);
-else
-    hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
-    hFigMri16   = view_helmet(ChannelFile, hFigMri16);
-    
-    figures     = {hFigMri16, hFigMri16, hFigMri16, hFigMri16};
-    fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    try
-        savefig( hFigMri16,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
-    catch
-    end
-    % Closing figure
-    close(fig_out,hFigMri16);
-    
-    hFigScalp20 = script_view_surface(ScalpFile, [], [], [], 'front');
-    hFigScalp20 = view_helmet(ChannelFile, hFigScalp20);
-    
-    figures     = {hFigScalp20, hFigScalp20, hFigScalp20, hFigScalp20};
-    fig_out     = merge_figures("Sensor-MRI registration", "Sensor-MRI registration", figures,...
-        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-        'colorbars',{'off','off','off','off'},...
-        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-    bst_report('Snapshot',fig_out,[],strcat('Sensor-MRI registration'), [200,200,900,700]);
-    try
-        savefig(hFigScalp20,fullfile(report_path,strcat('Sensor-MRI registration.fig')));
-    catch
-    end
-    % Closing figure
-    close(fig_out,hFigScalp20);
 end
+
+%%
+%% Registering process
+%%
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";

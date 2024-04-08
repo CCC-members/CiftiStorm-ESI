@@ -150,7 +150,7 @@ for sub=1:length(subjects)
     %%
     %% Process: Automatic QC
     %%
-    CiftiStorm  = process_AQC(CiftiStorm, OPTIONS, properties, subID);
+    [CiftiStorm, AQCI]  = process_AQC(CiftiStorm, OPTIONS, properties, subID);
 
     %%
     %% Process: Export subject
@@ -158,7 +158,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);
+    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve, AQCI);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));
@@ -174,8 +174,8 @@ h.save
 h.close
 
 %% Delete Protocol after analysis
-db_delete_protocol(isUserConfirm, isRemoveFiles)
-gui_brainstorm('DeleteProtocol', ProtocolName);
+% db_delete_protocol(0, 1)
+% gui_brainstorm('DeleteProtocol', ProtocolName);
 
 disp(strcat('CFS -->> Dataset processed....'));
 disp('==============================================================================');
