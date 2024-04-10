@@ -224,14 +224,14 @@ end
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(7).Name    = "Import_chann";
-    CiftiStorm.Participants(end).Process(7).Status  = "Completed";
-    CiftiStorm.Participants(end).Process(7).Error   = errMessage;
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Import_chann";
+    CiftiStorm.Participants(end).Process(end).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 else    
     CiftiStorm.Participants(end).Status             = "Rejected";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(7).Name    = "Import_chann";
-    CiftiStorm.Participants(end).Process(7).Status  = "Rejected";
-    CiftiStorm.Participants(end).Process(7).Error   = errMessage;     
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Import_chann";
+    CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
 end
 end

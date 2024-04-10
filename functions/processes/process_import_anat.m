@@ -121,7 +121,7 @@ if(getGlobalVerbose())
     close(hFigMri3);
 end
 
-if(isequal(type,'individual'))
+if(isequal(type,'individual') || isequal(type,'template'))
     %%
     %% Quality control
     %%
@@ -193,15 +193,15 @@ end
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(2).Name    = "Import_anat";
-    CiftiStorm.Participants(end).Process(2).Status  = "Completed";
-    CiftiStorm.Participants(end).Process(2).Error   = errMessage;
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Import_anat";
+    CiftiStorm.Participants(end).Process(end).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 else    
     CiftiStorm.Participants(end).Status             = "Rejected";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(2).Name    = "Import_anat";
-    CiftiStorm.Participants(end).Process(2).Status  = "Rejected";
-    CiftiStorm.Participants(end).Process(2).Error   = errMessage;     
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Import_anat";
+    CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
 end
 
 end

@@ -40,7 +40,7 @@ switch mq_control
         subjects                = bst_get('ProtocolSubjects');
         subjects                = subjects.Subject;
     case false
-        if(isequal(lower(anatomy_type.id),'template'))
+        if(isequal(lower(anatomy_type.id),'default'))
             subjects.name       = anatomy_type.template_name;
             sTemplates          = bst_get('AnatomyDefaults');
             sTemplate           = sTemplates(find(strcmpi(subjects.name, {sTemplates.Name}),1));
@@ -52,16 +52,19 @@ switch mq_control
                 return;
             end        
         else
-
             base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
             subjects(ismember({subjects.name},{'.','..'}))           = [];  %remove . and ..
             if(~isempty(reject_subjects))
                 subjects(ismember({subjects.name},{reject_subjects.SubID}))  = [];
             end
+            if(isequal(lower(anatomy_type.id),'template'))
+                subjects(find(~ismember({subjects.name}, {anatomy_type.template_name}),1))  = [];
+            end
             disp(strcat('-->> Data Source:  ', anatomy_type.base_path ));
         end
 end
+
 for sub=1:length(subjects)
     if(mq_control)
         subID        = subjects(sub).Name;
@@ -145,20 +148,24 @@ for sub=1:length(subjects)
     disp("CFS -->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
     [CiftiStorm, OPTIONS]     = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
-    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end    
     
-    %%
-    %% Process: Automatic QC
-    %%
-    [CiftiStorm, AQCI]  = process_AQC(CiftiStorm, OPTIONS, properties, subID);
-
     %%
     %% Process: Export subject
     %%
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve, AQCI);
+    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID);
+    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
+
+    %%
+    %% Process: Functional integration
+    %%
+    disp("--------------------------------------------------------------------------");
+    disp("CFS -->> Process Export subject");
+    disp("--------------------------------------------------------------------------");
+    CiftiStorm      = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));

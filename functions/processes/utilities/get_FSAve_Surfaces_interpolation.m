@@ -7,7 +7,8 @@ sSubject        = bst_get('Subject', subID);
 Surfaces        = sSubject.Surface;
 sub_to_FSAve    = [];
 
-if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
+if(isequal(properties.anatomy_params.anatomy_type.id,'individual') ...
+        || isequal(properties.anatomy_params.anatomy_type.id,'template'))
     layer_desc      = properties.anatomy_params.common_params.layer_desc.desc;
     if(isequal(lower(layer_desc),'white') || isequal(lower(layer_desc),'midthickness') || isequal(lower(layer_desc),'pial'))
         type = 'single';

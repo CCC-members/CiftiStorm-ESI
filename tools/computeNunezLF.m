@@ -3,9 +3,7 @@ function [Kn,Khom,KhomN] = computeNunezLF(Ke, Vertices, VertNorms, Channels, Cha
 Ne          = length(Channels);
 Nv          = size(Vertices,1);
 
-if(isequal(Modality,'EEG'))    
-    % H           = eye(Ne)-ones(Ne)./Ne;
-    
+if(isequal(Modality,'EEG'))        
     % Compute Distance vector R between Electrodes and Voxels
     Channels    = reshape(Channels,[Ne,1,3]);
     % VoxelCoord  = permute(VoxelCoord,[2 1]);
@@ -16,10 +14,6 @@ if(isequal(Modality,'EEG'))
     
     % Compute Nunez Homogeneous Media Leadfield
     Khom        = R./repmat(sqrt(sum(R.^2,3)).^3,1,1,3);
-    % Khom(:,:,1) = H*Khom(:,:,1);
-    % Khom(:,:,2) = H*Khom(:,:,2);
-    % Khom(:,:,3) = H*Khom(:,:,3);
-    %  ver   -----------------------------------
     VertNormsR  = reshape(VertNorms,[1,Nv,3]);
     VertNormsR  = repmat(VertNormsR,[Ne,1,1]);
     KhomN       = Khom.*VertNormsR;
@@ -27,9 +21,6 @@ if(isequal(Modality,'EEG'))
     % Compute realistics Leadfield
     Kn          = reshape(Ke,Ne,3,Nv);
     Kn          = permute(Kn,[1,3,2]);
-    % Kn(:,:,1)   = H*Kn(:,:,1);
-    % Kn(:,:,2)   = H*Kn(:,:,2);
-    % Kn(:,:,3)   = H*Kn(:,:,3);
 else
     e            = [1 0 0; 0 1 0; 0 0 1];
     Khom           = zeros(Ne,Nv,3);
