@@ -47,39 +47,44 @@ CSurfaces(10).filename  = sSubject.Surface(sSubject.iScalp).FileName;
 %%
 %% Quality control
 %%
-sSubject    = bst_get('Subject', subID);
-Surfaces    = sSubject.Surface;
-CortexFile  = Surfaces(sSubject.iCortex).FileName;
-hFigSurf11  = script_view_surface(CortexFile, [], [], [],'top');
+if(getGlobalVerbose())
+    sSubject    = bst_get('Subject', subID);
+    Surfaces    = sSubject.Surface;
+    CortexFile  = Surfaces(sSubject.iCortex).FileName;
+    hFigSurf11  = script_view_surface(CortexFile, [], [], [],'top');
 
-hFigSurf11  = script_view_surface(CSurfaces(8).filename, [], [], hFigSurf11);
-hFigSurf11  = script_view_surface(CSurfaces(9).filename, [], [], hFigSurf11);
-hFigSurf11  = script_view_surface(CSurfaces(10).filename, [], [], hFigSurf11);
-figures     = {hFigSurf11, hFigSurf11, hFigSurf11, hFigSurf11};
-fig_out     = merge_figures("BEM surfaces registration", "BEM surfaces registration", figures,...
-    'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-    'colorbars',{'off','off','off','off'},...
-    'view_orient',{[0,90],[90,360],[1,180],[0,360]});
-bst_report('Snapshot',fig_out,[],strcat('BEM surfaces registration'), [200,200,900,700]);
-try
-    savefig( hFigSurf11,fullfile(report_path,strcat('BEM surfaces registration.fig')));
-catch
+    hFigSurf11  = script_view_surface(CSurfaces(8).filename, [], [], hFigSurf11);
+    hFigSurf11  = script_view_surface(CSurfaces(9).filename, [], [], hFigSurf11);
+    hFigSurf11  = script_view_surface(CSurfaces(10).filename, [], [], hFigSurf11);
+    figures     = {hFigSurf11, hFigSurf11, hFigSurf11, hFigSurf11};
+    fig_out     = merge_figures("BEM surfaces registration", "BEM surfaces registration", figures,...
+        'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+        'colorbars',{'off','off','off','off'},...
+        'view_orient',{[0,90],[90,360],[1,180],[0,360]});
+    bst_report('Snapshot',fig_out,[],strcat('BEM surfaces registration'), [200,200,900,700]);
+    try
+        savefig( hFigSurf11,fullfile(report_path,strcat('BEM surfaces registration.fig')));
+    catch
+    end
+    % Closing figure
+    close(fig_out,hFigSurf11);
 end
-% Closing figure
-close(fig_out,hFigSurf11);
 
+%%
+%% Registering process
+%%
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(3).Name    = "BEM_surfaces";
-    CiftiStorm.Participants(end).Process(3).Status  = "Completed";
-    CiftiStorm.Participants(end).Process(3).Error   = errMessage;
-else    
+    CiftiStorm.Participants(end).Process(end+1).Name    = "BEM_surfaces";
+    CiftiStorm.Participants(end).Process(end).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
+else
     CiftiStorm.Participants(end).Status             = "Rejected";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(3).Name    = "BEM_surfaces";
-    CiftiStorm.Participants(end).Process(3).Status  = "Rejected";
-    CiftiStorm.Participants(end).Process(3).Error   = errMessage;     
+    CiftiStorm.Participants(end).Process(end+1).Name    = "BEM_surfaces";
+    CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 end
 
 end

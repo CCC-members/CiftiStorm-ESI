@@ -71,12 +71,15 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
         iSurface = [];
         return;
     end
+
     % Display where the outside points are
-    hFig_before = view_surface(TessFile, [], [], 'NewFigure');
-    panel_surface('SetSurfaceEdges', hFig_before, 1, 1);
-    line(TessMat.Vertices(iVertOut,1), TessMat.Vertices(iVertOut,2), TessMat.Vertices(iVertOut,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
-    view_surface(EnvFile, [], [], hFig_before);
-    figure_3d('SetStandardView', hFig_before, 'bottom');
+    if(getGlobalVerbose())
+        hFig_before = view_surface(TessFile, [], [], 'NewFigure');
+        panel_surface('SetSurfaceEdges', hFig_before, 1, 1);
+        line(TessMat.Vertices(iVertOut,1), TessMat.Vertices(iVertOut,2), TessMat.Vertices(iVertOut,3), 'LineStyle', 'none', 'Marker', 'o',  'MarkerFaceColor', [1 0 0], 'MarkerSize', 6);
+        view_surface(EnvFile, [], [], hFig_before);
+        figure_3d('SetStandardView', hFig_before, 'bottom');
+    end
     
     %% Original    
     % Fix point by point
@@ -156,33 +159,35 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
     iSurface = db_add_surface(iSubject, NewTessFile, NewTessMat.Comment);
     
     % Display modified surface
-    hFig_after = view_surface(NewTessFile, [], [], 'NewFigure');
-    panel_surface('SetSurfaceEdges', hFig_after, 1, 1);
-    view_surface(EnvFile, [], [], hFig_after);
-    figure_3d('SetStandardView', hFig_after, 'bottom');
-    
-    if(~isempty(iVertOut))
-        figures     = {hFig_before, hFig_before, hFig_before, hFig_before};
-        desc = split(TessMat.Comment,"_");
-        fig_text    =  strcat("Distance correction - ",desc{2});
-        fig_out     = merge_figures(fig_text, fig_text, figures,...
-            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-            'colorbars',{'off','off','off','off'},...
-            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-        bst_report('Snapshot',fig_out,[],'Cortex view before force the vertices inside of InnerSkull.', [200,200,900,700]);  
-        savefig( hFig_before,fullfile(subject_report_path,fig_text));
-        close(fig_out);
-        fig_text    =  strcat("Distance corrected - ",desc{2});
-        figures     = {hFig_after, hFig_after, hFig_after, hFig_after};
-        fig_out     = merge_figures(fig_text, fig_text, figures,...
-            'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
-            'colorbars',{'off','off','off','off'},...
-            'view_orient',{[0,90],[1,270],[1,180],[0,360]});
-        bst_report('Snapshot',fig_out,[],'Cortex view. All cortex vertices are already inside the inner skull.', [200,200,900,700]);
-        savefig( hFig_after,fullfile(subject_report_path,fig_text));
-        close(fig_out);
-    end    
-    close([hFig_before,hFig_after]);
+    if(getGlobalVerbose())
+        hFig_after = view_surface(NewTessFile, [], [], 'NewFigure');
+        panel_surface('SetSurfaceEdges', hFig_after, 1, 1);
+        view_surface(EnvFile, [], [], hFig_after);
+        figure_3d('SetStandardView', hFig_after, 'bottom');
+
+        if(~isempty(iVertOut))
+            figures     = {hFig_before, hFig_before, hFig_before, hFig_before};
+            desc = split(TessMat.Comment,"_");
+            fig_text    =  strcat("Distance correction - ",desc{2});
+            fig_out     = merge_figures(fig_text, fig_text, figures,...
+                'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+                'colorbars',{'off','off','off','off'},...
+                'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+            bst_report('Snapshot',fig_out,[],'Cortex view before force the vertices inside of InnerSkull.', [200,200,900,700]);
+            savefig( hFig_before,fullfile(subject_report_path,fig_text));
+            close(fig_out);
+            fig_text    =  strcat("Distance corrected - ",desc{2});
+            figures     = {hFig_after, hFig_after, hFig_after, hFig_after};
+            fig_out     = merge_figures(fig_text, fig_text, figures,...
+                'rows', 2, 'cols', 2,'axis_on',{'off','off','off','off'},...
+                'colorbars',{'off','off','off','off'},...
+                'view_orient',{[0,90],[1,270],[1,180],[0,360]});
+            bst_report('Snapshot',fig_out,[],'Cortex view. All cortex vertices are already inside the inner skull.', [200,200,900,700]);
+            savefig( hFig_after,fullfile(subject_report_path,fig_text));
+            close(fig_out);
+        end
+        close([hFig_before,hFig_after]);
+    end
     % Close progress bar
     bst_progress('stop');
     

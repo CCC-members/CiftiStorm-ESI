@@ -48,11 +48,14 @@ if(~isempty(varargin))
         disp('-->> Process stopped!!!');
         return;
     end
-    if(isequal(lower(properties.anatomy_params.anatomy_type.type),'template'))
+    if(isequal(lower(properties.anatomy_params.anatomy_type.type),'default'))
         properties.anatomy_params.anatomy_type = properties.anatomy_params.anatomy_type.type_list{1};
-    else
+    elseif(isequal(lower(properties.anatomy_params.anatomy_type.type),'individual'))
         properties.anatomy_params.anatomy_type = properties.anatomy_params.anatomy_type.type_list{2};
+    else
+        properties.anatomy_params.anatomy_type = properties.anatomy_params.anatomy_type.type_list{3};
     end
+    
     if(~isequal(lower(properties.channel_params.channel_type.type),'default') ...
             && ~isequal(lower(properties.channel_params.channel_type.type),'raw'))
         fprintf(2,"\n ->> Error: The channel type have to be <<raw>> or <<default>>. \n");

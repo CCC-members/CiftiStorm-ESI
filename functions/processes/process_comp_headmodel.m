@@ -140,14 +140,14 @@ end
 if(isempty(errMessage))
     CiftiStorm.Participants(end).Status             = "Processing";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(8).Name    = "Headmodel";
-    CiftiStorm.Participants(end).Process(8).Status  = "Completed";
-    CiftiStorm.Participants(end).Process(8).Error   = errMessage;
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Headmodel";
+    CiftiStorm.Participants(end).Process(end).Status  = "Completed";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 else
     CiftiStorm.Participants(end).Status             = "Rejected";
     CiftiStorm.Participants(end).FileInfo           = "";
-    CiftiStorm.Participants(end).Process(8).Name    = "Headmodel";
-    CiftiStorm.Participants(end).Process(8).Status  = "Rejected";
-    CiftiStorm.Participants(end).Process(8).Error   = errMessage;
+    CiftiStorm.Participants(end).Process(end+1).Name    = "Headmodel";
+    CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
+    CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 end
 end
