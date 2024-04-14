@@ -165,8 +165,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);
-    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
+    CiftiStorm      = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);   
     
     disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    
