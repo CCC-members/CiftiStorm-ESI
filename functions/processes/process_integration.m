@@ -54,7 +54,7 @@ if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
     EEG_path                    = fullfile(eeglab_path,subID);
     [MEEGs, HeadModels, Cdata]  = StructFunct_integration(EEG_path, modality, HeadModels, Cdata);
     AQCI                        = AutomaticQCI(HeadModels.HeadModel.Gain, Cdata, Scortex.Sc);
-    if(isempty(MEEGs))
+    if(isempty(fields(MEEGs)))
         action = 'anat';  
         CiftiStorm.Participants(end).Status             = "Structural";
     else

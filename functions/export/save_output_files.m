@@ -16,7 +16,7 @@ disp(strcat("-->> Creating subject output structure"));
 [output_subject_dir]                    = create_data_structure(base_path,subID,action);
 subject_info                            = struct;
 subject_info.name                       = subID;
-if(isequal(action,'all') && ~isempty(MEEGs))
+if(isequal(action,'all'))
     for i=1:length(MEEGs)
         MEEG = MEEGs(i);
         subject_info.meeg_dir{i}        = replace(fullfile('meeg',strcat(MEEG.filename,'.mat')),'\','/');
@@ -32,7 +32,7 @@ subject_info.headmodel_dir.outerskull   = replace(fullfile('headmodel','outersku
 subject_info.completed                  = true;
 
 % Saving subject files
-if(isequal(action,'all') && ~isempty(MEEGs))
+if(isequal(action,'all'))
     disp ("-->> Saving MEEG file");
     for i=1:length(MEEGs)
         EEG = MEEGs(i).EEG;
