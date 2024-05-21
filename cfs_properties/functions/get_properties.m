@@ -40,6 +40,7 @@ for i=1:length(process_files)
 end
 if(~isempty(varargin))
     if(~isequal(lower(properties.anatomy_params.anatomy_type.type),'template') ...
+            && ~isequal(lower(properties.anatomy_params.anatomy_type.type),'default') ...
             && ~isequal(lower(properties.anatomy_params.anatomy_type.type),'individual'))
         fprintf(2,"\n ->> Error: The anatomy type have to be <<template>>, or <<individual>>. \n");
         disp('template: For use default anatomy type.');
