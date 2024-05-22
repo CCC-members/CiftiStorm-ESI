@@ -1,0 +1,1 @@
+{    "description":"Integration process for Structural and Functional Data",    "preproc_data":{        "description":"Select the base path for the  preprocessed EEG or MEG",        "base_path":"/mnt/Data/Data_report/CHBMP_EEG_and_MRI/ds_bids_cbm_loris_24_11_21/derivatives/eeglab"    }}
