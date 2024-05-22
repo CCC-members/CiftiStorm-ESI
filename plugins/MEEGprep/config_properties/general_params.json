@@ -1,0 +1,25 @@
+{
+    "description":"",
+    "params":{
+        "modality":"EEG",
+        "description":"",
+        "colormap":"tools/Common/mycolormap.mat",   
+        "bcv_config":{
+            "description":"",
+            "base_path":"/mnt/Store/Data/CHBM/Test/BC-V_Structure/HeadModel_CHBMP",
+            "anat_template":{
+                "description":"",
+                "use_template":false,
+                "template_name":"ICBM152_2023"
+            }
+        },
+        "reports":{
+            "description":"",
+            "output_path":"/mnt/Store/Data/CHBM/Test/EEG_Reports"
+        },
+        "tmp_path":{
+            "description":"",
+            "value":"local"
+        }                
+    }
+}
