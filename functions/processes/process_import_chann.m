@@ -9,12 +9,6 @@ mq_control      = properties.general_params.bst_config.after_MaQC.run;
 sSubject        = bst_get('Subject', subID);
 type            = properties.channel_params.channel_type.id;
 
-
-%%
-%% Getting report path
-%%
-report_path     = get_report_path(properties, subID);
-
 if(~mq_control)    
     %%
     %% ===== IMPORT CHANNEL =====
@@ -151,6 +145,7 @@ MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;
 %% 
 %%
 if(getGlobalVerbose())
+    report_path     = get_report_path(CiftiStorm, subID);
     if(isequal(properties.general_params.modality,'EEG'))
         hFigMri16   = script_view_mri_3d(MriFile, [], [], [], 'front');
         hFigMri16   = view_channels(ChannelFile, 'EEG', 1, 0, hFigMri16, 1);

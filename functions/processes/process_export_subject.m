@@ -2,7 +2,7 @@ function CiftiStorm = process_export_subject(CiftiStorm, properties, subID)
 
 errMessage      = [];
 if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
-    output_path     = fullfile(properties.general_params.output_path,'brainstorm');
+    output_path     = CiftiStorm.Location;
 else
     template_name = properties.anatomy_params.anatomy_type.template_name;
     output_path = fullfile(properties.general_params.output_path,strcat('brainstorm-',template_name));
@@ -26,7 +26,7 @@ export_protocol(iProtocol, iSubject, subject_file);
 %%
 if(getGlobalVerbose())
     disp("-->> Export BST Report");
-    report_path     = get_report_path(properties, subID);
+    report_path     = get_report_path(CiftiStorm, subID);
     ReportFile      = bst_report('Save', []);
     bst_report('Export',  ReportFile, fullfile(report_path,[subID,'.html'])); 
 end

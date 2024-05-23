@@ -3,7 +3,6 @@ function CiftiStorm = process_import_atlas(CiftiStorm, properties, subID, CSurfa
 %%
 %% Getting report path and params
 %%
-report_path     = get_report_path(properties, subID);
 errMessage      = [];
 anatomy_type    = properties.anatomy_params.anatomy_type;
 type            = anatomy_type.id;
@@ -54,6 +53,7 @@ for i=1:length(CSurfaces)
         %% Quality control
         %%
         if(getGlobalVerbose())
+            report_path     = get_report_path(CiftiStorm, subID);
             panel_scout('SetScoutsOptions', 0, 0, 1, 'all', 1, 0, 0, 0);
             panel_scout('UpdateScoutsDisplay', 'all');
             panel_scout('SetScoutContourVisible', 0, 0);

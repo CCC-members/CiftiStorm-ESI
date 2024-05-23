@@ -1,4 +1,4 @@
-function export_error = export_subject_structure(properties,subID,CSurfaces,sub_to_FSAve, AQCI)
+function export_error = export_subject_structure(CiftiStorm,subID,CSurfaces,sub_to_FSAve, AQCI)
 
 %%
 %% Get Protocol information
@@ -8,7 +8,7 @@ export_error = [];
 % Get subject directory
 ProtocolInfo    = bst_get('ProtocolInfo');
 sSubject        = bst_get('Subject', subID);
-output_path     = properties.general_params.output_path;
+base_path       = CiftiStorm.Location;
 
 
 % Get the current Study
@@ -46,7 +46,6 @@ Cdata           = load(BSTChannelsFile);
 %%
 %% Saving files in BC-VARETA Structure
 %%
-base_path = fullfile(output_path,'ciftistorm');
 save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI);
 
 end

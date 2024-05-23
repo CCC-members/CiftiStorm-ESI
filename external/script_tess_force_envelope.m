@@ -1,4 +1,4 @@
-function [NewTessFile, iSurface] = script_tess_force_envelope(TessFile, EnvFile, subject_report_path)
+function [NewTessFile, iSurface] = script_tess_force_envelope(TessFile, EnvFile)
 % TESS_FORCE_ENVELOPE: Forces the vertices of a surface to fit entirely in an envelope.
 %
 % USAGE:  [NewTessFile, iSurface] = tess_force_envelope(TessFile, EnvFile)
@@ -160,6 +160,7 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
     
     % Display modified surface
     if(getGlobalVerbose())
+        report_path = get_report_path(CiftiStorm, subID);
         hFig_after = view_surface(NewTessFile, [], [], 'NewFigure');
         panel_surface('SetSurfaceEdges', hFig_after, 1, 1);
         view_surface(EnvFile, [], [], hFig_after);
@@ -174,7 +175,7 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
                 'colorbars',{'off','off','off','off'},...
                 'view_orient',{[0,90],[1,270],[1,180],[0,360]});
             bst_report('Snapshot',fig_out,[],'Cortex view before force the vertices inside of InnerSkull.', [200,200,900,700]);
-            savefig( hFig_before,fullfile(subject_report_path,fig_text));
+            savefig( hFig_before,fullfile(report_path,fig_text));
             close(fig_out);
             fig_text    =  strcat("Distance corrected - ",desc{2});
             figures     = {hFig_after, hFig_after, hFig_after, hFig_after};
@@ -183,7 +184,7 @@ iVertOut = find(~inpolyhd(vCortex, vInner, EnvMat.Faces));
                 'colorbars',{'off','off','off','off'},...
                 'view_orient',{[0,90],[1,270],[1,180],[0,360]});
             bst_report('Snapshot',fig_out,[],'Cortex view. All cortex vertices are already inside the inner skull.', [200,200,900,700]);
-            savefig( hFig_after,fullfile(subject_report_path,fig_text));
+            savefig( hFig_after,fullfile(report_path,fig_text));
             close(fig_out);
         end
         close([hFig_before,hFig_after]);

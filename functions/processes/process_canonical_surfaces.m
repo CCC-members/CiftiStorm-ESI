@@ -3,11 +3,6 @@ function CiftiStorm = process_canonical_surfaces(CiftiStorm, properties,subID)
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
 %%
-%% Getting report path
-%%
-report_path = get_report_path(properties, subID);
-
-%%
 %% Compute SPM canonical surfaces
 %%
 if(~mq_control)   
@@ -21,6 +16,7 @@ end
 %%
 % Get subject definition and subject files
 if(getGlobalVerbose())
+    report_path = get_report_path(CiftiStorm, subID);
     sSubject    = bst_get('Subject', subID);
     MriFile     = sSubject.Anatomy(sSubject.iAnatomy).FileName;
     ScalpFile   = sSubject.Surface(sSubject.iScalp).FileName;

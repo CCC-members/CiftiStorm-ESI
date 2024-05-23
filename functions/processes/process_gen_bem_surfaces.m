@@ -2,10 +2,6 @@ function [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properti
 
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
-%%
-%% Getting report path
-%%
-report_path = get_report_path(properties, subID);
 
 %%
 %% Compute BEM Surfaces
@@ -48,6 +44,7 @@ CSurfaces(10).filename  = sSubject.Surface(sSubject.iScalp).FileName;
 %% Quality control
 %%
 if(getGlobalVerbose())
+    report_path = get_report_path(CiftiStorm, subID);
     sSubject    = bst_get('Subject', subID);
     Surfaces    = sSubject.Surface;
     CortexFile  = Surfaces(sSubject.iCortex).FileName;

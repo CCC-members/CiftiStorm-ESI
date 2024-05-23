@@ -12,11 +12,6 @@ mq_control      = properties.general_params.bst_config.after_MaQC.run;
 nvertices     = properties.anatomy_params.common_params.surfaces_resolution.nvertices;
 
 %%
-%% Getting report path
-%%
-report_path = get_report_path(properties, subID);
-
-%%
 %% Compute surfaces like BigBrain
 %%
 if(isequal(lower(layer_desc),'bigbrain'))
@@ -92,7 +87,7 @@ if(~mq_control)
         if(~isempty(CSurface.name)  && isequal(CSurface.type,'cortex'))
             CortexFile                  = Surfaces(CSurface.iSurface).FileName;
             % [NewTessFile, iSurface]     = tess_force_envelope(CortexFile, InnerSkullFile);
-            [NewTessFile, iSurface]     = script_tess_force_envelope(CortexFile, InnerSkullFile, report_path);
+            [NewTessFile, iSurface]     = script_tess_force_envelope(CortexFile, InnerSkullFile);
             if(~isempty(iSurface))
                 CSurfaces(i).comment    = strcat(CSurface.comment,'_fix');
                 CSurfaces(i).iSurface   = iSurface;
@@ -163,6 +158,7 @@ sub_to_FSAve        = get_FSAve_Surfaces_interpolation(properties,subID);
 %% Quality control
 %%
 if(getGlobalVerbose())
+    report_path = get_report_path(CiftiStorm, subID);
     [sSubject, ~]       = bst_get('Subject', subID);
     Surfaces            = sSubject.Surface;
     for i=1:length(CSurfaces)

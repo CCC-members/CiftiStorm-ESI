@@ -3,14 +3,8 @@ function  CiftiStorm = process_integration(CiftiStorm, properties, subID, CSurfa
 % Get subject directory
 ProtocolInfo    = bst_get('ProtocolInfo');
 sSubject        = bst_get('Subject', subID);
-general_params  = properties.general_params;
+base_path       = CiftiStorm.Location;
 
-if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
-    base_path     = fullfile(general_params.output_path,'ciftistorm');
-else
-    template_name = properties.anatomy_params.anatomy_type.template_name;
-    base_path = fullfile(general_params.output_path,strcat('ciftistorm-',template_name));
-end
 
 % Get the current Study
 [sStudies, ~]   = bst_get('StudyWithSubject', sSubject.FileName, 'intra_subject');
@@ -68,12 +62,11 @@ if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
     CiftiStorm.Participants(end).Process(end).Error     = [];
 else
     CiftiStorm.Template = CiftiStorm.Participants;
-    disp(strcat("-->> Saving anatomy template: ",template_name));
+    disp(strcat("-->> Saving anatomy template: ",subID));
     disp("--------------------------------------------------------------------------");
-    CiftiStorm.Template.SubID       = template_name;
+    CiftiStorm.Template.SubID       = subID;
     CiftiStorm.Template.Status      = "Anatomy";
-    CiftiStorm.Template.FileInfo    = strcat(template_name,'.json');
-    subID                           = template_name;
+    CiftiStorm.Template.FileInfo    = strcat(subID,'.json');
     HeadModels                      = rawHeadModels;
     Cdata                           = rawCdata;
     AQCI                            = AutomaticQCI(HeadModels.HeadModel.Gain, Cdata, Scortex.Sc);
