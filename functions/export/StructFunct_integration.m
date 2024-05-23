@@ -16,7 +16,7 @@ if(~isempty(EEG_file))
                 fid = fopen(fullfile(EEG_file(i).folder,strrep(EEG_file(i).name,'set','fdt')), 'r', 'ieee-le');
                 for trialIdx = 1:MEEGs(count).EEG.trials % In case the saved data are epoched, loop the process for each epoch. Thanks Ramesh Srinivasan!
                     currentTrialData = fread(fid, [MEEGs(count).EEG.nbchan MEEGs(count).EEG.pnts], 'float32');
-                    data(:,:,trialIdx) = currentTrialData; % Data dimentions are: electrodes, time points, and trials (the last one is for epoched data)
+                    data{trialIdx} = currentTrialData; % Data dimentions are: electrodes, time points, and trials (the last one is for epoched data)
                 end
                 fclose(fid);
                 MEEGs(count).EEG.data = data;
