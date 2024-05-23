@@ -31,7 +31,9 @@ if(~general_params.bst_config.after_MaQC.run)
     end
     db_reload_database('current');
     db_add_subject(subID);
-    create_report_path(properties, subID);
+    if(getGlobalVerbose())
+        create_report_path(CiftiStorm, subID);
+    end
 else
     gui_brainstorm('UpdateProtocolsList');
     iProtocol = bst_get('Protocol', ProtocolName);

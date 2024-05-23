@@ -85,14 +85,12 @@ else
     end   
 end
 
-%%
-%% Getting report path
-%%
-report_path = get_report_path(properties, subID);
+
 %%
 %% Quality control
 %%
 % Get MRI file and surface files
+report_path = get_report_path(CiftiStorm, subID);
 if(getGlobalVerbose())
     [sSubject,~]    = bst_get('Subject', subID);
     MriFile         = sSubject.Anatomy(sSubject.iAnatomy).FileName;

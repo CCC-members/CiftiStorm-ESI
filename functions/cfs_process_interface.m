@@ -41,6 +41,7 @@ switch mq_control
         subjects                = subjects.Subject;
     case false
         if(isequal(lower(anatomy_type.id),'default'))
+            CiftiStorm.Location = fullfile(general_params.output_path,strcat('ciftistorm-',anatomy_type.template_name));
             subjects.name       = anatomy_type.template_name;
             sTemplates          = bst_get('AnatomyDefaults');
             sTemplate           = sTemplates(find(strcmpi(subjects.name, {sTemplates.Name}),1));

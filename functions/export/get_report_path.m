@@ -1,14 +1,13 @@
-function report_path = get_report_path(properties, subID)
+function report_path = get_report_path(CiftiStorm, subID)
 
 %%
 %% Checking the report output structure
 %%
-ProtocolName        = properties.general_params.bst_config.protocol_name;
-output_path         = properties.general_params.output_path;
+output_path         = CiftiStorm.Location;
 if(output_path == "local")
     output_path     = pwd;
 end
-report_path = fullfile(output_path,'brainstorm','Reports',subID);
+report_path = fullfile(output_path,'Reports',subID);
 if(~isfolder(report_path))
     mkdir(report_path);
 end
