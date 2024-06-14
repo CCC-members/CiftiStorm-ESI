@@ -83,9 +83,9 @@ if(~general_params.bst_config.after_MaQC.run)
     anat_params = properties.anatomy_params;
     
     % Check default template configuration
-    if(isequal(lower(anat_params.anatomy_type.id),'template'))
+    if(isequal(lower(anat_params.anatomy_type.id),'default'))
         disp("--------------------------------------------------------------------------");
-        disp('-->> Checking template configuration');
+        disp('-->> Checking default configuration');
         selected_anatomy = anat_params.anatomy_type;
         template_name = selected_anatomy.template_name;
         defaults = jsondecode(fileread(fullfile('bst_defaults','bst_default_anatomy.json')));
@@ -175,6 +175,23 @@ if(~general_params.bst_config.after_MaQC.run)
             end
         end
     end
+    
+    if(isequal(lower(anat_params.anatomy_type.id),'template'))
+        disp("--------------------------------------------------------------------------");
+        disp('-->> Checking template configuration');
+        selected_anatomy = anat_params.anatomy_type;
+        template_name = selected_anatomy.template_name;
+        subjects = dir(selected_anatomy.base_path);
+        if(~contains(template_name, {subjects.name}))
+            fprintf(2,strcat('\nBC-V-->> Error: The selected template name in process_import_anat.json is wrong \n'));
+            disp(strcat("Name: ",template_name));
+            disp(strcat("Please check the available anatomy templates in bst_template/bst_default_anatomy.json file"));
+            status = false;
+            disp('-->> Process stopped!!!');
+            return;
+        end
+    end
+
     % Check MRI transform configuration
     mri_transform = anat_params.common_params.mri_transformation;
     if(mri_transform.use_transformation)
