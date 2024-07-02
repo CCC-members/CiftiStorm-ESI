@@ -1,1 +1,1 @@
-{    "description":"Integration process for Structural and Functional Data",    "preproc_data":{        "description":"Select the base path for the  preprocessed EEG or MEG",        "base_path":"/mnt/Data/Data_report/Test/eeglab"    }}
+{    "description":"Integration process for Structural and Functional Data",    "preproc_data":{        "description":"Select the base path for the  preprocessed EEG or MEG",        "base_path":"/mnt/Data/Talia/MIITRA/eeglab"    }}
