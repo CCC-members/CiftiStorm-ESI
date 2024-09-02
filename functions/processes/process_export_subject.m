@@ -2,7 +2,7 @@ function CiftiStorm = process_export_subject(CiftiStorm, properties, subID)
 
 errMessage      = [];
 if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
-    output_path     = CiftiStorm.Location;
+    output_path = fullfile(properties.general_params.output_path,strcat('brainstorm'));
 else
     template_name = properties.anatomy_params.anatomy_type.template_name;
     output_path = fullfile(properties.general_params.output_path,strcat('brainstorm-',template_name));
