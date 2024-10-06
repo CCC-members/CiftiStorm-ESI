@@ -23,6 +23,7 @@ CiftiStorm.Name                 = general_params.dataset.Name;
 CiftiStorm.Description          = general_params.dataset.Description;
 CiftiStorm.ProtocolName         = ProtocolName;
 CiftiStorm.Location             = fullfile(general_params.output_path,'ciftistorm');
+CiftiStorm.BSTS_path            = fullfile(general_params.output_path,'brainstorm');
 CiftiStorm.Properties           = properties;
 CiftiStorm.Participants         = [];
 
