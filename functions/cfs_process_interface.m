@@ -52,7 +52,10 @@ switch mq_control
                 disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
                 disp('-->> Process stopped!!!');
                 return;
-            end        
+            end 
+        elseif(isequal(lower(anatomy_type.id),'template'))
+            CiftiStorm.Location = fullfile(general_params.output_path,strcat('ciftistorm-',anatomy_type.template_name)); 
+            subjects.name       = anatomy_type.template_name;
         else
             base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
