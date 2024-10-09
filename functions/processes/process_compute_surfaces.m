@@ -1,6 +1,9 @@
-function [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces)
+function [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces, app)
 
 errMessage = [];
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Compute Surfaces for: ", subID));
+end
 
 %%
 %% Getting params
@@ -227,6 +230,10 @@ else
     CiftiStorm.Participants(end).Process(end+1).Name    = "Compute_surfaces";
     CiftiStorm.Participants(end).Process(end).Status    = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error     = errMessage;
+end
+
+if(getGlobalGuimode())
+    delete(uimsg);
 end
 
 end

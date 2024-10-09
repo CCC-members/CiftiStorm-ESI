@@ -1,8 +1,11 @@
-function [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces)
+function [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces, app)
 
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
 
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Generate BEM Surfaces for: ", subID));
+end
 %%
 %% Compute BEM Surfaces
 %%
@@ -82,6 +85,10 @@ else
     CiftiStorm.Participants(end).Process(end+1).Name    = "BEM_surfaces";
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;
+end
+
+if(getGlobalGuimode())
+    delete(uimsg);
 end
 
 end

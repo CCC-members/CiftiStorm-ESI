@@ -1,5 +1,8 @@
-function CiftiStorm = process_import_atlas(CiftiStorm, properties, subID, CSurfaces)
+function CiftiStorm = process_import_atlas(CiftiStorm, properties, subID, CSurfaces, app)
 
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Import Atlas for: ", subID));
+end
 %%
 %% Getting report path and params
 %%
@@ -92,5 +95,10 @@ else
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
 end
+
+if(getGlobalGuimode())
+    delete(uimsg);
+end
+
 end
 

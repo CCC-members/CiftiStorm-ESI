@@ -1,10 +1,13 @@
-function [CiftiStorm, CSurfaces, properties] = process_import_anat(CiftiStorm, properties, subID)
+function [CiftiStorm, CSurfaces, properties] = process_import_anat(CiftiStorm, properties, subID, app)
 % === ANATOMY ===
 errMessage = [];
 
 %%
 %% Getting params
 %%
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Import Anatomy for: ", subID));
+end
 anatomy_type    = properties.anatomy_params.anatomy_type;
 type            = anatomy_type.id;
 mq_control      = properties.general_params.bst_config.after_MaQC.run;
@@ -200,6 +203,10 @@ else
     CiftiStorm.Participants(end).Process(end+1).Name    = "Import_anat";
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
+end
+
+if(getGlobalGuimode())
+    delete(uimsg);
 end
 
 end
