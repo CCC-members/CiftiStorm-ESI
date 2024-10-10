@@ -24,7 +24,7 @@ switch contextName
             output1 = [];
         end
     case 'datasets_file'
-        output1 = fullfile(cfs_get( 'cfs_dir' ),'Datasets.json');
+        output1 = fullfile(cfs_get( 'cfs_dir' ),'Datasets','Datasets.json');
     case 'bst_default_eeg'
         output1 = 'https://github.com/brainstorm-tools/brainstorm3/raw/master/defaults/eeg';
     case 'openmeeg'
