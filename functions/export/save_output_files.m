@@ -29,7 +29,7 @@ subject_info.channel_dir                = replace(fullfile('channel','channel.ma
 subject_info.headmodel_dir.scalp        = replace(fullfile('headmodel','scalp.mat'),'\','/');
 subject_info.headmodel_dir.innerskull   = replace(fullfile('headmodel','innerskull.mat'),'\','/');
 subject_info.headmodel_dir.outerskull   = replace(fullfile('headmodel','outerskull.mat'),'\','/');
-subject_info.headmodel_dir.brainstorm   = replace(fullfile('brainstorm',strcat(subID,'.zip')),'\','/');
+subject_info.brainstorm                 = replace(fullfile('brainstorm',strcat(subID,'.zip')),'\','/');
 subject_info.completed                  = true;
 
 % Saving subject files
@@ -44,6 +44,7 @@ end
 %%
 %% Export subject from protocol
 %%
+disp ("-->> Saving Brainstorm subject file");
 process_export_subject(output_subject_dir, subID, MEEGs(1));
 disp ("-->> Saving channel file");
 save(fullfile(output_subject_dir,subject_info.channel_dir),'-struct','Cdata');
