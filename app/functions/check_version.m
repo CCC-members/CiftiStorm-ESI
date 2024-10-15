@@ -12,7 +12,7 @@ result = '';
 try
     if(isnetav())
         % loading local data
-        local = jsondecode(fileread(strcat('app_properties.json')));
+        local = jsondecode(fileread(strcat('app/properties.json')));
         % finding online data
         url = local.generals.url_check;
         matlab.net.http.HTTPOptions.VerifyServerName = false;
@@ -20,14 +20,13 @@ try
         online = webread(url,options);
         disp('-->> Comparing local and master version');
         if(local.generals.version_number < online.generals.version_number)
-            answer = questdlg({'There a new version available of BrainStorm Protocol pipeline.',' Do you want to update the laster version?'}, ...
-                'Update', ...
+            answer = questdlg({'There a new version available of CiftiStorm pipeline.',' Do you want to update the latest version?'}, ...
+                'Update CiftiStorm', ...
                 'Yes','No','Close');
             % Handle response
             switch answer
                 case 'Yes'
-                    f = dialog('Position',[300 300 250 80]);
-                    
+                    f = dialog('Position',[300 300 250 80]);                    
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
                     iconsSizeEnums = javaMethod('values',iconsClassName);
                     SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
@@ -40,10 +39,10 @@ try
                     pause(1);
                     
                     
-                    %% Download lasted version
-                    filename = strcat('BST_P_lasted_version.zip');
+                    %% Download latest version
+                    filename = strcat('CiftiStorm_latest.zip');
                     disp(strcat("-->> Downloading laster version......."));
-                    jObj.setBusyText(strcat("Downloading laster version "));
+                    jObj.setBusyText(strcat("Downloading latest version "));
                     
                     url = local.generals.base_url;
                     matlab.net.http.HTTPOptions.VerifyServerName = false;
@@ -59,8 +58,8 @@ try
                     pause(1);
                     delete(filename);
                     
-                    movefile( strcat('BrainStorm_Protocol-master',filesep,'*'), pwd);
-                    rmdir BrainStorm_Protocol-master ;
+                    movefile( strcat('CiftiStorm-ESI-master',filesep,'*'), pwd, 'f');
+                    rmdir CiftiStorm-ESI-master ;
                     
                     jObj.stop;
                     jObj.setBusyText('All done!');
