@@ -1,4 +1,8 @@
-function [CiftiStorm, OPTIONS] = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces)
+function [CiftiStorm, OPTIONS] = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces, app)
+
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Compute Headmodel for: ", subID));
+end
 
 %%
 %% Getting Headmodel options
@@ -150,4 +154,9 @@ else
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;
 end
+
+if(getGlobalGuimode())
+    delete(uimsg);
+end
+
 end

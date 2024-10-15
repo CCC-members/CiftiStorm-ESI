@@ -1,4 +1,4 @@
-function datasetFile = cfs_process_interface(properties, reject_subjects)
+function datasetFile = cfs_process_interface(properties, reject_subjects, app)
 % HeadModel Process Interface
 %   
 %
@@ -51,7 +51,10 @@ switch mq_control
                 disp(strcat("Please check the aviable anatomy templates in bst_template/bst_default_anatomy.json file"));
                 disp('-->> Process stopped!!!');
                 return;
-            end        
+            end 
+        elseif(isequal(lower(anatomy_type.id),'template'))
+            CiftiStorm.Location = fullfile(general_params.output_path,strcat('ciftistorm-',anatomy_type.template_name)); 
+            subjects.name       = anatomy_type.template_name;
         else
             base_path           = anatomy_type.base_path;
             subjects            = dir(base_path);
@@ -79,7 +82,7 @@ for sub=1:length(subjects)
     %%
     %%  Process: Create BST Protocol and add subject
     %%
-    CiftiStorm          = process_create_subject(CiftiStorm, properties, subID);
+    CiftiStorm          = process_create_subject(CiftiStorm, properties, subID, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
@@ -94,7 +97,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Import Anatomy");
     disp("--------------------------------------------------------------------------");
-    [CiftiStorm, CSurfaces] = process_import_anat(CiftiStorm, properties,subID);
+    [CiftiStorm, CSurfaces] = process_import_anat(CiftiStorm, properties,subID, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
        
     %%
@@ -103,7 +106,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Generate BEM surfaces");
     disp("--------------------------------------------------------------------------");    
-    [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces);   
+    [CiftiStorm, CSurfaces] = process_gen_bem_surfaces(CiftiStorm, properties, subID, CSurfaces, app);   
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
@@ -112,7 +115,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Transform surfaces");
     disp("--------------------------------------------------------------------------");    
-    [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces);
+    [CiftiStorm, CSurfaces, sub_to_FSAve] = process_compute_surfaces(CiftiStorm, properties, subID, CSurfaces, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
 
     %%
@@ -121,7 +124,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Import Atlas");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm     = process_import_atlas(CiftiStorm, properties, subID, CSurfaces);
+    CiftiStorm     = process_import_atlas(CiftiStorm, properties, subID, CSurfaces, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
 
     %%
@@ -130,7 +133,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Generate SPM canonical surfaces");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_canonical_surfaces(CiftiStorm, properties, subID);
+    CiftiStorm      = process_canonical_surfaces(CiftiStorm, properties, subID, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
     
     %%
@@ -139,7 +142,7 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Import Channel");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm   = process_import_chann(CiftiStorm, properties, subID, CSurfaces);
+    CiftiStorm   = process_import_chann(CiftiStorm, properties, subID, CSurfaces, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
         
     %%
@@ -148,25 +151,16 @@ for sub=1:length(subjects)
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Compute HeadModel");
     disp("--------------------------------------------------------------------------");
-    [CiftiStorm, OPTIONS]     = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces);
+    [CiftiStorm, OPTIONS]     = process_comp_headmodel(CiftiStorm, properties, subID, CSurfaces, app);
     if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end    
     
-    %%
-    %% Process: Export subject
-    %%
-    disp("--------------------------------------------------------------------------");
-    disp("CFS -->> Process Export subject");
-    disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_export_subject(CiftiStorm, properties, subID);
-    if(isequal(CiftiStorm.Participants(end).Status,'Rejected'));continue;end
-
     %%
     %% Process: Functional integration
     %%
     disp("--------------------------------------------------------------------------");
     disp("CFS -->> Process Export subject");
     disp("--------------------------------------------------------------------------");
-    CiftiStorm      = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve);   
+    CiftiStorm      = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve, app);   
     
     disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    

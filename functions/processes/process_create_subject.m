@@ -1,9 +1,12 @@
-function CiftiStorm = process_create_subject(CiftiStorm, properties, subID)
+function CiftiStorm = process_create_subject(CiftiStorm, properties, subID, app)
 
 errMessage      = [];
 general_params  = properties.general_params;
 ProtocolName    = general_params.bst_config.protocol_name;
 
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Create subject for: ", subID));
+end
 %%
 %% Creating BST Protocol
 %%
@@ -61,6 +64,10 @@ else
     CiftiStorm.Participants(end).Process(1).Name    = "Create";
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;    
+end
+
+if(getGlobalGuimode())
+    delete(uimsg);
 end
 
 end

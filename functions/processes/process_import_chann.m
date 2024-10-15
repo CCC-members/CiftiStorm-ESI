@@ -1,4 +1,9 @@
-function CiftiStorm = process_import_chann(CiftiStorm, properties, subID, CSurfaces)
+function CiftiStorm = process_import_chann(CiftiStorm, properties, subID, CSurfaces, app)
+
+
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Canonical Surface for: ", subID));
+end
 
 %%
 %% Getting params
@@ -229,4 +234,9 @@ else
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
 end
+
+if(getGlobalGuimode())
+    delete(uimsg);
+end
+
 end

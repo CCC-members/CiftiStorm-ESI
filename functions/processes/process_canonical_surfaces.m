@@ -1,7 +1,11 @@
-function CiftiStorm = process_canonical_surfaces(CiftiStorm, properties,subID)
+function CiftiStorm = process_canonical_surfaces(CiftiStorm, properties,subID, app)
 
 errMessage  = [];
 mq_control  = properties.general_params.bst_config.after_MaQC.run;
+
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Canonical Surface for: ", subID));
+end
 %%
 %% Compute SPM canonical surfaces
 %%
@@ -43,4 +47,9 @@ else
     CiftiStorm.Participants(end).Process(end).Status  = "Rejected";
     CiftiStorm.Participants(end).Process(end).Error   = errMessage;     
 end
+
+if(getGlobalGuimode())
+    delete(uimsg);
+end
+
 end

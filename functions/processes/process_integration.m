@@ -1,4 +1,8 @@
-function  CiftiStorm = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve)
+function  CiftiStorm = process_integration(CiftiStorm, properties, subID, CSurfaces, sub_to_FSAve, app)
+
+if(getGlobalGuimode())
+    uimsg = uiprogressdlg(app,'Title',strcat("Process Structural and Functional Integration for: ", subID));
+end
 
 % Get subject directory
 ProtocolInfo    = bst_get('ProtocolInfo');
@@ -55,6 +59,7 @@ if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
         action = 'all';
         CiftiStorm.Participants(end).Status             = "Completed";
     end
+    
     save_output_files(base_path, modality, subID, MEEGs, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI, action);    
     CiftiStorm.Participants(end).FileInfo               = strcat(subID,".json");
     CiftiStorm.Participants(end).Process(end+1).Name    = "Integration";
@@ -97,6 +102,10 @@ else
         CiftiStorm.Participants(e)          = participant;
 
     end
+end
+
+if(getGlobalGuimode())
+    delete(uimsg);
 end
 
 end

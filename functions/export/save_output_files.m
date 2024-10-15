@@ -29,6 +29,7 @@ subject_info.channel_dir                = replace(fullfile('channel','channel.ma
 subject_info.headmodel_dir.scalp        = replace(fullfile('headmodel','scalp.mat'),'\','/');
 subject_info.headmodel_dir.innerskull   = replace(fullfile('headmodel','innerskull.mat'),'\','/');
 subject_info.headmodel_dir.outerskull   = replace(fullfile('headmodel','outerskull.mat'),'\','/');
+subject_info.brainstorm_dir             = replace(fullfile('brainstorm',strcat(subID,'.zip')),'\','/');
 subject_info.completed                  = true;
 
 % Saving subject files
@@ -39,6 +40,12 @@ if(isequal(action,'all'))
         save(fullfile(output_subject_dir,subject_info.meeg_dir{i}),'-struct','EEG');
     end
 end
+
+%%
+%% Export subject from protocol
+%%
+disp ("-->> Saving Brainstorm subject file");
+process_export_subject(output_subject_dir, subID, MEEGs(1));
 disp ("-->> Saving channel file");
 save(fullfile(output_subject_dir,subject_info.channel_dir),'-struct','Cdata');
 disp ("-->> Saving leadfield file");
@@ -54,6 +61,7 @@ save(fullfile(output_subject_dir,subject_info.headmodel_dir.innerskull),'-struct
 disp ("-->> Saving surf file");
 save(fullfile(output_subject_dir,subject_info.sourcemodel_dir),'-struct','Scortex');
 disp ("-->> Saving subject file");
+
 saveJSON(subject_info,fullfile(output_subject_dir,strcat(subID,'.json')));
 h = matlab.desktop.editor.openDocument(fullfile(output_subject_dir,strcat(subID,'.json')));
 h.smartIndentContents

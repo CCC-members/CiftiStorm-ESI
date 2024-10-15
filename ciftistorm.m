@@ -55,7 +55,7 @@ for i=1:length(varargin)
 end
 if(getGlobalGuimode())
     CiftiStorm
-else    
+else 
     %% Checking app properties
     properties  = get_properties('run');
     if(isequal(properties,'canceled'))
@@ -75,7 +75,7 @@ else
     
     %% Calling dataset function to analysis
     if(status)
-        datasetFile = cfs_process_interface(properties,reject_subjects);
+        datasetFile = cfs_process_interface(properties,reject_subjects, []);
         dataset = jsondecode(fileread(datasetFile));
         datasets  = cfs_get('datasets');
         if(isempty(datasets))            
