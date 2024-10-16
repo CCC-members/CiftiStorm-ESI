@@ -1,5 +1,5 @@
-function [updated, errors] = update_version()
-result = true;
+function [updated, errors] = update_version(app)
+updated = true;
 errors = [];
 %  App check version
 %
@@ -16,7 +16,9 @@ try
         d = uiprogressdlg(app.CiftiStormUIFigure,'Title','Downloading CiftiStorm latest version');
     end
     filename = strcat('CiftiStorm_latest.zip');
-    disp(strcat("-->> Downloading laster version......."));    
+    disp(strcat("-->> Downloading laster version......."));
+    % loading local data
+    local = jsondecode(fileread(strcat('app/properties.json')));
     url = local.generals.base_url;
     matlab.net.http.HTTPOptions.VerifyServerName = false;
     options = weboptions('Timeout',Inf,'RequestMethod','auto');
@@ -49,7 +51,7 @@ try
     disp('-->> The project is already update with the laster version.');
     disp('-->> The process was stoped to refresh all file');
     disp('-->> Please configure the app properties file, before restart the process.');
-    result = 'updated';
+    
     if(getGlobalGuimode())
         delete(d);
     end
