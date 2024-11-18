@@ -78,19 +78,27 @@ else
     action                          = 'anat';
     save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI, action);
     
-    subjects                    = dir(eeglab_path);
+    subjects                        = dir(eeglab_path);
     subjects(ismember({subjects.name},{'.','..'})) = [];
     for e=1:length(subjects)
-        subject                 = subjects(e);        
-        subID                   = subject.name;
+        subject                     = subjects(e);        
+        subID                       = subject.name;
         disp(strcat("-->> Saving subject: ",subID));
         disp("--------------------------------------------------------------------------");
-        EEG_path                = fullfile(eeglab_path,subID);
-        HeadModels              = rawHeadModels;
-        Cdata                   = rawCdata;
-        [MEEGs,HeadModels,Cdata] = StructFunct_integration(EEG_path, modality, HeadModels, Cdata);
-        AQCI                    = AutomaticQCI(HeadModels.HeadModel.Gain, Cdata, Scortex.Sc);
-        save_output_files(base_path, modality, subID, MEEGs, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI);
+        EEG_path                    = fullfile(eeglab_path,subID);
+        HeadModels                  = rawHeadModels;
+        Cdata                       = rawCdata;
+        [MEEGs,HeadModels,Cdata]    = StructFunct_integration(EEG_path, modality, HeadModels, Cdata);
+        AQCI                        = AutomaticQCI(HeadModels.HeadModel.Gain, Cdata, Scortex.Sc);
+        templateName                = CiftiStorm.Template.SubID;
+
+        %%
+        %% Dupicate subject if template or default
+        %%
+        [newTemplateName, Messages]        = process_duplicate('DuplicateSubject', templateName, '_copy');
+        db_rename_subject(newTemplateName, subID, 0);
+        action = 'all';
+        save_output_files(base_path, modality, subID, MEEGs, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI, action);    
 
         participant                         = CiftiStorm.Template;
         participant.SubID                   = subID;

@@ -36,7 +36,7 @@ subject_info.completed                  = true;
 if(isequal(action,'all'))
     disp ("-->> Saving MEEG file");
     for i=1:length(MEEGs)
-        EEG = MEEGs(i).EEG;
+        EEG = MEEGs(i);
         save(fullfile(output_subject_dir,subject_info.meeg_dir{i}),'-struct','EEG');
     end
 end
@@ -44,8 +44,10 @@ end
 %%
 %% Export subject from protocol
 %%
-disp ("-->> Saving Brainstorm subject file");
-process_export_subject(output_subject_dir, subID, MEEGs(1));
+if(isequal(action,'all'))
+    disp ("-->> Saving Brainstorm subject file");
+    process_export_subject(output_subject_dir, subID, MEEGs(1));
+end
 disp ("-->> Saving channel file");
 save(fullfile(output_subject_dir,subject_info.channel_dir),'-struct','Cdata');
 disp ("-->> Saving leadfield file");
