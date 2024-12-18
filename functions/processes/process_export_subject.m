@@ -1,5 +1,8 @@
-function process_export_subject(output_subject_dir, subID, EEG)
+function process_export_subject(output_subject_dir, subID, EEG, varargin)
 
+for i=1:length(varargin)
+    eval([inputname(i+4) '= varargin{i};']);
+end
 
 %%
 %% Update subject protocol with preprocessed data
@@ -20,7 +23,7 @@ if(isempty(sSubject) || isempty(sSubject.iAnatomy) || isempty(sSubject.iCortex) 
 end
 HeadModel = load(fullfile(ProtocolInfo.STUDIES, sStudies.HeadModel.FileName));
 Cdata     = load(fullfile(ProtocolInfo.STUDIES, sStudies.Channel.FileName));
-[Cdata_r, Gain] = remove_channels_by_preproc_data({EEG.EEG.chanlocs.labels}, Cdata, HeadModel.Gain);
+[Cdata_r, Gain] = remove_channels_by_preproc_data({EEG.chanlocs.labels}, Cdata, HeadModel.Gain);
 
 HeadModel.Gain = Gain;
 save(fullfile(ProtocolInfo.STUDIES, sStudies.HeadModel.FileName),'-struct','HeadModel');
@@ -39,6 +42,8 @@ iProtocol       = bst_get('iProtocol');
 [~, iSubject]   = bst_get('Subject', subID);
 subject_file    = fullfile(output_subject_dir,'brainstorm',strcat(subID,'.zip'));
 export_protocol(iProtocol, iSubject, subject_file);
+
+
 
 %%
 %% Save and display report

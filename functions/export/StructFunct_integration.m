@@ -1,6 +1,6 @@
 function [MEEGs, HeadModels, Cdata] = StructFunct_integration(EEG_path, modality, HeadModels, Cdata)
 
-MEEGs = struct;
+
 EEG_file                = dir(EEG_path);
 EEG_file([EEG_file.isdir]==1) = [];
 if(~isempty(EEG_file))
@@ -8,18 +8,18 @@ if(~isempty(EEG_file))
     for i=1:length(EEG_file)
         [~,filename,ext]      = fileparts(EEG_file(i).name);
         if(isequal(ext,'.set'))
-            MEEGs(count).EEG        = load(fullfile(EEG_file(i).folder,EEG_file(i).name),'-mat');
-            while(isfield( MEEGs(count).EEG,'EEG'))
-                 MEEGs(count).EEG = MEEGs(count).EEG.EEG;
+            MEEGs(count)      = load(fullfile(EEG_file(i).folder,EEG_file(i).name),'-mat');
+            while(isfield( MEEGs(count),'EEG'))
+                 MEEGs(count) = MEEGs(count).EEG;
             end
-            if(ischar(MEEGs(count).EEG.data))
+            if(ischar(MEEGs(count).data))
                 fid = fopen(fullfile(EEG_file(i).folder,strrep(EEG_file(i).name,'set','fdt')), 'r', 'ieee-le');
-                for trialIdx = 1:MEEGs(count).EEG.trials % In case the saved data are epoched, loop the process for each epoch. Thanks Ramesh Srinivasan!
-                    currentTrialData = fread(fid, [MEEGs(count).EEG.nbchan MEEGs(count).EEG.pnts], 'float32');
+                for trialIdx = 1:MEEGs(count).trials % In case the saved data are epoched, loop the process for each epoch. Thanks Ramesh Srinivasan!
+                    currentTrialData = fread(fid, [MEEGs(count).nbchan MEEGs(count).pnts], 'float32');
                     data{trialIdx} = currentTrialData; % Data dimentions are: electrodes, time points, and trials (the last one is for epoched data)
                 end
                 fclose(fid);
-                MEEGs(count).EEG.data = data;
+                MEEGs(count).data = data;
             end
             if(~contains(filename,'task'))
                 filename_parts = split(filename,'_');
@@ -32,13 +32,13 @@ if(~isempty(EEG_file))
             count = count + 1;
         end
     end
-    MEEG                    = MEEGs(1).EEG;
+    MEEG                    = MEEGs(1);
 
     %%
     %% Filter Channels and LeadField by Preprocessed MEEG
     %%
     if(isequal(modality,'EEG'))
-        labels              = {MEEGs(1).EEG.chanlocs(:).labels};
+        labels              = {MEEGs(1).chanlocs(:).labels};
     elseif(isequal(modality,'MEG'))
         labels              = MEEG.labels;
     else

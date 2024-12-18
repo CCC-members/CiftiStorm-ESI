@@ -165,6 +165,18 @@ for sub=1:length(subjects)
     disp(strcat('CFS -->> Subject:' , subID, '. Processing finished.'));
     disp('==========================================================================');    
 end
+%%
+%% Getting participants metadata
+%%
+eeglab_path             = fullfile(properties.integration_params.preproc_data.base_path);
+participants_file = fullfile(eeglab_path,'Participants.json');
+if(isfile(participants_file))
+    copyfile(participants_file,fullfile(CiftiStorm.Location,'Participants.json'))
+end
+
+%%
+%% Saving dataset information
+%%
 disp(strcat('CFS -->> Saving Dataset.'));
 disp('==============================================================================');
 datasetFile = fullfile(CiftiStorm.Location,'CiftiStorm.json');
