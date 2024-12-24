@@ -25,6 +25,7 @@ CiftiStorm.ProtocolName         = ProtocolName;
 CiftiStorm.Location             = fullfile(general_params.output_path,'ciftistorm');
 CiftiStorm.Properties           = properties;
 CiftiStorm.Participants         = [];
+CiftiStorm.Template             = [];
 
 switch mq_control
     case true
