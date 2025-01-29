@@ -19,7 +19,11 @@ if(~isempty(EEG_file))
                     data{trialIdx} = currentTrialData; % Data dimentions are: electrodes, time points, and trials (the last one is for epoched data)
                 end
                 fclose(fid);
-                MEEGs(count).data = data;
+                if(isequal(MEEGs(count).trials,1))
+                    MEEGs(count).data = data{:};
+                else
+                    MEEGs(count).data = data;
+                end
             end
             if(~contains(filename,'task'))
                 filename_parts = split(filename,'_');

@@ -79,7 +79,8 @@ else
     save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI, action);
     
     subjects                        = dir(eeglab_path);
-    subjects(ismember({subjects.name},{'.','..','Participants.json'})) = [];
+    subjects(ismember({subjects.name},{'.','..','Participants.json','derivatives'})) = [];
+    subjects(subjects.isdir==0) = [];
     for e=1:length(subjects)
         subject                     = subjects(e);        
         subID                       = subject.name;
