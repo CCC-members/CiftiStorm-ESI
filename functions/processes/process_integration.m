@@ -80,7 +80,7 @@ else
     
     subjects                        = dir(eeglab_path);
     subjects(ismember({subjects.name},{'.','..','Participants.json','derivatives'})) = [];
-    subjects(subjects.isdir==0) = [];
+    subjects([subjects.isdir]==0) = [];
     for e=1:length(subjects)
         subject                     = subjects(e);        
         subID                       = subject.name;
