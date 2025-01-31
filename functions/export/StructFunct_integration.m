@@ -57,6 +57,10 @@ if(~isempty(EEG_file))
         HeadModels.HeadModel(h).Gain = Gain; 
     end
     Cdata = Cdata_s;
+else
+    MEEGs = [];
 end
+
+
 end
 
