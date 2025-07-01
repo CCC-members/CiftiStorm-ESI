@@ -52,7 +52,7 @@ if(isequal(properties.anatomy_params.anatomy_type.id,'individual'))
     EEG_path                    = fullfile(eeglab_path,subID);
     [MEEGs, HeadModels, Cdata]  = StructFunct_integration(EEG_path, modality, HeadModels, Cdata);
     AQCI                        = AutomaticQCI(HeadModels.HeadModel.Gain, Cdata, Scortex.Sc);
-    if(isempty(fields(MEEGs)))
+    if(isempty(MEEGs))
         action = 'anat';  
         CiftiStorm.Participants(end).Status             = "Structural";
     else
@@ -79,7 +79,8 @@ else
     save_output_files(base_path, modality, subID, HeadModels, Cdata, Shead, Sout, Sinn, Scortex, AQCI, action);
     
     subjects                        = dir(eeglab_path);
-    subjects(ismember({subjects.name},{'.','..','Participants.json'})) = [];
+    subjects(ismember({subjects.name},{'.','..','Participants.json','derivatives'})) = [];
+    subjects([subjects.isdir]==0) = [];
     for e=1:length(subjects)
         subject                     = subjects(e);        
         subID                       = subject.name;
